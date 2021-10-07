@@ -1,21 +1,21 @@
-import React from 'react';
-import { Container, Grid, makeStyles, IconButton, Typography } from '@material-ui/core';
+import { Container, Grid, IconButton, Typography } from '@material-ui/core';
 import Sidebar from '../components/Sidebar';
 import Header from '../components/Header';
 import PageTitleBar from '../components/PageTitleBar';
 import { DataGrid, GridColDef, GridPageChangeParams, GridValueFormatterParams } from '@material-ui/data-grid';
-import { Teacher } from '../common/interfaces';
-import { TeachersService } from '../common/api';
+import { Teacher } from '../interfaces';
+import { TeachersService } from '../api';
 import { useFetch, usePagingInfo } from '../hooks';
 import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@material-ui/icons/Edit';
 import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
-import { formatDate } from '../common/utils/TimeHelper';
+import { formatDate } from '../utils/TimeHelper';
 import { useSelectedItems } from '../hooks';
 import ActionModal from '../components/Modal';
 import CreateOrUpdateTeacherRequest from '../components/Modal/CreateOrUpdateTeacherRequest';
-import { comparers } from '../common/appConsts';
+import { comparers } from '../appConsts';
 import { toast } from 'react-toastify';
+import useStyles from '../assets/jss/views/TeachersPage';
 
 
 const cols: GridColDef[] =  [
@@ -47,25 +47,7 @@ const cols: GridColDef[] =  [
   }
 ];
 
-const useStyles = makeStyles(theme => ({
-  root: {
-    height: '100%', 
-    width: '100%',
-    '& .MuiDataGrid-iconSeparator': {
-      color: theme.palette.divider,
-      
-      '&:hover': {
-        color: theme.palette.common.black
-      }
-    },
-    '& .MuiDataGrid-colCell': {
-      // borderRight: '1px solid #303030',
-    },
-    '& .MuiDataGrid-colCellTitle': {
-      fontWeight: 700,
-    }
-  }
-}));
+
 
 const TeachersPage = () => {
 

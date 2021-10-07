@@ -1,19 +1,19 @@
-import React from 'react';
+import { useState, useEffect } from 'react';
 import { Box, Container, TextField } from '@material-ui/core';
-import { Grade } from '../../common/interfaces';
+import { Grade } from '../../interfaces';
 import { useDataValidator } from '../../hooks';
-import { GradesService } from '../../common/api';
+import { GradesService } from '../../api';
 import ActionModal from '.';
 
 const CreateOrUpdateGradeRequest = ({id}: {id?: string}) => {
 
-  const [data, setData] = React.useState<Grade.CreateUpdateGradeDto>({
+  const [data, setData] = useState<Grade.CreateUpdateGradeDto>({
     displayName: '',
     description: ''
   });
   const {errors, validate, getError} = useDataValidator();
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (id) {
       GradesService.getGradeById(id).then(res => setData({
         displayName: res.displayName || '',
@@ -22,7 +22,7 @@ const CreateOrUpdateGradeRequest = ({id}: {id?: string}) => {
     }
   }, []);
 
-  React.useEffect(() => {
+  useEffect(() => {
     ActionModal.setData({
       data,
       error: errors.length > 0 ? {

@@ -1,24 +1,24 @@
-import React from 'react';
+import { useState, useEffect } from 'react';
 import { Box, Container, TextField, Select, InputLabel, FormControl, MenuItem } from '@material-ui/core';
-import { Class, Course, Grade, Teacher } from '../../common/interfaces';
+import { Class, Course, Grade, Teacher } from '../../interfaces';
 import { useDataValidator } from '../../hooks';
-import { ClassesService, CoursesService, GradesService, TeachersService } from '../../common/api';
+import { ClassesService, CoursesService, GradesService, TeachersService } from '../../api';
 import ActionModal from '.';
 
 const CreateOrUpdateClassRequest = ({id}: {id?: string}) => {
 
-  const [data, setData] = React.useState<Class.CreateUpdateClassDto>({
+  const [data, setData] = useState<Class.CreateUpdateClassDto>({
     name: '',
     courseId: '',
     gradeId: '',
     formTeacherId: '',
   });
-  const [courses, setCourses] = React.useState<Course.CourseDto[]>([]);
-  const [grades, setGrades] = React.useState<Grade.GradeDto[]>([]);
-  const [teachers, setTeachers] = React.useState<Teacher.TeacherForSimpleListDto[]>([]);
+  const [courses, setCourses] = useState<Course.CourseDto[]>([]);
+  const [grades, setGrades] = useState<Grade.GradeDto[]>([]);
+  const [teachers, setTeachers] = useState<Teacher.TeacherForSimpleListDto[]>([]);
   const {errors, validate, getError} = useDataValidator();
 
-  React.useEffect(() => {
+  useEffect(() => {
 
     const initData = async () => {
       const coursesRes = await CoursesService.getAllCourses({});
@@ -42,11 +42,11 @@ const CreateOrUpdateClassRequest = ({id}: {id?: string}) => {
     initData();
   }, [id]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     console.log({courses})
   }, [courses]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     ActionModal.setData({
       data,
       error: errors.length > 0 ? {
@@ -68,7 +68,7 @@ const CreateOrUpdateClassRequest = ({id}: {id?: string}) => {
             autoComplete='off'
             style={{width: '40ch'}}
             value={data.name}
-            onChange={e => setData(prev => ({...prev, name: e.target.value}))}
+            onChange={e => setData((prev) => ({...prev, name: e.target.value}))}
 
           />
         </Box>
@@ -78,7 +78,7 @@ const CreateOrUpdateClassRequest = ({id}: {id?: string}) => {
             <Select
               // native
               value={data.courseId}
-              onChange={e => setData(prev => ({...prev, courseId: (e.target.value as string)}))}
+              onChange={e => setData((prev) => ({...prev, courseId: (e.target.value as string)}))}
               inputProps={{
                 name: 'class-course',
                 id: 'create-class-course',
@@ -114,7 +114,7 @@ const CreateOrUpdateClassRequest = ({id}: {id?: string}) => {
             <Select
               // native
               value={data.formTeacherId}
-              onChange={e => setData(prev => ({...prev, formTeacherId: (e.target.value as string)}))}
+              onChange={e => setData((prev) => ({...prev, formTeacherId: (e.target.value as string)}))}
               inputProps={{
                 name: 'class-teacher',
                 id: 'create-class-teacher',

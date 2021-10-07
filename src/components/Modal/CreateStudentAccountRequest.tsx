@@ -1,14 +1,13 @@
-import React from 'react';
-import { Box, Container, TextField, MenuItem } from '@material-ui/core';
-import { Identity } from '../../common/interfaces';
+import { useState, useEffect } from 'react';
+import { Box, Container, TextField } from '@material-ui/core';
+import { Identity } from '../../interfaces';
 import ActionModal from '.';
 import { useDataValidator } from '../../hooks';
-import { IdentityService, StudentsService } from '../../common/api';
-import { Autocomplete, AutocompleteChangeReason } from '@material-ui/lab';
+import { StudentsService } from '../../api';
 
 const CreateStudentAccountRequest = ({id}: {id?: string}) => {
 
-  const [data, setData] = React.useState<Identity.CreateUpdateUserDto>({
+  const [data, setData] = useState<Identity.CreateUpdateUserDto>({
     userName: '',
     name: '',
     email: '',
@@ -17,11 +16,11 @@ const CreateStudentAccountRequest = ({id}: {id?: string}) => {
     password: '',
     extraProperties: {}
   });
-  const [selectedRoles, setSelectedRoles] = React.useState<Identity.UserRoleDto[]>([]);
-  const [roles, setRoles] = React.useState<Identity.UserRoleDto[]>([]);
+  const [selectedRoles, setSelectedRoles] = useState<Identity.UserRoleDto[]>([]);
+  const [roles, setRoles] = useState<Identity.UserRoleDto[]>([]);
   const {errors, validate, getError} = useDataValidator();
 
-  React.useEffect(() => {
+  useEffect(() => {
 
     const initData = async () => {
 
@@ -45,7 +44,7 @@ const CreateStudentAccountRequest = ({id}: {id?: string}) => {
     initData();
   }, [id]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     const dto = {...data};
     dto.roleNames = selectedRoles.map(x => x.name);
     console.log({dto});

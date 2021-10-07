@@ -17,7 +17,7 @@ import DCPReportHistoryPage from '../views/DCPReportHistoryPage';
 import DCPRankingPage from '../views/DCPRankingPage';
 import DCPStatisticsPage from '../views/DCPStatisticsPage';
 import ErrorPage from '../views/ErrorPage';
-import { policies } from '../common/appConsts';
+import { policies } from '../appConsts';
 import DCPReportUpdatePage from '../views/DCPReportUpdatePage';
 import DCPReportSchedule from '../views/DCPReportSchedule';
 import DCPReportScheduleAssignment from '../views/DCPReportScheduleAssignment';

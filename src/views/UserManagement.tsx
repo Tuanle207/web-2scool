@@ -1,5 +1,4 @@
-import React from 'react';
-import { Container, Grid, makeStyles, IconButton, Typography } from '@material-ui/core';
+import { Container, Grid, IconButton, Typography } from '@material-ui/core';
 import { DataGrid, GridColDef, GridPageChangeParams, GridValueFormatterParams } from '@material-ui/data-grid';
 import { toast } from 'react-toastify';
 import DeleteIcon from '@material-ui/icons/Delete';
@@ -7,15 +6,15 @@ import EditIcon from '@material-ui/icons/Edit';
 import Sidebar from '../components/Sidebar';
 import Header from '../components/Header';
 import PageTitleBar from '../components/PageTitleBar';
-import { Course, Identity } from '../common/interfaces';
-import { IdentityService } from '../common/api';
+import { Identity } from '../interfaces';
+import { IdentityService } from '../api';
 import { useFetch, usePagingInfo } from '../hooks';
 import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
-import { formatDate } from '../common/utils/TimeHelper';
 import { useSelectedItems } from '../hooks';
 import CreateOrUpdateUserRequest from '../components/Modal/CreateOrUpdateUserRequest';
 import ActionModal from '../components/Modal';
-import { comparers } from '../common/appConsts';
+import { comparers } from '../appConsts';
+import useStyles from '../assets/jss/views/UserManagement';
 
 
 const cols: GridColDef[] =  [
@@ -58,26 +57,6 @@ const cols: GridColDef[] =  [
     width: 150,
   }
 ];
-
-const useStyles = makeStyles(theme => ({
-  root: {
-    height: '100%',
-    width: '100%',
-    '& .MuiDataGrid-iconSeparator': {
-      color: theme.palette.divider,
-      
-      '&:hover': {
-        color: theme.palette.common.black
-      }
-    },
-    '& .MuiDataGrid-colCell': {
-      // borderRight: '1px solid #303030',
-    },
-    '& .MuiDataGrid-colCellTitle': {
-      fontWeight: 700,
-    }
-  }
-}));
 
 const UserManagement = () => {
 

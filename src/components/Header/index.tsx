@@ -1,10 +1,8 @@
-import React from 'react';
-import { AppBar, IconButton, Badge, Toolbar, InputBase, Menu, MenuItem, ListItemIcon, ListItemText } from '@material-ui/core';
+import { FC, memo, useState } from 'react';
+import { AppBar, IconButton, Badge, Toolbar,
+  InputBase, Menu, MenuItem, ListItemIcon, ListItemText } from '@material-ui/core';
 import useHeaderStyles from '../../assets/jss/components/Header/headerStyles';
-import { withRedux } from '../../common/utils/ReduxConnect';
-import { AuthActions } from '../../common/store/actions';
 import { StyledMenu, StyledMenuItem } from './HeaderMenu';
-
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import AccountCircle from '@material-ui/icons/AccountCircle';
 import SettingsIcon from '@material-ui/icons/Settings';
@@ -12,6 +10,8 @@ import SearchIcon from '@material-ui/icons/Search';
 import NotificationsIcon from '@material-ui/icons/Notifications';
 import MoreIcon from '@material-ui/icons/MoreVert';
 import { useHistory } from 'react-router';
+import { withRedux } from '../../utils/ReduxConnect';
+import { AuthActions } from '../../store/actions';
 
 interface Props {
   hiddenSearchBar?: boolean;
@@ -20,13 +20,13 @@ interface Props {
   
 }
 
-const Header: React.FC<Props> = ({ postlogoutAsync, onTextChange, hiddenSearchBar = false }) => {
+const Header: FC<Props> = ({ postlogoutAsync, onTextChange, hiddenSearchBar = false }) => {
 
   const classes = useHeaderStyles();
   const history = useHistory();
 
-  const [anchorEl, setAnchorEl] = React.useState(null);
-  const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = useState(null);
 
   const isMenuOpen = Boolean(anchorEl);
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
@@ -181,7 +181,7 @@ const Header: React.FC<Props> = ({ postlogoutAsync, onTextChange, hiddenSearchBa
 };
 
 export default withRedux<Props>({
-  component: React.memo(Header),
+  component: memo(Header),
   dispatchProps: ({
     postlogoutAsync: AuthActions.postLogoutAsync
   })

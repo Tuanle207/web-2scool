@@ -1,20 +1,18 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Container, Grid, Button, makeStyles, List, ListItem, Typography, IconButton, Menu, MenuItem, Tooltip } from '@material-ui/core';
+import { Container, Grid, Button, makeStyles, Typography } from '@material-ui/core';
 import React from 'react';
 import { useHistory } from 'react-router-dom';
 import Header from '../components/Header';
 import Sidebar from '../components/Sidebar';
-import { Class, TaskAssignment, Util } from '../common/interfaces';
+import { Class, TaskAssignment, Util } from '../interfaces';
 import { DataGrid, GridColDef, GridValueFormatterParams } from '@material-ui/data-grid';
-import { TaskAssignmentService } from '../common/api';
-import { getDayOfWeek, formatTime, formatDate } from '../common/utils/TimeHelper';
-import { taskType } from '../common/appConsts';
-import { FindInPage } from '@material-ui/icons';
+import { TaskAssignmentService } from '../api';
+import { getDayOfWeek, formatTime, formatDate } from '../utils/TimeHelper';
+import { taskType } from '../appConsts';
 import AlarmIcon from '@material-ui/icons/Alarm';
 import PermContactCalendarIcon from '@material-ui/icons/PermContactCalendar';
 
-import StudentList from '../components/Modal/StudentList';
-import { sleep } from '../common/utils/SetTimeOut';
+import { sleep } from '../utils/SetTimeOut';
 
 
 const useStyles = makeStyles(theme => ({
@@ -158,7 +156,7 @@ const DCPReportSchedule = () => {
           setCreatorInfo(firstItem.creator);
         }
       }
-    } catch (error) {
+    } catch (error: any) {
       if (error?.message) {
         setError(error.message);
       }

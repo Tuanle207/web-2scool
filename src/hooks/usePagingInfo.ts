@@ -1,5 +1,5 @@
-import { Util } from '../common/interfaces';
 import React from 'react';
+import { Util } from '../interfaces';
 
 interface ReturnType {
   pagingInfo: Util.PagingInfo;
@@ -12,7 +12,7 @@ interface Props {
   filter: Util.PagingFilter[]
 }
 
-export default function usePagingInfo(props?: Props): ReturnType {
+export function usePagingInfo(props?: Props): ReturnType {
   
   const [pagingInfo, setPagingInfo] = React.useState<Util.PagingInfo>({ 
     pageIndex: 0, 

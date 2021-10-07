@@ -1,15 +1,15 @@
+import { useEffect, useMemo } from 'react';
 import { StylesProvider, CssBaseline, ThemeProvider } from '@material-ui/core'
 import DashboardRouter from '../../routers/DashboardRouter';
 import AuthRouter from '../../routers/AuthRouter';
 import { theme, jss } from '../../assets/themes/theme';
-import { withRedux } from '../../common/utils/ReduxConnect';
-import { AppConfigActions } from '../../common/store/actions';
-import React from 'react';
-import { AuthSelector, LoadingSelector } from '../../common/store/selectors';
-import { isTokenValid } from '../../common/@helper/network/util';
 import ActionModal from '../Modal';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { withRedux } from '../../utils/ReduxConnect';
+import { AuthSelector, LoadingSelector } from '../../store/selectors';
+import { AppConfigsActions } from '../../store/actions';
+import { isTokenValid } from '../../config/axios/util';
 
 interface Props {
   token: string;
@@ -19,9 +19,9 @@ interface Props {
 
 const AppContainer: React.FC<Props> = ({ token, getAppConfig, fetchingAppConfig }) => {
 
-  const isValid = React.useMemo(() => isTokenValid(token), [token]);
+  const isValid = useMemo(() => isTokenValid(token), [token]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (isTokenValid(token))
     {
       getAppConfig();
@@ -57,6 +57,6 @@ export default withRedux({
     fetchingAppConfig: LoadingSelector.createFetchingAppConfigSelector()(state)
   }),
   dispatchProps: {
-    getAppConfig: AppConfigActions.getAppConfigAsync
+    getAppConfig: AppConfigsActions.getAppConfigAsync
   }
 });

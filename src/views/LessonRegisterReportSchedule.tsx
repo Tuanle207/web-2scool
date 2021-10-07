@@ -1,75 +1,19 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Container, Grid, Button, makeStyles, List, ListItem, Typography, IconButton, Menu, MenuItem, Tooltip, TextField } from '@material-ui/core';
+import { Container, Grid, Button, makeStyles, List, ListItem, Typography, TextField } from '@material-ui/core';
 import React from 'react';
-import { useHistory } from 'react-router-dom';
 import Header from '../components/Header';
 import Sidebar from '../components/Sidebar';
-import { Class, Identity, Student, TaskAssignment, Util } from '../common/interfaces';
-import { DataGrid, GridColDef, GridValueFormatterParams } from '@material-ui/data-grid';
-import { ClassesService, IdentityService, TaskAssignmentService } from '../common/api';
-import { getDayOfWeek, formatTime, formatDate } from '../common/utils/TimeHelper';
-import { taskType } from '../common/appConsts';
-import { FindInPage } from '@material-ui/icons';
+import { Class, Identity, TaskAssignment, Util } from '../interfaces';
+import { ClassesService, IdentityService, TaskAssignmentService } from '../api';
+import { getDayOfWeek, formatTime } from '../utils/TimeHelper';
+import { taskType } from '../appConsts';
 import AlarmIcon from '@material-ui/icons/Alarm';
 import PermContactCalendarIcon from '@material-ui/icons/PermContactCalendar';
 import CheckIcon from '@material-ui/icons/Check';
-import { sleep } from '../common/utils/SetTimeOut';
 import { Autocomplete } from '@material-ui/lab';
 import { toast } from 'react-toastify';
 import ActionModal from '../components/Modal';
-
-
-const useStyles = makeStyles(theme => ({
-  container: {
-    height: '100%',
-
-    '& .MuiGrid-container': {
-      flexWrap: 'nowrap'
-    }
-  },
-  actionGroup: {
-    padding: theme.spacing(1, 4),
-    borderBottom: `1px solid ${theme.palette.divider}`
-  },
-  list: {
-    // overflowY: 'scroll'
-    // padding: '20px 100px' 
-  },
-  datagridContainer: {
-    // height: '100%', 
-    width: '100%',
-    '& .MuiDataGrid-columnSeparator': {
-      display: 'none'
-    },
-    '& .MuiDataGrid-colCellTitle': {
-      fontWeight: 700,
-    },
-    '& .MuiDataGrid-root': {
-      border: 'none',
-      '& .MuiDataGrid-withBorder': {
-        borderRight: 'none',
-      }
-    },
-    '& .MuiDataGrid-root.MuiDataGrid-colCellMoving': {
-      backgroundColor: 'inherit'
-    }
-  },
-
-  dateCardContainer: {
-    padding: theme.spacing(1, 2), 
-    border: '1px solid #000',
-    boxShadow: '2px 2px 6px #000',
-    cursor: 'pointer',
-    '&:hover': {
-      backgroundColor: theme.palette.primary.light,
-      color: theme.palette.common.white
-    }
-  },
-  dateCardContainerActive: {
-    backgroundColor: theme.palette.primary.main,
-    color: theme.palette.common.white
-  },
-}));
+import useStyles from '../assets/jss/views/LessonRegisterReportSchedule';
 
 
 interface IAssignClass {
@@ -178,7 +122,7 @@ const LessonRegisterReportSchedule = () => {
     const assigns: IAssignClass[] = [];
 
     classRes.items.forEach(el => {
-      const status = taskAssignRes.items.find(x => x.classAssigned.id === el.id);
+      const status = taskAssignRes.items.find((x) => x.classAssigned.id === el.id);
       assigns.push({
         classId: el.id,
         assigned: status ? true : false,

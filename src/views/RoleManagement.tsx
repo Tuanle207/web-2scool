@@ -1,5 +1,4 @@
-import React from 'react';
-import { Container, Grid, makeStyles, IconButton, Typography } from '@material-ui/core';
+import { Container, Grid, IconButton, Typography } from '@material-ui/core';
 import { DataGrid, GridColDef, GridPageChangeParams } from '@material-ui/data-grid';
 import { toast } from 'react-toastify';
 import DeleteIcon from '@material-ui/icons/Delete';
@@ -7,15 +6,16 @@ import EditIcon from '@material-ui/icons/Edit';
 import Sidebar from '../components/Sidebar';
 import Header from '../components/Header';
 import PageTitleBar from '../components/PageTitleBar';
-import { Identity } from '../common/interfaces';
-import { IdentityService } from '../common/api';
+import { Identity } from '../interfaces';
+import { IdentityService } from '../api';
 import { useFetch, usePagingInfo } from '../hooks';
 import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
 import { useSelectedItems } from '../hooks';
 import CreateOrUpdateRoleRequest from '../components/Modal/CreateOrUpdateRoleRequest';
 import UpdateRolePermissionsRequest from '../components/Modal/UpdateRolePermissionsRequest';
 import ActionModal from '../components/Modal';
-import { comparers } from '../common/appConsts';
+import { comparers } from '../appConsts';
+import useStyles from '../assets/jss/views/RoleManagement';
 
 
 const cols: GridColDef[] =  [
@@ -31,26 +31,6 @@ const cols: GridColDef[] =  [
   },
 ];
 
-const useStyles = makeStyles(theme => ({
-  root: {
-    height: '100%',
-    width: '100%',
-    '& .MuiDataGrid-iconSeparator': {
-      color: theme.palette.divider,
-      
-      '&:hover': {
-        color: theme.palette.common.black
-      }
-    },
-    '& .MuiDataGrid-colCell': {
-      // borderRight: '1px solid #303030',
-    },
-    '& .MuiDataGrid-colCellTitle': {
-      fontWeight: 700,
-    }
-  }
-}));
-
 const RoleManagement = () => {
 
   const classes = useStyles();
@@ -60,7 +40,7 @@ const RoleManagement = () => {
     IdentityService.getAllRoles,
     { ...pagingInfo, pageIndex: pagingInfo.pageIndex! + 1 } // DataGrid's start page count from 0, but API count from 1.
   );
-  const {selectedItems, reset, changeSelection} = useSelectedItems<Identity.RoleDto>();
+  const {selectedItems, changeSelection} = useSelectedItems<Identity.RoleDto>();
   
   const onPageChange = (param: GridPageChangeParams) => {
     setPageIndex(param.page);

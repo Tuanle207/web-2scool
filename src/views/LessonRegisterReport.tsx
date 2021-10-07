@@ -1,16 +1,13 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Container, Grid, Box, Button, makeStyles, List, ListItem, Chip, Typography, Tooltip, IconButton } from '@material-ui/core';
-import { MuiPickersUtilsProvider, KeyboardDatePicker } from '@material-ui/pickers';
-import DateFnsUtils from '@date-io/date-fns';
+import { Grid, Button, List, ListItem, Typography, Tooltip, IconButton } from '@material-ui/core';
 import React from 'react';
 import Header from '../components/Header';
 import Sidebar from '../components/Sidebar';
-import { DcpReportsService, LrReportsService } from '../common/api';
+import { LrReportsService } from '../api';
 import { useFetch, usePagingInfo } from '../hooks';
-import { Class, DcpReport } from '../common/interfaces';
+import { Class, DcpReport } from '../interfaces';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import { addDays, formatDate, formatTime, getDayOfWeek } from '../common/utils/TimeHelper';
-import { comparers, dcpReportStatus } from '../common/appConsts';
+import { formatTime, getDayOfWeek } from '../utils/TimeHelper';
 import { Alarm as AlarmIcon  } from '@material-ui/icons';
 import BxBxsBookReaderIcon from '@material-ui/icons/LocalLibrary';
 import PhotoIcon from '@material-ui/icons/Photo';
@@ -18,52 +15,7 @@ import ControlPointIcon from '@material-ui/icons/ControlPoint';
 import RemoveCircleOutlineIcon from '@material-ui/icons/RemoveCircleOutline';
 import SettingsIcon from '@material-ui/icons/Settings';
 import { useHistory } from 'react-router';
-
-const useStyles = makeStyles(theme => ({
-  actionGroup: {
-    padding: theme.spacing(1, 4),
-    borderBottom: `1px solid ${theme.palette.divider}`
-  },
-  list: {
-    // overflowY: 'scroll'
-    padding: '20px 100px' 
-  },
-  emptyText: {
-    color: theme.palette.grey[500],
-    textAlign: 'center'
-  },
-  cardContainer: {
-    flex: 1,
-    border: `1px solid ${theme.palette.grey.A700}`,
-    padding: theme.spacing(2, 4),
-    position: 'relative'
-  },
-  imgContainer: {
-    margin: theme.spacing(2, 0),
-    width: 'auto', 
-    position: 'relative',
-    '& > img': {
-      height: 300,
-      width: 400,
-      cursor: 'pointer',
-      '&:hover': {
-        animation: 'all 10s',
-        transform: 'scale(1.1, 1.05)'
-      }
-    }
-  },
-  imgIcon: {
-    position: 'absolute', 
-    top: 10, 
-    left: 10,
-    zIndex: 1
-  },
-  settingBtn: {
-    position: 'absolute',
-    top: 0,
-    right: 0
-  }
-}));
+import useStyles from '../assets/jss/views/LessonRegisterReport';
 
 const LRCard = ({
   index,

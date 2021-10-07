@@ -1,28 +1,28 @@
-import React from 'react';
+import { FC, ReactNode, useEffect, useState } from 'react';
 import { TextField, Button, Container, FormControlLabel, Checkbox } from '@material-ui/core';
 import useLoginFormStyles from '../../assets/jss/components/Form/useLoginFormStyles';
-import { withRedux } from '../../common/utils/ReduxConnect';
-import { AuthActions } from '../../common/store/actions';
-import { User } from '../../common/interfaces';
+import { User } from '../../interfaces';
+import { withRedux } from '../../utils/ReduxConnect';
+import { AuthActions } from '../../store/actions';
 // import { AuthService } from '../../common/api/AuthService';
 // import { IdentityService } from '../../common/api';
 
 interface Props {
-  children?: React.ReactNode;
+  children?: ReactNode;
   history: any;
   auth: any;
   postLogin: (params: User.LoginReqBody) => void;
 }
 
-const LoginForm: React.FC<Props> = ({ history, auth, postLogin }) => {
+const LoginForm: FC<Props> = ({ history, auth, postLogin }) => {
 
   const styles = useLoginFormStyles();
   
-  const [ email, setEmail ] = React.useState<string>('');
-  const [ password, setPassword ] = React.useState<string>('');
+  const [ email, setEmail ] = useState<string>('');
+  const [ password, setPassword ] = useState<string>('');
   // const [ authService, setAuthService ] = React.useState<AuthService>(new AuthService());
 
-  React.useEffect(() => {
+  useEffect(() => {
     // authService.getUser().then(user => console.log({user}));
     // authService.userManager.signinCallback().then(user => console.log({user}));
     // IdentityService.createRole({name: 'test'});

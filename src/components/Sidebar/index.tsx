@@ -1,12 +1,12 @@
-import React from 'react';
-import { Box, Collapse, Container, List, ListItem, ListItemIcon, ListItemText, SvgIconTypeMap, Typography } from '@material-ui/core';
+import { FC, useState, useEffect } from 'react';
+import { Box, Collapse, Container, List, ListItem, ListItemText } from '@material-ui/core';
 import { Dashboard } from '@material-ui/icons';
 import { Link, useHistory, useLocation } from 'react-router-dom';
-import useSidebarStyles from '../../assets/jss/components/Sidebar/sidebarStyles';
-import { withRedux } from '../../common/utils/ReduxConnect';
-import { Util } from '../../common/interfaces';
-import { policies } from '../../common/appConsts';
 import HistoryIcon from '@material-ui/icons/History';
+import useSidebarStyles from '../../assets/jss/components/Sidebar/sidebarStyles';
+import { withRedux } from '../../utils/ReduxConnect';
+import { Util } from '../../interfaces';
+import { policies } from '../../appConsts';
 import CheckCircleIcon from '@material-ui/icons/CheckCircle';
 import AssignmentIcon from '@material-ui/icons/Assignment';
 import CreateIcon from '@material-ui/icons/Create';
@@ -19,12 +19,11 @@ import AssignmentTurnedInIcon from '@material-ui/icons/AssignmentTurnedIn';
 import FlagIcon from '@material-ui/icons/Flag';
 import LocalLibraryIcon from '@material-ui/icons/LocalLibrary';
 import BookIcon from '@material-ui/icons/Book';
-import { ReactComponent as TeacherIcon } from '../../assets/img/teacher.svg';
-import { ReactComponent as StudentIcon } from '../../assets/img/student.svg';
-import { ReactComponent as RoleIcon } from '../../assets/img/permission.svg';
-import { ReactComponent as UserIcon } from '../../assets/img/user.svg';
-
-// import { OverridableComponent } from '@material-ui/core/OverridableComponent';
+import TeacherIcon from '../../assets/img/teacher.svg';
+import StudentIcon from '../../assets/img/student.svg';
+import RoleIcon from '../../assets/img/permission.svg';
+import UserIcon from '../../assets/img/user.svg';
+// import { ReactComponent as UserIcon } from '../../assets/img/user.svg';
 
 interface ISidebarInfo {
   key: string;
@@ -194,23 +193,23 @@ type Props = OwnProps & {
   grantedPolicies: Util.IObject<boolean>
 }
 
-const Sidebar: React.FC<Props> = ({ activeKey, grantedPolicies }) => {
+const Sidebar: FC<Props> = ({ activeKey, grantedPolicies }) => {
 
   const styles = useSidebarStyles();
   const history = useHistory();
   const location = useLocation();
 
-  const [expandTaskAssignment, setExpandTaskAssignment] = React.useState(
+  const [expandTaskAssignment, setExpandTaskAssignment] = useState(
     location.pathname.includes('/dcp-report-schedules') ||
     location.pathname.includes('/lesson-register-report-schedules')
   );
 
-  const [expandCreateReport, setExpandCreateReport] = React.useState(
+  const [expandCreateReport, setExpandCreateReport] = useState(
     location.pathname.includes('/my-dcp-report') ||
     location.pathname.includes('/my-lr-report')
   );
   
-  React.useEffect(() => {
+  useEffect(() => {
     if (activeKey && [
       'report-schedule-assignment', 
       'lessons-register-report-schedule-assignment'

@@ -1,7 +1,7 @@
-import React from 'react';
+import { FC } from 'react';
 import { Route, Redirect, RouteComponentProps, useHistory } from 'react-router-dom';
-import { Util } from '../../common/interfaces';
-import { withRedux } from '../../common/utils/ReduxConnect';
+import { Util } from '../../interfaces';
+import { withRedux } from '../../utils/ReduxConnect';
 
 interface OwnProps {
   component: React.FC<RouteComponentProps>;
@@ -14,7 +14,7 @@ type Props = OwnProps & {
   policies: Util.IObject<boolean>
 };
 
-const ProtectedRoute: React.FC<Props> = ({
+const ProtectedRoute: FC<Props> = ({
   component: Component,
   policyName = '',
   path,

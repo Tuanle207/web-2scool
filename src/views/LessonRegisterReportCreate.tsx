@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Grid, Button, makeStyles, Typography, Tooltip, TextField, Paper } from '@material-ui/core';
+import { Grid, Button, Typography, Tooltip, TextField, Paper } from '@material-ui/core';
 import React from 'react';
 import Header from '../components/Header';
 import Sidebar from '../components/Sidebar';
@@ -12,40 +12,13 @@ import AddAPhotoIcon from '@material-ui/icons/AddAPhoto';
 import SendIcon from '@material-ui/icons/Send';
 import PlaceholderImage from '../assets/img/placeholder-img.png';
 import { useHistory } from 'react-router';
-import { formatTime, getDayOfWeek } from '../common/utils/TimeHelper';
+import { formatTime, getDayOfWeek } from '../utils/TimeHelper';
 import { toast } from 'react-toastify';
-import { LrReportsService, TaskAssignmentService } from '../common/api';
+import { LrReportsService, TaskAssignmentService } from '../api';
 import ActionModal from '../components/Modal';
-import { taskType } from '../common/appConsts';
-import { Class } from '../common/interfaces';
-
-const useStyles = makeStyles(theme => ({
-  actionGroup: {
-    padding: theme.spacing(1, 4),
-    borderBottom: `1px solid ${theme.palette.divider}`
-  },
-  imgContainer: {
-    margin: theme.spacing(0, 8),
-    marginTop: theme.spacing(1),
-    width: 'auto', 
-    position: 'relative',
-    '& > img': {
-      height: 300,
-      width: 400,
-      objectFit: 'cover'
-    }
-  },
-  imgIcon: {
-    position: 'absolute', 
-    top: 10, 
-    left: 10,
-    zIndex: 1
-  },
-  formContainer: {
-    display: 'flex',
-    padding: theme.spacing(6, 8)
-  }
-}));
+import { taskType } from '../appConsts';
+import { Class } from '../interfaces';
+import useStyles from '../assets/jss/views/LessonRegisterReportCreate';
 
 
 const LessonRegisterReportCreate = () => {

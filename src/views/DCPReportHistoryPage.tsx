@@ -1,32 +1,18 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Container, Grid, Box, Button, makeStyles, List, ListItem, Chip } from '@material-ui/core';
+import { Grid, Box, Button, List, ListItem, Chip } from '@material-ui/core';
 import { MuiPickersUtilsProvider, KeyboardDatePicker } from '@material-ui/pickers';
 import DateFnsUtils from '@date-io/date-fns';
 import React from 'react';
 import Header from '../components/Header';
 import Sidebar from '../components/Sidebar';
 import DisciplineApprovalCard from '../components/DCPReport/DisciplineApprovalCard';
-import { DcpReportsService } from '../common/api';
+import { DcpReportsService } from '../api';
 import { useFetch, usePagingInfo } from '../hooks';
-import { DcpReport } from '../common/interfaces';
+import { DcpReport } from '../interfaces';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import { formatDate } from '../common/utils/TimeHelper';
-import { comparers, dcpReportStatus } from '../common/appConsts';
-
-const useStyles = makeStyles(theme => ({
-  actionGroup: {
-    padding: theme.spacing(1, 4),
-    borderBottom: `1px solid ${theme.palette.divider}`
-  },
-  list: {
-    // overflowY: 'scroll'
-    padding: '20px 100px' 
-  },
-  emptyText: {
-    color: theme.palette.grey[500],
-    textAlign: 'center'
-  }
-}));
+import { formatDate } from '../utils/TimeHelper';
+import { comparers, dcpReportStatus } from '../appConsts';
+import useStyles from '../assets/jss/views/DCPReportHistoryPage';
 
 
 const DCPReportsApprovalPage = () => {
@@ -61,7 +47,7 @@ const DCPReportsApprovalPage = () => {
       }
     ]
   });
-  const {loading, data, error, resetCache} = useFetch<DcpReport.DcpReportDto>(
+  const {loading, data, resetCache} = useFetch<DcpReport.DcpReportDto>(
     DcpReportsService.getDcpReportsForApproval, 
     { ...pagingInfo, pageIndex: pagingInfo.pageIndex! + 1 }
   );

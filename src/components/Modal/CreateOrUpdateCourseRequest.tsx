@@ -1,16 +1,16 @@
-import React from 'react';
+import { useEffect, useState } from 'react';
 import { Box, Container, TextField } from '@material-ui/core';
 import DateFnsUtils from '@date-io/date-fns';
 import { MuiPickersUtilsProvider, KeyboardDatePicker } from '@material-ui/pickers';
-import { Course } from '../../common/interfaces';
+import { Course } from '../../interfaces';
 import ActionModal from '.';
-import { Validator } from '../../common/utils/DataValidation';
+import { Validator } from '../../utils/DataValidation';
 import { useDataValidator } from '../../hooks';
-import { CoursesService } from '../../common/api';
+import { CoursesService } from '../../api';
 
 const CreateOrUpdateCourseRequest = ({id}: {id?: string}) => {
 
-  const [data, setData] = React.useState<Course.CreateUpdateCourseDto>({
+  const [data, setData] = useState<Course.CreateUpdateCourseDto>({
     name: '',
     description: '',
     startTime: new Date(),
@@ -18,7 +18,7 @@ const CreateOrUpdateCourseRequest = ({id}: {id?: string}) => {
   });
   const {errors, validate, getError} = useDataValidator();
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (id) {
       CoursesService.getCourseById(id).then(res => setData({
         name: res.name || '',
@@ -29,7 +29,7 @@ const CreateOrUpdateCourseRequest = ({id}: {id?: string}) => {
     }
   }, [id]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     ActionModal.setData({
       data,
       error: errors.length > 0 ? {
@@ -91,7 +91,7 @@ const CreateOrUpdateCourseRequest = ({id}: {id?: string}) => {
                 id="create-course-start-date"
                 label="Ngày bắt đầu"
                 value={data.startTime}
-                onChange={date => setData(prev => ({...prev, startTime: date || prev.startTime}))}
+                onChange={date => setData((prev) => ({...prev, startTime: date || prev.startTime}))}
                 KeyboardButtonProps={{
                   'aria-label': 'change date',
                 }}
@@ -107,7 +107,7 @@ const CreateOrUpdateCourseRequest = ({id}: {id?: string}) => {
               id="create-course-end-date"
               label="Ngày kết thúc"
               value={data.finishTime}
-              onChange={date => setData(prev => ({...prev, finishTime: date || prev.startTime}))}
+              onChange={date => setData((prev) => ({...prev, finishTime: date || prev.startTime}))}
               KeyboardButtonProps={{
                 'aria-label': 'change date',
               }}

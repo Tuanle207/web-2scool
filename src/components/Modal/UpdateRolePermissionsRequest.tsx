@@ -1,4 +1,4 @@
-import React from 'react';
+import { useState, useEffect, ReactNode, ChangeEvent } from 'react';
 import { 
   Container, 
   Tabs, 
@@ -8,8 +8,8 @@ import {
   Checkbox,
 
  } from '@material-ui/core';
-import { Identity } from '../../common/interfaces';
-import { IdentityService } from '../../common/api';
+import { Identity } from '../../interfaces';
+import { IdentityService } from '../../api';
 import ActionModal from '.';
 
 const useStyles = makeStyles(theme => ({
@@ -55,7 +55,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 interface TabPanelProps {
-  children?: React.ReactNode;
+  children?: ReactNode;
   index: any;
   value: any;
 }
@@ -85,21 +85,21 @@ const UpdateRolePermissionsRequest = ({provider}: {provider: Identity.Permission
 
   const classes = useStyles();
 
-  const [tabIndex, setTabIndex] = React.useState(0);
+  const [tabIndex, setTabIndex] =useState(0);
 
-  const [data, setData] = React.useState<Identity.CreateUpdateRoleDto>({
+  const [data, setData] =useState<Identity.CreateUpdateRoleDto>({
     name: ''
   });
-  const [ grantedPermissions, setGrantedPermissions ] = React.useState<string[]>([]);
-  const [ permissionGroups, setPermissionGroups ] = React.useState<Identity.PermissionGroup[]>([]);
-  const [ parentsPermissions, setParentsPermissions ] = React.useState<string[]>([]);
+  const [ grantedPermissions, setGrantedPermissions ] =useState<string[]>([]);
+  const [ permissionGroups, setPermissionGroups ] =useState<Identity.PermissionGroup[]>([]);
+  const [ parentsPermissions, setParentsPermissions ] =useState<string[]>([]);
 
 
-  React.useEffect(() => {
+ useEffect(() => {
     const dto: Identity.UpdateRolePermissionDto = {permissions: []};
 
-    permissionGroups.forEach(group => {
-      group.permissions.forEach(permission => {
+    permissionGroups.forEach((group) => {
+      group.permissions.forEach((permission) => {
         dto.permissions.push({
           name: permission.name,
           isGranted: grantedPermissions.includes(permission.name)
@@ -113,7 +113,7 @@ const UpdateRolePermissionsRequest = ({provider}: {provider: Identity.Permission
   }, [grantedPermissions]);
 
 
-  React.useEffect(() => {
+ useEffect(() => {
     if (provider) {
       IdentityService.getPermissions(provider).then(res => {
         const permissionGroups = res.groups;
@@ -121,11 +121,11 @@ const UpdateRolePermissionsRequest = ({provider}: {provider: Identity.Permission
 
         const granted: string[] = [];
         const parents: string[] = [];
-        permissionGroups.forEach(group => {
+        permissionGroups.forEach((group) => {
           if (group.permissions.length === 1 && !parentsPermissions.includes(group.permissions[0].name)) {
             parents.push(group.permissions[0].name);
           }
-          group.permissions.forEach(permission => {
+          group.permissions.forEach((permission) => {
 
             if (permission.isGranted) {
               granted.push(permission.name);
@@ -143,7 +143,7 @@ const UpdateRolePermissionsRequest = ({provider}: {provider: Identity.Permission
     }
   }, [provider]);
 
-  const handleTabChange = (event: React.ChangeEvent<{}>, newValue: number) => {
+  const handleTabChange = (event: ChangeEvent<{}>, newValue: number) => {
     setTabIndex(newValue);
   };
 
@@ -230,7 +230,7 @@ const UpdateRolePermissionsRequest = ({provider}: {provider: Identity.Permission
                 <p>{group.displayName}</p>
                 <div className={classes.miniGroup}>
                   {
-                    group.permissions.map(permission => (
+                    group.permissions.map((permission) => (
                       parentsPermissions.includes(permission.name) ?
                       (
                         <FormControlLabel

@@ -1,21 +1,20 @@
-import React from 'react';
-import { Container, Grid, makeStyles, IconButton, Typography } from '@material-ui/core';
+import { Container, Grid, IconButton, Typography } from '@material-ui/core';
 import Sidebar from '../components/Sidebar';
 import Header from '../components/Header';
 import PageTitleBar from '../components/PageTitleBar';
 import { DataGrid, GridColDef, GridPageChangeParams, GridValueFormatterParams } from '@material-ui/data-grid';
-import { Class, Grade, Teacher } from '../common/interfaces';
-import { ClassesService } from '../common/api';
+import { Class, Grade, Teacher } from '../interfaces';
+import { ClassesService } from '../api';
 import { useFetch, usePagingInfo } from '../hooks';
 import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@material-ui/icons/Edit';
 import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
-import { formatDate } from '../common/utils/TimeHelper';
 import { useSelectedItems } from '../hooks';
 import ActionModal from '../components/Modal';
 import CreateOrUpdateClassRequest from '../components/Modal/CreateOrUpdateClassRequest';
-import { comparers } from '../common/appConsts';
+import { comparers } from '../appConsts';
 import { toast } from 'react-toastify';
+import useStyles from '../assets/jss/views/ClassesPage';
 
 
 const cols: GridColDef[] =  [
@@ -48,25 +47,6 @@ const cols: GridColDef[] =  [
   },
 ];
 
-const useStyles = makeStyles(theme => ({
-  root: {
-    height: '100%', 
-    width: '100%',
-    '& .MuiDataGrid-iconSeparator': {
-      color: theme.palette.divider,
-      
-      '&:hover': {
-        color: theme.palette.common.black
-      }
-    },
-    '& .MuiDataGrid-colCell': {
-      // borderRight: '1px solid #303030',
-    },
-    '& .MuiDataGrid-colCellTitle': {
-      fontWeight: 700,
-    }
-  }
-}));
 
 const ClassesPage = () => {
 
@@ -188,7 +168,7 @@ const ClassesPage = () => {
                   checkboxSelection
                   paginationMode='server'
                   onRowSelected={changeSelection}
-                  selectionModel={selectedItems.map(el => el.id)}
+                  selectionModel={selectedItems.map((el) => el.id)}
                 />
               </Container>
             </Grid>

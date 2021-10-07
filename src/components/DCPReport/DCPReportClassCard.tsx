@@ -1,8 +1,6 @@
 import { Grid, makeStyles, Typography } from '@material-ui/core';
 import BxBxsBookReaderIcon from '@material-ui/icons/LocalLibrary';
 
-import React from 'react';
-
 const useStyles = makeStyles(theme => ({
   container: {
     padding: theme.spacing(2, 4),

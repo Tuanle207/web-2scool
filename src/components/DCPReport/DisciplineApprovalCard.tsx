@@ -1,15 +1,14 @@
-import React from 'react';
 import { Button, Grid, IconButton, makeStyles, Tooltip, Typography } from '@material-ui/core';
 import { Alarm as AlarmIcon, CheckSharp, Clear, PermContactCalendar as PermContactCalendarIcon,  } from '@material-ui/icons';
 import { useHistory } from 'react-router-dom';
 import BxBxsBookReaderIcon from '@material-ui/icons/LocalLibrary';
 import RestoreIcon from '@material-ui/icons/Restore';
-import { DcpReport } from '../../common/interfaces';
-import { formatTime, getDayOfWeek } from '../../common/utils/TimeHelper';
 import ActionModal from '../Modal';
-import { DcpReportsService } from '../../common/api';
 import { toast } from 'react-toastify';
-import { dcpReportStatus } from '../../common/appConsts';
+import { formatTime, getDayOfWeek } from '../../utils/TimeHelper';
+import { DcpReportsService } from '../../api';
+import { DcpReport } from '../../interfaces';
+import { dcpReportStatus } from '../../appConsts';
 
 const useStyles = makeStyles(theme => ({
   container: {
@@ -86,7 +85,7 @@ const DisciplineApprovalCard = ({data}: {data: DcpReport.DcpReportDto}) => {
             <BxBxsBookReaderIcon />
           </Grid>
           <Grid item style={{marginLeft: 8}}>
-            <Typography variant={'body1'} > {data.dcpClassReports.map(el => el.class.name).join(', ')} </Typography>
+            <Typography variant={'body1'} > {data.dcpClassReports.map((el) => el.class.name).join(', ')} </Typography>
           </Grid>
         </Grid>
       </Grid>

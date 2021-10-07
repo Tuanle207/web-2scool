@@ -1,12 +1,4 @@
-import usePagingInfo from './usePagingInfo';
-import useSelectedItems from './useSelectedItems';
-import useFetch from './useFetch';
-import useDataValidator from './useDataValidator';
-
-export {
-  usePagingInfo,
-  useSelectedItems,
-  useFetch,
-  useDataValidator
-
-}
+export * from './usePagingInfo';
+export * from './useSelectedItems';
+export * from './useFetch';
+export * from './useDataValidator';

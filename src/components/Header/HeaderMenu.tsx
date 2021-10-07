@@ -1,4 +1,3 @@
-import React from 'react';
 import { Menu, MenuItem, withStyles, MenuProps } from '@material-ui/core';
 
 const StyledMenu = withStyles((theme) => ({

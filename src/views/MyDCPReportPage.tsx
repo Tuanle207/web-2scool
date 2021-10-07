@@ -1,99 +1,24 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Container, Grid, Box, Button, makeStyles, List, ListItem, Typography, Tabs, Tab, IconButton, Menu, MenuItem, Chip, Tooltip } from '@material-ui/core';
+import { Container, Grid, Box, Button, List, ListItem,
+  Typography, Tabs, Tab, IconButton, Menu, MenuItem, Chip, Tooltip } from '@material-ui/core';
 import { MuiPickersUtilsProvider, KeyboardDatePicker } from '@material-ui/pickers';
 import DateFnsUtils from '@date-io/date-fns';
 import React from 'react';
 import { useHistory } from 'react-router-dom';
 import Header from '../components/Header';
 import Sidebar from '../components/Sidebar';
-import { DcpReport, Regulation } from '../common/interfaces';
+import { DcpReport, Regulation } from '../interfaces';
 import { DataGrid, GridColDef, GridValueFormatterParams } from '@material-ui/data-grid';
-import { DcpReportsService } from '../common/api';
+import { DcpReportsService } from '../api';
 import { usePagingInfo, useFetch } from '../hooks';
-import { formatDate, getDayOfWeek, formatTime } from '../common/utils/TimeHelper';
+import { formatDate, getDayOfWeek, formatTime } from '../utils/TimeHelper';
 import SettingsIcon from '@material-ui/icons/Settings';
 import ActionModal from '../components/Modal';
 import { toast } from 'react-toastify';
-import { comparers } from '../common/appConsts';
+import { comparers } from '../appConsts';
 import { FindInPage } from '@material-ui/icons';
 import StudentList from '../components/Modal/StudentList';
-
-
-const useStyles = makeStyles(theme => ({
-  container: {
-    height: '100%',
-
-    '& .MuiGrid-container': {
-      flexWrap: 'nowrap'
-    }
-  },
-  actionGroup: {
-    padding: theme.spacing(1, 4),
-    borderBottom: `1px solid ${theme.palette.divider}`
-  },
-  list: {
-    // overflowY: 'scroll'
-    // padding: '20px 100px' 
-  },
-  datagridContainer: {
-    // height: '100%', 
-    width: '100%',
-    '& .MuiDataGrid-columnSeparator': {
-      display: 'none'
-    },
-    '& .MuiDataGrid-colCellTitle': {
-      fontWeight: 700,
-    },
-    '& .MuiDataGrid-root': {
-      border: 'none',
-      '& .MuiDataGrid-withBorder': {
-        borderRight: 'none',
-      }
-    },
-  },
-  dcpReportClassFilter: {
-    minHeight: 0,
-    // padding: theme.spacing(2), 
-    borderTop: `1px solid ${theme.palette.divider}`,
-    borderBottom: `1px solid ${theme.palette.divider}`,
-    overflowX: 'auto',
-    scrollbarWidth: 'none',
-    minWidth: 0,
-    overflow: 'hidden',
-    '&::-webkit-scrollbar': {
-      display: 'none',
-    }
-  },
-  classFilter: {
-    margin: theme.spacing(1, 1, 1, 0),
-  },
-
-  dateCardContainer: {
-    padding: theme.spacing(1, 2), 
-    border: '1px solid #000',
-    boxShadow: '2px 2px 6px #000',
-    cursor: 'pointer',
-    '&:hover': {
-      backgroundColor: theme.palette.primary.light,
-      color: theme.palette.common.white
-    }
-  },
-  dateCardContainerActive: {
-    backgroundColor: theme.palette.primary.main,
-    color: theme.palette.common.white
-  },
-  classTabContainer: {
-
-    '& .MuiTabs-scroller.MuiTabs-scrollable': {
-      maxWidth: 750
-    }
-  },
-  emptyText: {
-    color: theme.palette.grey[500],
-    textAlign: 'center'
-  }
-}));
-
+import useStyles from '../assets/jss/views/MyDCPReportPage';
 
 const cols: GridColDef[] = [
   {
@@ -281,8 +206,8 @@ const MyDCPReportPage = () => {
   const classes = useStyles();
   const history = useHistory();
 
-  const {pagingInfo, setPageIndex, setFilter} = usePagingInfo();
-  const {loading, data, error, resetCache} = useFetch<DcpReport.DcpReportDto>(
+  const {pagingInfo, setFilter} = usePagingInfo();
+  const {loading, data, resetCache} = useFetch<DcpReport.DcpReportDto>(
     DcpReportsService.getMyDcpReports, 
     { ...pagingInfo, pageIndex: pagingInfo.pageIndex! + 1 }
   );

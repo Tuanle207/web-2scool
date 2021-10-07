@@ -1,7 +1,7 @@
 import { GridRowSelectedParams } from '@material-ui/data-grid';
 import { useState } from 'react';
 
-export default function useSelectedItems<T extends { id: string }>(predicate: (model: T) => any = (model => model.id)) 
+export function useSelectedItems<T extends { id: string }>(predicate: (model: T) => any = (model => model.id)) 
   : {
     selectedItems: Array<T>;
     reset: () => void;

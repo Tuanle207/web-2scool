@@ -1,6 +1,5 @@
-import React from 'react';
 import { Container, Grid } from '@material-ui/core';
-import { DcpReport } from '../../common/interfaces';
+import { DcpReport } from '../../interfaces';
 import FaceIcon from '@material-ui/icons/Face';
 
 const StudentList = ({students}: {students: DcpReport.DcpStudentReportDto[]}) => {

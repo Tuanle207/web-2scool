@@ -1,82 +1,21 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Container, Grid, Box, Button, makeStyles, InputLabel, Select, Typography, Tabs, Tab, IconButton, Chip, Tooltip, FormControl, MenuItem } from '@material-ui/core';
+import { Container, Grid, Box, InputLabel, Select,
+  IconButton, Chip, Tooltip, FormControl, MenuItem } from '@material-ui/core';
 import { MuiPickersUtilsProvider, KeyboardDatePicker } from '@material-ui/pickers';
 import DateFnsUtils from '@date-io/date-fns';
 import React, { ChangeEvent } from 'react';
 import { useHistory } from 'react-router-dom';
 import Header from '../components/Header';
 import Sidebar from '../components/Sidebar';
-import { DcpReport, Regulation, Stats } from '../common/interfaces';
-import { DataGrid, GridColDef, GridRowData, GridValueFormatterParams } from '@material-ui/data-grid';
-import { DcpReportsService, StatisticsService } from '../common/api';
-import { usePagingInfo, useFetch } from '../hooks';
-import { formatDate, getDayOfWeek, addDays, getPreviousMonday } from '../common/utils/TimeHelper';
-import SettingsIcon from '@material-ui/icons/Settings';
-import ActionModal from '../components/Modal';
-import { toast } from 'react-toastify';
-import { comparers } from '../common/appConsts';
+import { DataGrid, GridColDef, GridRowData } from '@material-ui/data-grid';
+import { StatisticsService } from '../api';
+import { getPreviousMonday } from '../utils/TimeHelper';
 import { FindInPage } from '@material-ui/icons';
 import GetAppIcon from '@material-ui/icons/GetApp';
-import { sleep } from '../common/utils/SetTimeOut';
+import { sleep } from '../utils/SetTimeOut';
+import { Stats } from '../interfaces';
+import useStyles from '../assets/jss/views/DCPStatisticsPage';
 
-
-const useStyles = makeStyles(theme => ({
-  container: {
-    height: '100%',
-
-    '& .MuiGrid-container': {
-      flexWrap: 'nowrap'
-    }
-  },
-  actionGroup: {
-    padding: theme.spacing(1, 4),
-    borderBottom: `1px solid ${theme.palette.divider}`
-  },
-  list: {
-    // overflowY: 'scroll'
-    // padding: '20px 100px' 
-  },
-  datagridContainer: {
-    // height: '100%', 
-    width: '100%',
-    '& .MuiDataGrid-columnSeparator': {
-      display: 'none'
-    },
-    '& .MuiDataGrid-colCellTitle': {
-      fontWeight: 700,
-    },
-    '& .MuiDataGrid-root': {
-      border: 'none',
-      '& .MuiDataGrid-withBorder': {
-        borderRight: 'none',
-      }
-    },
-    '& .MuiDataGrid-root.MuiDataGrid-colCellMoving': {
-      backgroundColor: 'inherit'
-    }
-  },
-
-  dateCardContainer: {
-    padding: theme.spacing(1, 2), 
-    border: '1px solid #000',
-    boxShadow: '2px 2px 6px #000',
-    cursor: 'pointer',
-    '&:hover': {
-      backgroundColor: theme.palette.primary.light,
-      color: theme.palette.common.white
-    }
-  },
-  dateCardContainerActive: {
-    backgroundColor: theme.palette.primary.main,
-    color: theme.palette.common.white
-  },
-  statisticsTypeSelector: {
-    width: 150,
-    '& .MuiSelect-select:focus': {
-      backgroundColor: 'unset'
-    }
-  }
-}));
 
 const classFaultsStatsCols: GridColDef[] = [
   {

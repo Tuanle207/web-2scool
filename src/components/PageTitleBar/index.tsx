@@ -1,7 +1,7 @@
-import React from 'react';
-import usePageTitleBarStyles from '../../assets/jss/components/PageTitleBar/usePageTitleBarStyles';
+import { FC } from 'react';
 import { Box, Button, Grid, Typography } from '@material-ui/core';
 import MoreHorizIcon from '@material-ui/icons/MoreHoriz';
+import usePageTitleBarStyles from '../../assets/jss/components/PageTitleBar/usePageTitleBarStyles';
 
 interface Props {
   title: string,
@@ -9,7 +9,7 @@ interface Props {
   onOptionsButtonClick?: Function;
 }
 
-const PageTitleBar: React.FC<Props> = ({ title, onMainButtonClick, onOptionsButtonClick }) => {
+const PageTitleBar: FC<Props> = ({ title, onMainButtonClick, onOptionsButtonClick }) => {
 
   const classes = usePageTitleBarStyles();
 
