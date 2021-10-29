@@ -1,10 +1,18 @@
 import { combineReducers } from 'redux';
 import AppConfigReducer from './AppConfigReducer';
-import AuthReducer from './AuthReducer';
+import AuthReducer, { IAuthState } from './AuthReducer';
 import DcpReportReducer from './DcpReportReducer';
 import LoadingReducer from './LoadingReducer';
+import { Util, DcpReport } from '../../interfaces';
 
-const reducers = combineReducers({
+export interface IState {
+  appConfig: Util.AppConfig;
+  auth: IAuthState;
+  loading: Util.IObject<boolean>,
+  dcpReport: DcpReport.CreateUpdateDcpReportDto
+} 
+
+const reducers = combineReducers<IState>({
   appConfig: AppConfigReducer,
   auth: AuthReducer,
   loading: LoadingReducer,

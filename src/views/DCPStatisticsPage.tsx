@@ -14,6 +14,7 @@ import { FindInPage } from '@material-ui/icons';
 import GetAppIcon from '@material-ui/icons/GetApp';
 import { sleep } from '../utils/SetTimeOut';
 import { Stats } from '../interfaces';
+import { routes } from '../routers/routesDictionary';
 import useStyles from '../assets/jss/views/DCPStatisticsPage';
 
 
@@ -315,7 +316,7 @@ const DCPStatisticsPage = () => {
     <div style={{ height: '100%' }}>
       <Grid container className={classes.container}>
         <Grid item xs={4} sm={3} md={2}>
-          <Sidebar activeKey={'dcp-statistics'} />
+          <Sidebar activeKey={routes.DCPStatistics} />
         </Grid>
         <Grid style={{ height: '100%' }} item container xs={8} sm={9} md={10} direction={'column'}>
           <Header />

@@ -12,6 +12,7 @@ import { DcpReport } from '../interfaces';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import { formatDate } from '../utils/TimeHelper';
 import { comparers, dcpReportStatus } from '../appConsts';
+import { routes } from '../routers/routesDictionary';
 import useStyles from '../assets/jss/views/DCPReportHistoryPage';
 
 
@@ -137,7 +138,7 @@ const DCPReportsApprovalPage = () => {
     <div style={{ height: '100%' }}>
       <Grid container style={{ height: '100%' }}>
         <Grid item xs={4} sm={3} md={2}>
-          <Sidebar activeKey={'dcp-report-history'} />
+          <Sidebar activeKey={routes.DCPReportHistory} />
         </Grid>
         <Grid style={{ height: '100%' }} item container xs={8} sm={9} md={10} direction='column'>
           <Header />

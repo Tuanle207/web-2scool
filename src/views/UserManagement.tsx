@@ -1,3 +1,5 @@
+import { useEffect } from 'react';
+import AwesomeDebouncePromise from 'awesome-debounce-promise';
 import { Container, Grid, IconButton, Typography } from '@material-ui/core';
 import { DataGrid, GridColDef, GridPageChangeParams, GridValueFormatterParams } from '@material-ui/data-grid';
 import { toast } from 'react-toastify';
@@ -8,13 +10,14 @@ import Header from '../components/Header';
 import PageTitleBar from '../components/PageTitleBar';
 import { Identity } from '../interfaces';
 import { IdentityService } from '../api';
-import { useFetch, usePagingInfo } from '../hooks';
+import { useFetchV2 } from '../hooks';
 import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
 import { useSelectedItems } from '../hooks';
 import CreateOrUpdateUserRequest from '../components/Modal/CreateOrUpdateUserRequest';
 import ActionModal from '../components/Modal';
 import { comparers } from '../appConsts';
 import useStyles from '../assets/jss/views/UserManagement';
+import { routes } from '../routers/routesDictionary';
 
 
 const cols: GridColDef[] =  [
@@ -58,19 +61,30 @@ const cols: GridColDef[] =  [
   }
 ];
 
+const fetchAPIDebounced = AwesomeDebouncePromise(IdentityService.getUsers, 500);
+
 const UserManagement = () => {
 
   const classes = useStyles();
 
-  const {pagingInfo, setPageIndex, setFilter} = usePagingInfo();
-  const {loading, data, error, resetCache} = useFetch(
-    IdentityService.getUsers,
-    { ...pagingInfo, pageIndex: pagingInfo.pageIndex! + 1 } // DataGrid's start page count from 0, but API count from 1.
-  );
+  const { 
+    pagingInfo,
+    setFilter,
+    setPageIndex,
+    data,
+    loading,
+    error,
+    resetCache
+  } = useFetchV2({ fetchFn: fetchAPIDebounced });
+
   const {selectedItems, reset, changeSelection} = useSelectedItems<Identity.UserDto>();
   
+  useEffect(() => {
+    document.title = '2Scool | Quản lý người dùng';
+  }, []);
+
   const onPageChange = (param: GridPageChangeParams) => {
-    setPageIndex(param.page);
+    setPageIndex(param.page + 1);
   };
 
   const onRequestDelete = async (courseId: string) => {
@@ -108,7 +122,7 @@ const UserManagement = () => {
     <div style={{ flexGrow: 1 }}>
       <Grid container style={{ flex: 1 }}>
         <Grid item xs={4} sm={3} md={2}>
-          <Sidebar activeKey={'users'} />
+          <Sidebar activeKey={routes.UsersManager} />
         </Grid>
         <Grid style={{ background: '#fff', flexGrow: 1 }} item container xs={8} sm={9} md={10} direction='column'>
           <Grid item >
@@ -117,7 +131,7 @@ const UserManagement = () => {
           <Grid item container direction='column' style={{ flexGrow: 1 }}>
             <Grid item>
               <PageTitleBar 
-                title={`Khóa học`} 
+                title={'Người dùng'} 
                 onMainButtonClick={() => ActionModal.show({
                   title: 'Thêm người dùng mới',
                   acceptText: 'Lưu',
@@ -173,7 +187,7 @@ const UserManagement = () => {
                   rowCount={data.totalCount}
                   onPageChange={onPageChange}
                   loading={loading}
-                  page={pagingInfo.pageIndex}
+                  page={pagingInfo.pageIndex && pagingInfo.pageIndex - 1}
                   error={error}
                   checkboxSelection
                   paginationMode='server'

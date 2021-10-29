@@ -29,7 +29,7 @@ function* login({ payload }: Util.IObject) {
 function* logout() {
   try {
     yield call(AuthService.logout);
-    yield put(AuthActions.setLogin({token: ''}));
+    yield put(AuthActions.setLogin({refresh_token: '', access_token: '', expires_in: 0}));
   } catch (err) {
     console.log('ERROR', err);
   }

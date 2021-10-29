@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Grid, Box, Button, makeStyles, List, ListItem, Chip } from '@material-ui/core';
+import { Grid, Box, Button, List, ListItem, Chip } from '@material-ui/core';
 import { MuiPickersUtilsProvider, KeyboardDatePicker } from '@material-ui/pickers';
 import DateFnsUtils from '@date-io/date-fns';
 import React from 'react';
@@ -132,7 +132,7 @@ const DCPReportsApprovalPage = () => {
     <div style={{ height: '100%' }}>
       <Grid container style={{ height: '100%' }}>
         <Grid item xs={4} sm={3} md={2}>
-          <Sidebar activeKey={'dcp-report-approval'} />
+          <Sidebar activeKey={''} />
         </Grid>
         <Grid style={{ height: '100%' }} item container xs={8} sm={9} md={10} direction='column'>
           <Header />

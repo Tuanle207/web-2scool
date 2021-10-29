@@ -166,7 +166,7 @@ const LessonRegisterReportCreate = () => {
                       onClick={handleOpenFileDialog}
                     >
                       Chọn ảnh
-                      <input ref={inputRef} type='file' hidden onChange={handleFileChange} />
+                      <input ref={inputRef} type='file' hidden onChange={handleFileChange} accept="image/*" />
                     </Button>
                     {
                       fileUrl !== null && (

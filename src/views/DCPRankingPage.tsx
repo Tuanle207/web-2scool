@@ -12,6 +12,7 @@ import { getPreviousMonday } from '../utils/TimeHelper';
 import { FindInPage } from '@material-ui/icons';
 import GetAppIcon from '@material-ui/icons/GetApp';
 import { sleep } from '../utils/SetTimeOut';
+import { routes } from '../routers/routesDictionary';
 import useStyles from '../assets/jss/views/DCPRankingPage';
 
 
@@ -62,7 +63,7 @@ const cols: GridColDef[] = [
   {
     field: '',
     headerName: 'Chi tiết',
-    disableClickEventBubbling: true,
+    // disableClickEventBubbling: true,
     hideSortIcons: true,
     align: 'center',
     renderCell: (params) => {
@@ -192,7 +193,7 @@ const DCPRankingPage = () => {
     <div style={{ height: '100%' }}>
       <Grid container className={classes.container}>
         <Grid item xs={4} sm={3} md={2}>
-          <Sidebar activeKey={'dcp-rankings'} />
+          <Sidebar activeKey={routes.DCPRanking} />
         </Grid>
         <Grid style={{ height: '100%' }} item container xs={8} sm={9} md={10} direction={'column'}>
           <Header />

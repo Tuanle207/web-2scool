@@ -44,4 +44,56 @@ export namespace Util {
     startTime: Date;
     endTime: Date;
   }
+
+  export interface AppConfig {
+    auth: {
+      grantedPolicies: IObject<boolean>;
+      policies: IObject<boolean>;
+    },
+    clock: {
+      kind: string;
+    },
+    currentTenant: {
+      id?: string;
+      isAvailable: boolean;
+      name?: string;
+    },
+    currentUser: {
+      id: string;
+      userName: string;
+      surName: string;
+      email: string;
+      emailVerified: boolean;
+      name: string;
+      phoneNumber: string;
+      phoneNumberVerified: boolean;
+      roles: string[];
+      tenantId: string;
+      isAuthenticated: boolean;
+    },
+    features: {
+      value: IObject
+    },
+    localization: {
+      currentCulture: IObject;
+      defaultResourceName: string;
+      languageFilesMap: IObject;
+      languages: IObject;
+      languagesMap: IObject;
+      values: IObject;
+    },
+    multiTenancy: {
+      isEnabled: boolean;
+    },
+    objectExtensions: {
+      enums: IObject;
+      modules: IObject;
+    },
+    setting: {
+      value: IObject;
+    },
+    timing: {
+      timeZone: IObject;
+    }
+  }
 }

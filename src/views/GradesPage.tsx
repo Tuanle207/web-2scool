@@ -1,3 +1,5 @@
+import { useEffect } from 'react';
+import AwesomeDebouncePromise from 'awesome-debounce-promise';
 import { Container, Grid, IconButton, Typography } from '@material-ui/core';
 import Sidebar from '../components/Sidebar';
 import Header from '../components/Header';
@@ -5,7 +7,7 @@ import PageTitleBar from '../components/PageTitleBar';
 import { DataGrid, GridColDef, GridPageChangeParams } from '@material-ui/data-grid';
 import { Grade } from '../interfaces';
 import { GradesService } from '../api';
-import { useFetch, usePagingInfo } from '../hooks';
+import { useFetchV2 } from '../hooks';
 import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@material-ui/icons/Edit';
 import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
@@ -15,6 +17,7 @@ import CreateOrUpdateGradeRequest from '../components/Modal/CreateOrUpdateGradeR
 import { comparers } from '../appConsts';
 import { toast } from 'react-toastify';
 import useStyles from '../assets/jss/views/GradesPage';
+import { routes } from '../routers/routesDictionary';
 
 
 const cols: GridColDef[] =  [
@@ -35,20 +38,30 @@ const cols: GridColDef[] =  [
   }
 ];
 
+const fetchAPIDebounced = AwesomeDebouncePromise(GradesService.getAllGrades, 500);
 
 const GradesPage = () => {
 
   const classes = useStyles();
 
-  const {pagingInfo, setPageIndex, setFilter} = usePagingInfo();
-  const {loading, data, error, resetCache} = useFetch(
-    GradesService.getAllGrades, 
-    { ...pagingInfo, pageIndex: pagingInfo.pageIndex! + 1 } // DataGrid's start page count from 0, but API count from 1.
-  );
+  const { 
+    pagingInfo,
+    setFilter,
+    setPageIndex,
+    data,
+    loading,
+    error,
+    resetCache
+  } = useFetchV2({ fetchFn: fetchAPIDebounced });
+
   const {selectedItems, reset, changeSelection} = useSelectedItems<Grade.GradeDto>();
   
+  useEffect(() => {
+    document.title = "2Scool | Quản lý khối";
+  }, []);
+
   const onPageChange = (param: GridPageChangeParams) => {
-    setPageIndex(param.page);
+    setPageIndex(param.page + 1);
   };
 
   const onRequestDelete = async (id: string) => {
@@ -86,7 +99,7 @@ const GradesPage = () => {
     <div style={{ flexGrow: 1 }}>
       <Grid container style={{ flex: 1 }}>
         <Grid item xs={4} sm={3} md={2}>
-          <Sidebar activeKey={'grades'} />
+          <Sidebar activeKey={routes.GradesManager} />
         </Grid>
         <Grid style={{ background: '#fff', flexGrow: 1 }} item container xs={8} sm={9} md={10} direction='column'>
           <Grid item >
@@ -151,7 +164,7 @@ const GradesPage = () => {
                   rowCount={data.totalCount}
                   onPageChange={onPageChange}
                   loading={loading}
-                  page={pagingInfo.pageIndex}
+                  page={pagingInfo.pageIndex && pagingInfo.pageIndex - 1}
                   error={error}
                   checkboxSelection
                   paginationMode='server'

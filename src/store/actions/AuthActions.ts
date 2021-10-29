@@ -1,5 +1,6 @@
 import { createAction } from '@reduxjs/toolkit';
 import { User } from '../../interfaces';
+import { IAuthState } from '../reducers/AuthReducer';
 
 const postLoginAsync = createAction( 
   'app/AuthAction/postLoginAsync', 
@@ -8,7 +9,7 @@ const postLoginAsync = createAction(
 
 const setLogin = createAction( 
   'app/AuthAction/setLogin', 
-  payload => ({payload}) 
+  (payload: User.LoginResponse) => ({payload}) 
 );
 
 const postLogoutAsync = createAction( 

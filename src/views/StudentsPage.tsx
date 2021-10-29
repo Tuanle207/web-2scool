@@ -1,30 +1,119 @@
-import React from 'react';
-import { Container, Grid, IconButton, Typography, Tooltip } from '@material-ui/core';
+import { useEffect } from 'react';
+import AwesomeDebouncePromise from 'awesome-debounce-promise';
+import { Container, Grid, IconButton, Paper, Tooltip } from '@material-ui/core';
 import Sidebar from '../components/Sidebar';
 import Header from '../components/Header';
 import PageTitleBar from '../components/PageTitleBar';
-import { DataGrid, GridColDef, GridPageChangeParams, GridValueFormatterParams } from '@material-ui/data-grid';
+import { DataGrid, GridColDef, GridPageChangeParams, GridValueFormatterParams,
+  GridApi, GridRowId } from '@material-ui/data-grid';
 import { Student, Class, Identity } from '../interfaces';
 import { IdentityService, StudentsService } from '../api';
-import { useFetch, usePagingInfo } from '../hooks';
+import { useFetchV2 } from '../hooks/useFetchV2';
 import PersonAddIcon from '@material-ui/icons/PersonAdd';
 import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@material-ui/icons/Edit';
 import { formatDate } from '../utils/TimeHelper';
-import { useSelectedItems } from '../hooks';
 import ActionModal from '../components/Modal';
 import CreateOrUpdateStudentRequest from '../components/Modal/CreateOrUpdateStudentRequest';
 import { comparers } from '../appConsts';
 import { toast } from 'react-toastify';
 import CreateStudentAccountRequest from '../components/Modal/CreateStudentAccountRequest';
 import useStyles from '../assets/jss/views/StudentsPage';
+import { routes } from '../routers/routesDictionary';
 
+interface RowMenuProps {
+  api: GridApi;
+  id: GridRowId;
+}
+
+const RowMenuCell = (props: RowMenuProps) => {
+  const { api, id } = props;
+
+  const reloadCurrentPageData = () => {
+    api.setPage(api.getState().pagination.page);
+  };
+
+  const onRequestUpdate = async (data: Student.CreateUpdateStudentDto) => {
+    await StudentsService.updateStudent({id: id.toString(), data});
+    toast('Cập nhật thông tin học sinh thành công', {
+      type: toast.TYPE.SUCCESS
+    });
+    reloadCurrentPageData();
+  };
+
+  const onRequestAccountCreate = async (data: Identity.CreateUpdateUserDto) => {
+    await IdentityService.createUser(data);
+    toast('Cấp tài khoản thành công', {
+      type: toast.TYPE.SUCCESS
+    });
+  };
+
+  const onRequestDelete = async () => {
+    await StudentsService.removeStudent({id: id.toString()});
+    toast(`Xóa học sinh ${id} thành công`, {
+      type: toast.TYPE.SUCCESS
+    });
+    reloadCurrentPageData();
+  };
+
+  return (
+    <div>
+      <Tooltip title='Cập nhật thông tin'>
+          <IconButton  
+            onClick={() => ActionModal.show({
+              title: 'Cập nhật thông tin học sinh',
+              acceptText: 'Lưu',
+              cancelText: 'Hủy',
+              component: <CreateOrUpdateStudentRequest id={id.toString()}/>,
+              onAccept: onRequestUpdate
+            })} 
+          >
+            <EditIcon />
+          </IconButton>
+        </Tooltip>
+      <Tooltip title='Cấp tài khoản'>
+        <IconButton
+          onClick={() => ActionModal.show({
+            title: "Cấp tài khoản cho học sinh",
+            acceptText: "Cấp tài khoản",
+            component: <CreateStudentAccountRequest id={id.toString()} />,
+            onAccept: onRequestAccountCreate
+          })}
+        >
+          <PersonAddIcon />
+        </IconButton>
+      </Tooltip>
+      <Tooltip title='Xóa học sinh này'>
+        <IconButton
+          onClick={() => ActionModal.show({
+            title: `Xác nhận xóa học sinh: ${api.getCellValue(id, 'name')}?`,
+            onAccept: onRequestDelete
+          })}
+        >
+          <DeleteIcon />
+        </IconButton>
+      </Tooltip>
+    </div>
+  );
+};
 
 const cols: GridColDef[] =  [
   {
+    field: 'actions',
+    headerName: 'Hành động',
+    renderCell: RowMenuCell,
+    sortable: false,
+    width: 150,
+    headerAlign: 'left',
+    filterable: false,
+    align: 'center',
+    disableColumnMenu: true,
+    // disableReorder: true,
+  },
+  {
     field: 'id',
     headerName: 'Mã',
-    width: 150
+    width: 120
   },
   {
     field: 'name',
@@ -34,44 +123,44 @@ const cols: GridColDef[] =  [
   {
     field: 'dob',
     headerName: 'Ngày sinh',
-    width: 150,
+    width: 120,
     valueFormatter: (params: GridValueFormatterParams) => formatDate(params.value as string)
   },
   {
     field: 'class',
     headerName: 'Lớp',
-    width: 150,
+    width: 120,
     valueFormatter: (params: GridValueFormatterParams) => (params.value as Class.ClassForStudentDto).name
   },
   {
     field: 'parentPhoneNumber',
     headerName: 'SĐT phụ huynh',
-    width: 200
-  }
+    width: 150
+  },
 ];
+
+const fetchAPIDebounced = AwesomeDebouncePromise(StudentsService.getAllStudents, 500);
 
 const StudentsPage = () => {
 
   const classes = useStyles();
 
-  const {pagingInfo, setPageIndex, setFilter} = usePagingInfo();
-  const {loading, data, error, resetCache} = useFetch(
-    StudentsService.getAllStudents, 
-    { ...pagingInfo, pageIndex: pagingInfo.pageIndex! + 1 } // DataGrid's start page count from 0, but API count from 1.
-  );
-  const {selectedItems, reset, changeSelection} = useSelectedItems<Student.StudentDto>();
-  
-  const onPageChange = (param: GridPageChangeParams) => {
-    setPageIndex(param.page);
-  };
+  const { 
+    pagingInfo,
+    setFilter,
+    setPageIndex,
+    data,
+    loading,
+    error,
+    resetCache
+  } = useFetchV2({ fetchFn: fetchAPIDebounced });
 
-  const onRequestDelete = async (id: string) => {
-    await StudentsService.removeStudent({id});
-    toast(`Xóa học sinh ${id} thành công`, {
-      type: toast.TYPE.SUCCESS
-    });
-    resetCache();
-    reset();
+  useEffect(() => {
+    document.title = '2Scool | Quản lý học sinh';
+  }, []);
+
+  const onPageChange = (param: GridPageChangeParams) => {
+    setPageIndex(param.page + 1);
   };
 
   const onRequestCreate = async (data: Student.CreateUpdateStudentDto) => {
@@ -82,97 +171,44 @@ const StudentsPage = () => {
     resetCache();
   };
 
-  const onRequestUpdate = async (data: Student.CreateUpdateStudentDto) => {
-    await StudentsService.updateStudent({id: getSelectedItem()!.id, data});
-    toast('Cập nhật thông tin học sinh thành công', {
-      type: toast.TYPE.SUCCESS
-    });
-    resetCache();
-  };
-
-  const onRequestAccountCreate = async (data: Identity.CreateUpdateUserDto) => {
-    await IdentityService.createUser(data);
-    toast('Cấp tài khoản thành công', {
-      type: toast.TYPE.SUCCESS
-    });
-  };
-
-  const getSelectedItem = (): Student.StudentDto | null => {
-    return selectedItems && selectedItems.length > 0 
-      ? selectedItems[selectedItems.length - 1] 
-      : null;
-  };
-
   return (
     <div style={{ flexGrow: 1 }}>
       <Grid container style={{ flex: 1 }}>
         <Grid item xs={4} sm={3} md={2}>
-          <Sidebar activeKey={'students'} />
+          <Sidebar activeKey={routes.StudentsManager} />
         </Grid>
         <Grid style={{ background: '#fff', flexGrow: 1 }} item container xs={8} sm={9} md={10} direction='column'>
           <Grid item >
-            <Header onTextChange={(value) => setFilter({key: 'Name', comparison: comparers.Contains, value: value })} />
+            <Header
+              searchBarPlaceholder="Tìm kiếm học sinh..."
+              onTextChange={(value) => setFilter({key: 'Name', comparison: comparers.Contains, value: value })} 
+            />
           </Grid>
           <Grid item container direction='column' style={{ flexGrow: 1 }}>
-            <Grid item>
-              <PageTitleBar 
-                title={`Học sinh`} 
-                onMainButtonClick={() => ActionModal.show({
-                  title: 'Thêm học sinh mới',
-                  acceptText: 'Lưu',
-                  cancelText: 'Hủy',
-                  component: <CreateOrUpdateStudentRequest />,
-                  onAccept: onRequestCreate
-                })}
-                onOptionsButtonClick={() => toast('default toast', {
-                  type: toast.TYPE.INFO,
-                })}
-              />
-              <Grid container justify='space-between' style={{padding: 10, paddingLeft: 64}}>
-                <Grid item>
-                  <Typography variant='h6'>Danh sách học sinh</Typography>
-                </Grid>
-                <Grid item>
-                  <Tooltip title='Xóa học sinh này'>
-                    <IconButton
-                      disabled={selectedItems.length === 0} 
-                      onClick={() => ActionModal.show({
-                        title: `Xác nhận xóa học sinh: ${getSelectedItem()!.name}?`,
-                        onAccept: () => onRequestDelete(getSelectedItem()!.id)
-                      })}
-                    >
-                      <DeleteIcon />
-                    </IconButton>
-                  </Tooltip>
-                  <Tooltip title='Cập nhật thông tin'>
-                    <IconButton  
-                      disabled={selectedItems.length === 0} 
-                      onClick={() => ActionModal.show({
-                        title: 'Cập nhật thông tin học sinh',
-                        acceptText: 'Lưu',
-                        cancelText: 'Hủy',
-                        component: <CreateOrUpdateStudentRequest id={getSelectedItem()!.id}/>,
-                        onAccept: onRequestUpdate
-                      })} 
-                    >
-                      <EditIcon />
-                    </IconButton>
-                  </Tooltip>
-                  <Tooltip title='Cấp tài khoản'>
-                    <IconButton
-                      disabled={selectedItems.length === 0} 
-                      onClick={() => ActionModal.show({
-                        component: <CreateStudentAccountRequest id={getSelectedItem()!.id} />,
-                        onAccept: onRequestAccountCreate
-                      })}
-                    >
-                      <PersonAddIcon />
-                    </IconButton>
-                  </Tooltip>
-                </Grid>
-              </Grid>
+            <Grid item style={{ 
+              backgroundColor: "#e8e8e8", 
+              paddingTop: 16, 
+              paddingRight: 24, 
+              paddingLeft: 24 
+            }}
+            >
+              <Paper variant="outlined" elevation={1}>
+                <PageTitleBar 
+                  title={`Học sinh`} 
+                  onMainButtonClick={() => ActionModal.show({
+                    title: 'Thêm học sinh mới',
+                    acceptText: 'Lưu',
+                    cancelText: 'Hủy',
+                    component: <CreateOrUpdateStudentRequest />,
+                    onAccept: onRequestCreate
+                  })}
+                  onOptionsButtonClick={() => toast('default toast', {
+                    type: toast.TYPE.INFO,
+                  })}
+                />
+              </Paper>
             </Grid>
-            <Grid item style={{ flexGrow: 1 }}>
+            <Grid item style={{ flexGrow: 1, paddingTop: 16, paddingBottom: 16, backgroundColor: '#e8e8e8' }}>
               <Container className={classes.root}>
                 <DataGrid
                   columns={cols}
@@ -181,12 +217,10 @@ const StudentsPage = () => {
                   rowCount={data.totalCount}
                   onPageChange={onPageChange}
                   loading={loading}
-                  page={pagingInfo.pageIndex}
+                  page={pagingInfo.pageIndex && pagingInfo.pageIndex - 1}
                   error={error}
-                  checkboxSelection
                   paginationMode='server'
-                  onRowSelected={changeSelection}
-                  selectionModel={selectedItems.map(el => el.id)}
+                  hideFooterSelectedRowCount
                 />
               </Container>
             </Grid>
@@ -194,7 +228,6 @@ const StudentsPage = () => {
         </Grid>
       </Grid>
     </div>
-    
   );
 };
 

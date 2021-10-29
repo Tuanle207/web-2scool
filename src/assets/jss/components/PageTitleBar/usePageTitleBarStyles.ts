@@ -2,9 +2,7 @@ import { makeStyles, Theme } from '@material-ui/core';
 
 const usePageTitleBarStyles = makeStyles((theme: Theme) => ({
   container: {
-    padding: theme.spacing(1, 8),
-    backgroundColor: '#e8e8e8',
-    borderBottom: '1px solid #8888',
+    padding: theme.spacing(1, 4),
   },
   title: {
   

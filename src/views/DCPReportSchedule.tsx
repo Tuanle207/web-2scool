@@ -11,7 +11,7 @@ import { getDayOfWeek, formatTime, formatDate } from '../utils/TimeHelper';
 import { taskType } from '../appConsts';
 import AlarmIcon from '@material-ui/icons/Alarm';
 import PermContactCalendarIcon from '@material-ui/icons/PermContactCalendar';
-
+import { routes } from '../routers/routesDictionary';
 import { sleep } from '../utils/SetTimeOut';
 
 
@@ -169,7 +169,7 @@ const DCPReportSchedule = () => {
     <div style={{ height: '100%' }}>
       <Grid container className={classes.container}>
         <Grid item xs={4} sm={3} md={2}>
-          <Sidebar activeKey={'report-schedule-assignment'} />
+          <Sidebar activeKey={routes.DCPReportSchedule} />
         </Grid>
         <Grid style={{ height: '100%' }} item container xs={8} sm={9} md={10} direction={'column'}>
           <Header />

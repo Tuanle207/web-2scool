@@ -11,6 +11,7 @@ import DcpReportsService from './DcpReportsService';
 import LrReportsService from './LrReportsService';
 import StatisticsService from './StatisticsService';
 import TaskAssignmentService from './TaskAssignmentService';
+import ProfileService from './ProfileService';
 
 
 export {
@@ -26,5 +27,6 @@ export {
   DcpReportsService,
   LrReportsService,
   StatisticsService,
-  TaskAssignmentService
+  TaskAssignmentService,
+  ProfileService
 };

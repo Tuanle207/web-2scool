@@ -1,30 +1,32 @@
 import { useEffect, useMemo } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { StylesProvider, CssBaseline, ThemeProvider } from '@material-ui/core'
+import { toast, ToastContainer } from 'react-toastify';
 import DashboardRouter from '../../routers/DashboardRouter';
 import AuthRouter from '../../routers/AuthRouter';
 import { theme, jss } from '../../assets/themes/theme';
 import ActionModal from '../Modal';
-import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import { withRedux } from '../../utils/ReduxConnect';
 import { AuthSelector, LoadingSelector } from '../../store/selectors';
 import { AppConfigsActions } from '../../store/actions';
 import { isTokenValid } from '../../config/axios/util';
+import 'react-toastify/dist/ReactToastify.css';
 
-interface Props {
-  token: string;
-  fetchingAppConfig: boolean;
-  getAppConfig: () => void;
+interface IAppContainerProps {
+  
 } 
 
-const AppContainer: React.FC<Props> = ({ token, getAppConfig, fetchingAppConfig }) => {
+const AppContainer: React.FC<IAppContainerProps> = () => {
 
-  const isValid = useMemo(() => isTokenValid(token), [token]);
+  const token = useSelector(AuthSelector.token);
+  const fetchingAppConfig = useSelector(LoadingSelector.fetchingAppConfig);
+  const dispatch = useDispatch();
+
+  const isValid = useMemo(() => isTokenValid(token ?? ''), [token]);
 
   useEffect(() => {
-    if (isTokenValid(token))
+    if (isTokenValid(token ?? ''))
     {
-      getAppConfig();
+      dispatch(AppConfigsActions.getAppConfigAsync());
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token]);
@@ -50,13 +52,4 @@ const AppContainer: React.FC<Props> = ({ token, getAppConfig, fetchingAppConfig 
   );
 };
 
-export default withRedux({
-  component: AppContainer,
-  stateProps: (state: any) => ({
-    token: AuthSelector.createTokenSelector()(state),
-    fetchingAppConfig: LoadingSelector.createFetchingAppConfigSelector()(state)
-  }),
-  dispatchProps: {
-    getAppConfig: AppConfigsActions.getAppConfigAsync
-  }
-});
+export default AppContainer;

@@ -1,9 +1,10 @@
 import { createSelector } from 'reselect';
+import { IState } from '../reducers';
 
-const Loading = (state: any) => state.loading;
+const Loading = (state: IState) => state.loading;
 
-const createFetchingAppConfigSelector = () => createSelector(Loading, loading => loading.fetchingAppConfig)
+const fetchingAppConfig = createSelector(Loading, loading => loading.fetchingAppConfig)
 
 export const LoadingSelector = {
-  createFetchingAppConfigSelector
+  fetchingAppConfig
 };

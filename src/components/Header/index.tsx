@@ -12,15 +12,22 @@ import MoreIcon from '@material-ui/icons/MoreVert';
 import { useHistory } from 'react-router';
 import { withRedux } from '../../utils/ReduxConnect';
 import { AuthActions } from '../../store/actions';
+import { routes } from '../../routers/routesDictionary';
+import { useDebouncedCallback } from 'use-debounce/lib';
 
 interface Props {
   hiddenSearchBar?: boolean;
   onTextChange?: (text: string) => void;
   postlogoutAsync: () => void;
-  
+  searchBarPlaceholder?: string;
 }
 
-const Header: FC<Props> = ({ postlogoutAsync, onTextChange, hiddenSearchBar = false }) => {
+const Header: FC<Props> = ({ 
+  postlogoutAsync, 
+  onTextChange, 
+  hiddenSearchBar = false,
+  searchBarPlaceholder = "Tìm kiếm..."
+ }) => {
 
   const classes = useHeaderStyles();
   const history = useHistory();
@@ -28,37 +35,41 @@ const Header: FC<Props> = ({ postlogoutAsync, onTextChange, hiddenSearchBar = fa
   const [anchorEl, setAnchorEl] = useState(null);
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = useState(null);
 
+  const onSearchChangeDebounced = useDebouncedCallback(
+    (value: string) => onTextChange && onTextChange(value),
+    500
+  );
+
   const isMenuOpen = Boolean(anchorEl);
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
+
+
+  const handleMobileMenuClose = () => {
+    setMobileMoreAnchorEl(null);
+  };
+
+  const handleMobileMenuOpen = (event: any) => {
+    setMobileMoreAnchorEl(event.currentTarget);
+  };
 
   const handleProfileMenuOpen = (event: any) => {
     setAnchorEl(event.currentTarget);
   };
 
-  const handleMobileMenuClose = () => {
-    setMobileMoreAnchorEl(null);
+  const handleProfileClick = () => {
+    setAnchorEl(null);
+    history.push(routes.Profile);
+  };
+
+  const handleAdminClick = () => {
+    setAnchorEl(null);
+    history.push(routes.CoursesManager);
   };
 
   const handleLogoutClick = () => {
     setAnchorEl(null);
     postlogoutAsync();
     handleMobileMenuClose();
-  };
-
-  const handleAdminClick = () => {
-    setAnchorEl(null);
-    history.push('/admin/courses');
-    setAnchorEl(null);
-  }
-
-  const handleMobileMenuOpen = (event: any) => {
-    setMobileMoreAnchorEl(event.currentTarget);
-  };
-
-  const textChange = (e: any) => {
-    const value = e.target!.value || '';
-    // setSearchText(value);
-    onTextChange && onTextChange(value);
   };
 
   const menuId = 'primary-search-account-menu';
@@ -70,7 +81,7 @@ const Header: FC<Props> = ({ postlogoutAsync, onTextChange, hiddenSearchBar = fa
       open={isMenuOpen}
       onBackdropClick={() => setAnchorEl(null)}
       >
-      <StyledMenuItem>
+      <StyledMenuItem onClick={handleProfileClick}>
         <ListItemIcon className={classes.resetMenuIconWidth}>
           <AccountCircle fontSize="small" />
         </ListItemIcon>
@@ -133,15 +144,19 @@ const Header: FC<Props> = ({ postlogoutAsync, onTextChange, hiddenSearchBar = fa
               <SearchIcon />
             </div>
             <InputBase
+              name="fcking-name"
               disabled={hiddenSearchBar ? true : false}
-              placeholder="Tìm kiếm…"
+              placeholder={searchBarPlaceholder}
               fullWidth
+              autoComplete="new-search"
+              defaultValue=""
+              type="search"
               classes={{
                 root: classes.inputRoot,
                 input: classes.inputInput,
               }}
               inputProps={{ 'aria-label': 'search' }}
-              onChange={textChange}
+              onChange={(e) => onSearchChangeDebounced(e.target.value)}
             />
           </div>
           <div className={classes.sectionDesktop}>

@@ -1,7 +1,7 @@
 import { getApiService } from '../BaseApiService';
 import Endpoint from './@endpoint';
 
-export default async () => {
+export const logout = async () => {
   try {
     const apiService = await getApiService();
     const result = (await apiService.get(Endpoint.Logout())) as any;

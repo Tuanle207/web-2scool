@@ -14,6 +14,7 @@ import { Autocomplete } from '@material-ui/lab';
 import { toast } from 'react-toastify';
 import ActionModal from '../components/Modal';
 import useStyles from '../assets/jss/views/LessonRegisterReportSchedule';
+import { routes } from '../routers/routesDictionary';
 
 
 interface IAssignClass {
@@ -209,7 +210,7 @@ const LessonRegisterReportSchedule = () => {
     <div style={{ height: '100%' }}>
       <Grid container className={classes.container}>
         <Grid item xs={4} sm={3} md={2}>
-          <Sidebar activeKey={'lessons-register-report-schedule-assignment'} />
+          <Sidebar activeKey={routes.LRReportSchedule} />
         </Grid>
         <Grid style={{ height: '100%' }} item container xs={8} sm={9} md={10} direction={'column'}>
           <Header />

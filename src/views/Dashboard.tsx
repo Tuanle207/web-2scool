@@ -2,6 +2,7 @@ import React from 'react';
 import { Container, Grid, Typography } from '@material-ui/core';
 import Sidebar from '../components/Sidebar';
 import Header from '../components/Header';
+import { routes } from '../routers/routesDictionary';
 
 const Dashboard = () => {
 
@@ -13,7 +14,7 @@ const Dashboard = () => {
     <div style={{ flexGrow: 1 }}>
       <Grid container style={{ flex: 1 }}>
         <Grid item xs={4} sm={3} md={2}>
-          <Sidebar activeKey={'dashboard'} />
+          <Sidebar activeKey={routes.Dashboard} />
         </Grid>
         <Grid style={{ background: '#fff' }} item container xs={8} sm={9} md={10} direction='column'>
           <Grid item style={{ flex: 1 }}>

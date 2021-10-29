@@ -9,6 +9,7 @@ import { formatTime, getDayOfWeek } from '../../utils/TimeHelper';
 import { DcpReportsService } from '../../api';
 import { DcpReport } from '../../interfaces';
 import { dcpReportStatus } from '../../appConsts';
+import { routes, routeWithParams } from '../../routers/routesDictionary';
 
 const useStyles = makeStyles(theme => ({
   container: {
@@ -135,7 +136,7 @@ const DisciplineApprovalCard = ({data}: {data: DcpReport.DcpReportDto}) => {
           
         </Grid>
         <Grid item>
-          <Button onClick={() => history.push(`/dcp-report-approval/${data.id}`)} 
+          <Button onClick={() => history.push(routeWithParams(routes.DCPReportApprovalDetail, data.id))} 
             color={'primary'}>Xem chi tiết...</Button>
         </Grid>
       </Grid>

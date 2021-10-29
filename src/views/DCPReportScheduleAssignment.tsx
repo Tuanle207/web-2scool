@@ -20,6 +20,7 @@ import AlarmIcon from '@material-ui/icons/Alarm';
 import ArrowRightAltIcon from '@material-ui/icons/ArrowRightAlt';
 import { taskType } from '../appConsts';
 import { getDayOfWeek, formatTime, addDays, getPreviousMonday } from '../utils/TimeHelper';
+import { routes } from '../routers/routesDictionary';
 import useStyles from '../assets/jss/views/DCPReportScheduleAssignment';  
 
 interface IAssignClass {
@@ -263,7 +264,7 @@ const DCPReportScheduleAssignment = () => {
     <div style={{ height: '100%' }}>
       <Grid container className={classes.container}>
         <Grid item xs={4} sm={3} md={2}>
-          <Sidebar activeKey={'report-schedule-assignment'} />
+          <Sidebar activeKey={routes.DCPReportScheduleAssignment} />
         </Grid>
         <Grid style={{ height: '100%' }} item container xs={8} sm={9} md={10} direction={'column'}>
           <Header />

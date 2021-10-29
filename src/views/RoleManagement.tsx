@@ -1,3 +1,5 @@
+import { useEffect } from 'react';
+import AwesomeDebouncePromise from 'awesome-debounce-promise';
 import { Container, Grid, IconButton, Typography } from '@material-ui/core';
 import { DataGrid, GridColDef, GridPageChangeParams } from '@material-ui/data-grid';
 import { toast } from 'react-toastify';
@@ -8,7 +10,7 @@ import Header from '../components/Header';
 import PageTitleBar from '../components/PageTitleBar';
 import { Identity } from '../interfaces';
 import { IdentityService } from '../api';
-import { useFetch, usePagingInfo } from '../hooks';
+import { useFetchV2 } from '../hooks';
 import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
 import { useSelectedItems } from '../hooks';
 import CreateOrUpdateRoleRequest from '../components/Modal/CreateOrUpdateRoleRequest';
@@ -16,6 +18,7 @@ import UpdateRolePermissionsRequest from '../components/Modal/UpdateRolePermissi
 import ActionModal from '../components/Modal';
 import { comparers } from '../appConsts';
 import useStyles from '../assets/jss/views/RoleManagement';
+import { routes } from '../routers/routesDictionary';
 
 
 const cols: GridColDef[] =  [
@@ -31,29 +34,31 @@ const cols: GridColDef[] =  [
   },
 ];
 
+const fetchAPIDebounced = AwesomeDebouncePromise(IdentityService.getAllRoles, 500);
+
 const RoleManagement = () => {
 
   const classes = useStyles();
 
-  const {pagingInfo, setPageIndex, setFilter} = usePagingInfo();
-  const {loading, data, error, resetCache} = useFetch(
-    IdentityService.getAllRoles,
-    { ...pagingInfo, pageIndex: pagingInfo.pageIndex! + 1 } // DataGrid's start page count from 0, but API count from 1.
-  );
+  const { 
+    pagingInfo,
+    setFilter,
+    setPageIndex,
+    data,
+    loading,
+    error,
+    resetCache
+  } = useFetchV2({ fetchFn: fetchAPIDebounced });
+
   const {selectedItems, changeSelection} = useSelectedItems<Identity.RoleDto>();
   
-  const onPageChange = (param: GridPageChangeParams) => {
-    setPageIndex(param.page);
-  };
+  useEffect(() => {
+    document.title = '2Scool | Quản lý vai trò';
+  }, []);
 
-  // const onRequestDelete = async (courseId: string) => {
-  //   await IdentityService.removeCourse({courseId});
-  //   toast(`Xóa khóa học ${courseId} thành công`, {
-  //     type: toast.TYPE.SUCCESS
-  //   });
-  //   resetCache();
-  //   reset();
-  // };
+  const onPageChange = (param: GridPageChangeParams) => {
+    setPageIndex(param.page + 1);
+  };
 
   const onRequestCreate = async (data: Identity.CreateUpdateRoleDto) => {
     await IdentityService.createRole(data);
@@ -102,7 +107,7 @@ const RoleManagement = () => {
     <div style={{ flexGrow: 1 }}>
       <Grid container style={{ flex: 1 }}>
         <Grid item xs={4} sm={3} md={2}>
-          <Sidebar activeKey={'roles'} />
+          <Sidebar activeKey={routes.RolesManager} />
         </Grid>
         <Grid style={{ background: '#fff', flexGrow: 1 }} item container xs={8} sm={9} md={10} direction='column'>
           <Grid item >
@@ -111,7 +116,7 @@ const RoleManagement = () => {
           <Grid item container direction='column' style={{ flexGrow: 1 }}>
             <Grid item>
               <PageTitleBar 
-                title={`Khóa học`} 
+                title={'Vai trò'} 
                 onMainButtonClick={() => ActionModal.show({
                   title: 'Thêm vai trò mới',
                   acceptText: 'Lưu',
@@ -173,7 +178,7 @@ const RoleManagement = () => {
                   rowCount={data.totalCount}
                   onPageChange={onPageChange}
                   loading={loading}
-                  page={pagingInfo.pageIndex}
+                  page={pagingInfo.pageIndex && pagingInfo.pageIndex - 1}
                   error={error}
                   checkboxSelection
                   paginationMode='server'

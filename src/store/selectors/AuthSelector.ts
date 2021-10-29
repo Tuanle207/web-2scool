@@ -1,10 +1,10 @@
 import { createSelector } from 'reselect';
-import { Util } from '../../interfaces';
+import { IState } from '../reducers';
 
-const Auth = (state: Util.IObject) => state.auth;
+const Auth = (state: IState) => state.auth;
 
-const createTokenSelector = () => createSelector(Auth, auth => auth.token);
+const token = createSelector(Auth, auth => auth.token);
 
 export const AuthSelector = {
-  createTokenSelector
+  token
 };

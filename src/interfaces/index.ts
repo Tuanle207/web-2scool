@@ -10,6 +10,7 @@ import { Regulation } from './Regulation';
 import { DcpReport } from './DcpReport';
 import { Stats } from './Stats';
 import { TaskAssignment } from './TaskAssignment';
+import { Profile } from './Profile';
 
 export type {
   Util,
@@ -23,5 +24,6 @@ export type {
   Regulation,
   DcpReport,
   Stats,
-  TaskAssignment
+  TaskAssignment,
+  Profile
 };

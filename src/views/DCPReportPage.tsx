@@ -18,6 +18,7 @@ import PauseCircleOutlineIcon from '@material-ui/icons/PauseCircleOutline';
 import HighlightOffIcon from '@material-ui/icons/HighlightOff';
 import RestoreIcon from '@material-ui/icons/Restore';
 import { dcpReportStatus, dcpReportStatusDic } from '../appConsts';
+import { routes } from '../routers/routesDictionary';
 import useStyles from '../assets/jss/views/DCPReportPage';
 
 const cols: GridColDef[] = [
@@ -67,11 +68,11 @@ const cols: GridColDef[] = [
   },
   {
     field: '',
-    disableClickEventBubbling: true,
+    // disableClickEventBubbling: true,
     renderCell: (params) => {
       const onClick = () => {
         const api: GridApi = params.api;
-        console.log({x: params.getValue('id')});
+        // console.log({x: params.getValue('id')});
       };
 
       return (
@@ -208,7 +209,7 @@ const DCPReportPage = () => {
     <div style={{ height: '100%' }}>
       <Grid container className={classes.container}>
         <Grid item xs={4} sm={3} md={2}>
-          <Sidebar activeKey={'dcp-report-approval'} />
+          <Sidebar activeKey={routes.DCPReportApprovalDetail} />
         </Grid>
         <Grid style={{ height: '100%' }} item container xs={8} sm={9} md={10} direction={'column'}>
           <Header />

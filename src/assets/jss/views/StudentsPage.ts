@@ -4,6 +4,9 @@ const useStyles = makeStyles(theme => ({
   root: {
     height: '100%', 
     width: '100%',
+    '& .MuiDataGrid-root': {
+      backgroundColor: '#fff',
+    },
     '& .MuiDataGrid-iconSeparator': {
       color: theme.palette.divider,
       

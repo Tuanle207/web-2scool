@@ -1,3 +1,5 @@
+import { useEffect } from 'react';
+import AwesomeDebouncePromise from 'awesome-debounce-promise';
 import { Container, Grid, IconButton, Typography } from '@material-ui/core';
 import { DataGrid, GridColDef, GridPageChangeParams, GridValueFormatterParams } from '@material-ui/data-grid';
 import { toast } from 'react-toastify';
@@ -8,13 +10,13 @@ import Header from '../components/Header';
 import PageTitleBar from '../components/PageTitleBar';
 import { Course } from '../interfaces';
 import { CoursesService } from '../api';
-import { useFetch, usePagingInfo } from '../hooks';
 import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
 import { formatDate } from '../utils/TimeHelper';
-import { useSelectedItems } from '../hooks';
+import { useSelectedItems, useFetchV2 } from '../hooks';
 import CreateOrUpdateCourseRequest from '../components/Modal/CreateOrUpdateCourseRequest';
 import ActionModal from '../components/Modal';
 import { comparers } from '../appConsts';
+import { routes } from '../routers/routesDictionary';
 import useStyles from '../assets/jss/views/CoursesPage';
 
 
@@ -43,20 +45,35 @@ const cols: GridColDef[] =  [
   }
 ];
 
+const fetchAPIDebounced = AwesomeDebouncePromise(CoursesService.getAllCourses, 500);
+
 
 const CoursesPage = () => {
 
   const classes = useStyles();
 
-  const {pagingInfo, setPageIndex, setFilter} = usePagingInfo();
-  const {loading, data, error, resetCache} = useFetch(
-    CoursesService.getAllCourses, 
-    { ...pagingInfo, pageIndex: pagingInfo.pageIndex! + 1 } // DataGrid's start page count from 0, but API count from 1.
-  );
+  const { 
+    pagingInfo,
+    setFilter,
+    setPageIndex,
+    data,
+    loading,
+    error,
+    resetCache
+  } = useFetchV2({ fetchFn: fetchAPIDebounced });
+
   const {selectedItems, reset, changeSelection} = useSelectedItems<Course.CourseDto>();
   
+  useEffect(() => {
+    document.title = "2Scool | Quản lý khóa học";
+  }, []);
+
+  useEffect(() => {
+    console.log({data});
+  }, [data]);
+
   const onPageChange = (param: GridPageChangeParams) => {
-    setPageIndex(param.page);
+    setPageIndex(param.page + 1);
   };
 
   const onRequestDelete = async (courseId: string) => {
@@ -94,7 +111,7 @@ const CoursesPage = () => {
     <div style={{ flexGrow: 1 }}>
       <Grid container style={{ flex: 1 }}>
         <Grid item xs={4} sm={3} md={2}>
-          <Sidebar activeKey={'courses'} />
+          <Sidebar activeKey={routes.CoursesManager} />
         </Grid>
         <Grid style={{ background: '#fff', flexGrow: 1 }} item container xs={8} sm={9} md={10} direction='column'>
           <Grid item >
@@ -159,13 +176,28 @@ const CoursesPage = () => {
                   rowCount={data.totalCount}
                   onPageChange={onPageChange}
                   loading={loading}
+                  page={pagingInfo.pageIndex && pagingInfo.pageIndex - 1}
+                  error={error}
+                  checkboxSelection
+                  paginationMode='server'
+                  onSelectionModelChange={(selection) => console.log({selection})}
+                  onRowSelected={changeSelection}
+                  selectionModel={selectedItems.map(el => el.id)}
+                />
+                {/* <DataGrid
+                  columns={cols}
+                  rows={data.items}
+                  pageSize={data.pageSize} 
+                  rowCount={data.totalCount}
+                  onPageChange={onPageChange}
+                  loading={loading}
                   page={pagingInfo.pageIndex}
                   error={error}
                   checkboxSelection
                   paginationMode='server'
                   onRowSelected={changeSelection}
                   selectionModel={selectedItems.map(el => el.id)}
-                />
+                /> */}
               </Container>
             </Grid>
           </Grid>

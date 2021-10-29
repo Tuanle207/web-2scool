@@ -20,6 +20,7 @@ import { DcpReportActions } from '../store/actions';
 import { formatTime } from '../utils/TimeHelper';
 import ActionModal from '../components/Modal';
 import { taskType } from '../appConsts';
+import { routes } from '../routers/routesDictionary';
 import useStyles from '../assets/jss/views/DCPReportUpdatePage';
 
 
@@ -235,7 +236,7 @@ const DCPReportUpdatePage: React.FC<Props> = ({
     <div style={{ height: '100%' }}>
       <Grid container className={classes.container}>
         <Grid item xs={4} sm={3} md={2}>
-          <Sidebar activeKey={'my-dcp-report'} />
+          <Sidebar activeKey={routes.UpdateDCPReport} />
         </Grid>
         <Grid style={{ height: '100%' }} item container xs={8} sm={9} md={10} direction={'column'}>
           <Header />

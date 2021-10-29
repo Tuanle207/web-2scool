@@ -16,6 +16,7 @@ import RemoveCircleOutlineIcon from '@material-ui/icons/RemoveCircleOutline';
 import SettingsIcon from '@material-ui/icons/Settings';
 import { useHistory } from 'react-router';
 import useStyles from '../assets/jss/views/LessonRegisterReport';
+import { routes } from '../routers/routesDictionary';
 
 const LRCard = ({
   index,
@@ -55,7 +56,7 @@ const LRCard = ({
             <Typography variant={'body1'} style={{marginLeft: 8}} > {`Số lượt vắng: ${absence}`} </Typography>
         </Grid>
       </Grid>
-      <Grid item container 
+      <Grid item container
         direction='row'
         justify='center'
         alignItems='center'
@@ -109,7 +110,7 @@ const LessonRegisterReport = () => {
     <div style={{ height: '100%' }}>
       <Grid container style={{ height: '100%' }}>
         <Grid item xs={4} sm={3} md={2}>
-          <Sidebar activeKey={'my-lr-report'} />
+          <Sidebar activeKey={routes.MyLRReport} />
         </Grid>
         <Grid style={{ height: '100%' }} item container xs={8} sm={9} md={10} direction='column'>
           <Header />
@@ -118,7 +119,7 @@ const LessonRegisterReport = () => {
                
                
               <Grid item container alignItems='flex-end' justify='flex-end' style={{width: 'auto'}}>
-                <Button variant={'contained'} color={'primary'} onClick={() => history.push('lr-report-creation')} >
+                <Button variant={'contained'} color={'primary'} onClick={() => history.push(routes.CreateLRReport)} >
                   Nộp sổ đầu bài
                 </Button>
               </Grid>
@@ -167,7 +168,7 @@ const LessonRegisterReport = () => {
                 !loading && items.length === 0 && (
                   
                   <Grid container justify='center' alignItems='center' style={{flex: 1}}>
-                    <p className={classes.emptyText}>Không có phiếu chấm điểm nào đang chờ duyệt!</p>
+                    <p className={classes.emptyText}>Không có phiếu gửi sổ đầu bài nào!</p>
                   </Grid>
                 )
               }
