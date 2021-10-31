@@ -4,6 +4,16 @@ const useStyles = makeStyles(theme => ({
   root: {
     height: '100%',
     width: '100%',
+    '& .MuiDataGrid-root': {
+      backgroundColor: '#fff',
+      padding: theme.spacing(0, 2),
+    },
+    '& .MuiDataGrid-root *': {
+      '&::-webkit-scrollbar': {
+        width: 8,
+        height: 8
+      }
+    },
     '& .MuiDataGrid-iconSeparator': {
       color: theme.palette.divider,
       

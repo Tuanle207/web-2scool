@@ -364,7 +364,7 @@ const MyDCPReportPage = () => {
                 <Button 
                   variant={'contained'} 
                   color={'primary'}
-                  onClick={() => history.push('dcp-report-creation')}>
+                  onClick={() => history.push(routes.CreateDCPReport)}>
                   Tạo phiếu chấm nề nếp
                 </Button>
               </Grid>

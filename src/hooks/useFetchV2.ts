@@ -66,6 +66,10 @@ export const useFetchV2 = <T = any> ({ fetchFn, filter, pageIndex, pageSize }: I
     setPagingInfo(prev => ({...prev, pageIndex}));
   };
 
+  const setPageSize = (pageSize: number) => {
+    setPagingInfo(prev => ({...prev, pageSize}));
+  };
+
   const resetCache = () => {
     setPagingInfo({
       pageIndex: pageIndex || 1, 
@@ -77,6 +81,7 @@ export const useFetchV2 = <T = any> ({ fetchFn, filter, pageIndex, pageSize }: I
   return {
     pagingInfo,
     setPageIndex,
+    setPageSize,
     setFilter,
     data: res,
     resetCache,

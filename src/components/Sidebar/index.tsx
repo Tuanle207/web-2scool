@@ -179,7 +179,7 @@ const sidebarItems: Util.IObject<ISidebarInfo[]> = {
       policyName: policies.Rankings
     },
     {
-      key: policies.Statistics,
+      key: routes.DCPStatistics,
       Icon: ShowChartIcon,
       title: 'Thống kê',
       route: routes.DCPStatistics,

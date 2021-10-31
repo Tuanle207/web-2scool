@@ -30,5 +30,13 @@ export const routes = {
 };
 
 export const routeWithParams = (route: string, ...params: string[]) => {
-  return route + params.map((param) => `/${param}`);
+  const segments = route.split('/');
+  let paramsPassed = 0;
+  for (let i = 0; i < segments.length; i++) {
+    if (segments[i].startsWith(':')) {
+      segments[i] = params[paramsPassed];
+      paramsPassed++;
+    }
+  }
+  return segments.join('/');
 };

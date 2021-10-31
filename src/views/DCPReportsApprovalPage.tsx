@@ -13,6 +13,7 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import { addDays, formatDate } from '../utils/TimeHelper';
 import { comparers, dcpReportStatus } from '../appConsts';
 import useStyles from '../assets/jss/views/DCPReportsApprovalPage';
+import { routes } from '../routers/routesDictionary';
 
 
 const DCPReportsApprovalPage = () => {
@@ -132,7 +133,7 @@ const DCPReportsApprovalPage = () => {
     <div style={{ height: '100%' }}>
       <Grid container style={{ height: '100%' }}>
         <Grid item xs={4} sm={3} md={2}>
-          <Sidebar activeKey={''} />
+          <Sidebar activeKey={routes.DCPReportApproval} />
         </Grid>
         <Grid style={{ height: '100%' }} item container xs={8} sm={9} md={10} direction='column'>
           <Header />

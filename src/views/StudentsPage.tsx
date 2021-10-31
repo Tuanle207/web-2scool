@@ -18,8 +18,8 @@ import CreateOrUpdateStudentRequest from '../components/Modal/CreateOrUpdateStud
 import { comparers } from '../appConsts';
 import { toast } from 'react-toastify';
 import CreateStudentAccountRequest from '../components/Modal/CreateStudentAccountRequest';
-import useStyles from '../assets/jss/views/StudentsPage';
 import { routes } from '../routers/routesDictionary';
+import useStyles from '../assets/jss/views/StudentsPage';
 
 interface RowMenuProps {
   api: GridApi;
@@ -50,7 +50,7 @@ const RowMenuCell = (props: RowMenuProps) => {
 
   const onRequestDelete = async () => {
     await StudentsService.removeStudent({id: id.toString()});
-    toast(`Xóa học sinh ${id} thành công`, {
+    toast(`Xóa học sinh ${api.getCellValue(id, 'name')} thành công`, {
       type: toast.TYPE.SUCCESS
     });
     reloadCurrentPageData();
@@ -58,7 +58,7 @@ const RowMenuCell = (props: RowMenuProps) => {
 
   return (
     <div>
-      <Tooltip title='Cập nhật thông tin'>
+      <Tooltip title='Cập nhật thông tin học sinh này'>
           <IconButton  
             onClick={() => ActionModal.show({
               title: 'Cập nhật thông tin học sinh',
@@ -71,7 +71,7 @@ const RowMenuCell = (props: RowMenuProps) => {
             <EditIcon />
           </IconButton>
         </Tooltip>
-      <Tooltip title='Cấp tài khoản'>
+      <Tooltip title='Cấp tài khoản cho học sinh này'>
         <IconButton
           onClick={() => ActionModal.show({
             title: "Cấp tài khoản cho học sinh",
@@ -86,7 +86,7 @@ const RowMenuCell = (props: RowMenuProps) => {
       <Tooltip title='Xóa học sinh này'>
         <IconButton
           onClick={() => ActionModal.show({
-            title: `Xác nhận xóa học sinh: ${api.getCellValue(id, 'name')}?`,
+            title: `Xác nhận xóa học sinh ${api.getCellValue(id, 'name')}?`,
             onAccept: onRequestDelete
           })}
         >
@@ -108,7 +108,6 @@ const cols: GridColDef[] =  [
     filterable: false,
     align: 'center',
     disableColumnMenu: true,
-    // disableReorder: true,
   },
   {
     field: 'id',
@@ -149,6 +148,7 @@ const StudentsPage = () => {
     pagingInfo,
     setFilter,
     setPageIndex,
+    setPageSize,
     data,
     loading,
     error,
@@ -161,6 +161,10 @@ const StudentsPage = () => {
 
   const onPageChange = (param: GridPageChangeParams) => {
     setPageIndex(param.page + 1);
+  };
+
+  const onPageSizeChange = (param: GridPageChangeParams) => {
+    setPageSize(param.pageSize);
   };
 
   const onRequestCreate = async (data: Student.CreateUpdateStudentDto) => {
@@ -213,7 +217,7 @@ const StudentsPage = () => {
                 <DataGrid
                   columns={cols}
                   rows={data.items}
-                  pageSize={data.pageSize} 
+                  pageSize={pagingInfo.pageSize} 
                   rowCount={data.totalCount}
                   onPageChange={onPageChange}
                   loading={loading}
@@ -221,6 +225,9 @@ const StudentsPage = () => {
                   error={error}
                   paginationMode='server'
                   hideFooterSelectedRowCount
+                  rowsPerPageOptions={[5, 15, 30, 50]}
+                  onPageSizeChange={onPageSizeChange}
+                  pagination
                 />
               </Container>
             </Grid>
