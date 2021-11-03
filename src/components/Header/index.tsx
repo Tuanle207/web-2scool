@@ -1,19 +1,19 @@
 import { FC, memo, useState } from 'react';
 import { AppBar, IconButton, Badge, Toolbar,
-  InputBase, Menu, MenuItem, ListItemIcon, ListItemText } from '@material-ui/core';
-import useHeaderStyles from '../../assets/jss/components/Header/headerStyles';
-import { StyledMenu, StyledMenuItem } from './HeaderMenu';
-import ExitToAppIcon from '@material-ui/icons/ExitToApp';
-import AccountCircle from '@material-ui/icons/AccountCircle';
-import SettingsIcon from '@material-ui/icons/Settings';
-import SearchIcon from '@material-ui/icons/Search';
-import NotificationsIcon from '@material-ui/icons/Notifications';
-import MoreIcon from '@material-ui/icons/MoreVert';
-import { useHistory } from 'react-router';
-import { withRedux } from '../../utils/ReduxConnect';
-import { AuthActions } from '../../store/actions';
-import { routes } from '../../routers/routesDictionary';
-import { useDebouncedCallback } from 'use-debounce/lib';
+  InputBase, Menu, MenuItem, ListItemIcon, ListItemText, Typography, Grid } from '@material-ui/core';
+  import { StyledMenu, StyledMenuItem } from './HeaderMenu';
+  import ExitToAppIcon from '@material-ui/icons/ExitToApp';
+  import AccountCircle from '@material-ui/icons/AccountCircle';
+  import SettingsIcon from '@material-ui/icons/Settings';
+  import SearchIcon from '@material-ui/icons/Search';
+  import NotificationsIcon from '@material-ui/icons/Notifications';
+  import MoreIcon from '@material-ui/icons/MoreVert';
+  import { useHistory } from 'react-router';
+  import { withRedux } from '../../utils/ReduxConnect';
+  import { AuthActions } from '../../store/actions';
+  import { routes } from '../../routers/routesDictionary';
+  import { useDebouncedCallback } from 'use-debounce/lib';
+  import useHeaderStyles from '../../assets/jss/components/Header/headerStyles';
 
 interface Props {
   hiddenSearchBar?: boolean;
@@ -139,26 +139,27 @@ const Header: FC<Props> = ({
     <div className={classes.grow}>
       <AppBar color='transparent' position="static">
         <Toolbar className={classes.toolbar}>
-          <div className={classes.search} style={hiddenSearchBar ? { visibility: 'hidden' } : {}} >
-            <div className={classes.searchIcon}>
-              <SearchIcon />
+          <Typography variant='h5' display='inline'>Quản lý học sinh</Typography>
+            <div className={classes.search} style={hiddenSearchBar ? { visibility: 'hidden' } : {}} >
+              <div className={classes.searchIcon}>
+                <SearchIcon />
+              </div>
+              <InputBase
+                name="fcking-name"
+                disabled={hiddenSearchBar ? true : false}
+                placeholder={searchBarPlaceholder}
+                fullWidth
+                autoComplete="new-search"
+                defaultValue=""
+                type="search"
+                classes={{
+                  root: classes.inputRoot,
+                  input: classes.inputInput,
+                }}
+                inputProps={{ 'aria-label': 'search' }}
+                onChange={(e) => onSearchChangeDebounced(e.target.value)}
+              />
             </div>
-            <InputBase
-              name="fcking-name"
-              disabled={hiddenSearchBar ? true : false}
-              placeholder={searchBarPlaceholder}
-              fullWidth
-              autoComplete="new-search"
-              defaultValue=""
-              type="search"
-              classes={{
-                root: classes.inputRoot,
-                input: classes.inputInput,
-              }}
-              inputProps={{ 'aria-label': 'search' }}
-              onChange={(e) => onSearchChangeDebounced(e.target.value)}
-            />
-          </div>
           <div className={classes.sectionDesktop}>
             <IconButton aria-label="show 17 new notifications" color="inherit">
               <Badge badgeContent={17} color="secondary">

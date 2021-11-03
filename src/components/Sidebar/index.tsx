@@ -1,10 +1,8 @@
 import { FC, useState, useEffect } from 'react';
-import { Box, Collapse, Container, List, ListItem, ListItemText } from '@material-ui/core';
+import { Box, Collapse, Container, Divider, List, ListItem, ListItemText } from '@material-ui/core';
 import { Dashboard } from '@material-ui/icons';
 import { Link, useHistory, useLocation } from 'react-router-dom';
 import HistoryIcon from '@material-ui/icons/History';
-import useSidebarStyles from '../../assets/jss/components/Sidebar/sidebarStyles';
-import { withRedux } from '../../utils/ReduxConnect';
 import { Util } from '../../interfaces';
 import { policies } from '../../appConsts';
 import CheckCircleIcon from '@material-ui/icons/CheckCircle';
@@ -23,10 +21,11 @@ import { ReactComponent as TeacherIcon } from '../../assets/img/teacher.svg';
 import { ReactComponent as StudentIcon } from '../../assets/img/student.svg';
 import { ReactComponent as RoleIcon } from '../../assets/img/permission.svg';
 import { ReactComponent as UserIcon } from '../../assets/img/user.svg';
+import { ReactComponent as RegulationIcon } from '../../assets/img/regulation.svg';
 import { routes } from '../../routers/routesDictionary';
 import { AppConfigSelector } from '../../store/selectors';
 import { useSelector } from 'react-redux';
-// import { ReactComponent as UserIcon } from '../../assets/img/user.svg';
+import useSidebarStyles from '../../assets/jss/components/Sidebar/sidebarStyles';
 
 interface ISidebarInfo {
   key: string;
@@ -72,6 +71,13 @@ const sidebarItems: Util.IObject<ISidebarInfo[]> = {
       Icon: BookIcon,
       title: 'Khối',
       route: routes.GradesManager,
+      policyName: policies.Courses
+    },
+    {
+      key: routes.RegulationManager,
+      Icon: RegulationIcon,
+      title: 'Quy định nề nếp',
+      route: routes.RegulationManager,
       policyName: policies.Courses
     },
     {
@@ -228,7 +234,7 @@ const Sidebar: FC<ISidebarProps> = ({ activeKey }) => {
       </Box>
       <List component='nav'>
         {
-          sidebarItems[location.pathname.startsWith('/quan-ly') ? 'admin' : 'dashboard'].map(item => 
+          sidebarItems[location.pathname.startsWith('/quan-ly') ? 'admin' : 'dashboard'].map((item) => 
             ((grantedPolicies && grantedPolicies[item.policyName] === true) || item.policyName === '') && (
               item.key === 'task-assignments' ? (
                 <ListItem 
@@ -266,7 +272,7 @@ const Sidebar: FC<ISidebarProps> = ({ activeKey }) => {
                   <List disablePadding>
                       {
                         item.subItems && item.subItems.map(el => (
-                          <ListItem 
+                          <ListItem
                             button
                             className={`${styles.listItem} ${el.key === activeKey ? styles.listItemActive : ''}`}
                             component={Link} 
@@ -299,16 +305,21 @@ const Sidebar: FC<ISidebarProps> = ({ activeKey }) => {
                   </List>
                 </Collapse>
               ) : (
-                <ListItem
-                  button 
-                  className={`${styles.listItem} ${item.key === activeKey ? styles.listItemActive : ''}`}
-                  component={Link}
-                  to={item.route}
-                  key={item.key}
-                >
-                  <item.Icon  style={{marginRight: 8, marginBottom: 4, width: 24, height: 24}} />
-                  <ListItemText primary={item.title} />
-                </ListItem>
+                <>
+                  {
+                    item.key === routes.UsersManager && <Divider light className={styles.divider} />
+                  }
+                  <ListItem
+                    button 
+                    className={`${styles.listItem} ${item.key === activeKey ? styles.listItemActive : ''}`}
+                    component={Link}
+                    to={item.route}
+                    key={item.key}
+                  >
+                    <item.Icon  style={{marginRight: 8, marginBottom: 4, width: 24, height: 24}} />
+                    <ListItemText primary={item.title} />
+                  </ListItem>
+                </>
               )
             )
           )

@@ -25,6 +25,7 @@ import LessonRegisterReportCreate from '../views/LessonRegisterReportCreate';
 import ProfilePage from '../views/ProfilePage';
 import { policies } from '../appConsts';
 import { routes } from './routesDictionary';
+import RegulationsPage from '../views/RegulationsPage';
 
 const DashboardRouter = () => {
   return (
@@ -149,6 +150,11 @@ const DashboardRouter = () => {
           path={routes.GradesManager}
           policyName={policies.Courses}
           component={GradesPage}
+        />
+         <ProtectedRoute 
+          path={routes.RegulationManager}
+          policyName={policies.Courses}
+          component={RegulationsPage}
         />
         <ProtectedRoute 
           path={routes.UsersManager}

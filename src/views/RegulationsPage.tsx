@@ -3,22 +3,19 @@ import AwesomeDebouncePromise from 'awesome-debounce-promise';
 import { Box, Container, Grid, IconButton, Paper, Tooltip } from '@material-ui/core';
 import Sidebar from '../components/Sidebar';
 import Header from '../components/Header';
-import PageTitleBar from '../components/PageTitleBar';
 import FilterButton, { IFilterOption } from '../components/FilterButton';
+import PageTitleBar from '../components/PageTitleBar';
 import { DataGrid, GridColDef, GridPageChangeParams, GridValueFormatterParams,
   GridApi, GridRowId } from '@material-ui/data-grid';
-import { Student, Class, Identity } from '../interfaces';
-import { ClassesService, IdentityService, StudentsService } from '../api';
+import { Student, Regulation } from '../interfaces';
+import { RegulationsService, StudentsService } from '../api';
 import { useFetchV2 } from '../hooks/useFetchV2';
-import PersonAddIcon from '@material-ui/icons/PersonAdd';
 import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@material-ui/icons/Edit';
-import { formatDate } from '../utils/TimeHelper';
 import ActionModal from '../components/Modal';
+import CreateOrUpdateStudentRequest from '../components/Modal/CreateOrUpdateStudentRequest';
 import { comparers } from '../appConsts';
 import { toast } from 'react-toastify';
-import CreateOrUpdateStudentRequest from '../components/Modal/CreateOrUpdateStudentRequest';
-import CreateStudentAccountRequest from '../components/Modal/CreateStudentAccountRequest';
 import { routes } from '../routers/routesDictionary';
 import useStyles from '../assets/jss/views/StudentsPage';
 
@@ -40,13 +37,6 @@ const RowMenuCell = (props: RowMenuProps) => {
       type: toast.TYPE.SUCCESS
     });
     reloadCurrentPageData();
-  };
-
-  const onRequestAccountCreate = async (data: Identity.CreateUpdateUserDto) => {
-    await IdentityService.createUser(data);
-    toast('Cấp tài khoản thành công', {
-      type: toast.TYPE.SUCCESS
-    });
   };
 
   const onRequestDelete = async () => {
@@ -72,18 +62,6 @@ const RowMenuCell = (props: RowMenuProps) => {
             <EditIcon />
           </IconButton>
         </Tooltip>
-      <Tooltip title='Cấp tài khoản cho học sinh này'>
-        <IconButton
-          onClick={() => ActionModal.show({
-            title: "Cấp tài khoản cho học sinh",
-            acceptText: "Cấp tài khoản",
-            component: <CreateStudentAccountRequest id={id.toString()} />,
-            onAccept: onRequestAccountCreate
-          })}
-        >
-          <PersonAddIcon />
-        </IconButton>
-      </Tooltip>
       <Tooltip title='Xóa học sinh này'>
         <IconButton
           onClick={() => ActionModal.show({
@@ -116,36 +94,31 @@ const cols: GridColDef[] =  [
     width: 120
   },
   {
-    field: 'name',
+    field: 'displayName',
     headerName: 'Tên',
-    width: 200
+    width: 300
+  },
+ 
+  {
+    field: 'criteria',
+    headerName: 'Tiêu chí',
+    width: 250,
+    valueFormatter: (params: GridValueFormatterParams) => (params.value as Regulation.CriteriaDto).displayName
   },
   {
-    field: 'dob',
-    headerName: 'Ngày sinh',
-    width: 120,
-    valueFormatter: (params: GridValueFormatterParams) => formatDate(params.value as string)
-  },
-  {
-    field: 'class',
-    headerName: 'Lớp',
-    width: 120,
-    valueFormatter: (params: GridValueFormatterParams) => (params.value as Class.ClassForStudentDto).name
-  },
-  {
-    field: 'parentPhoneNumber',
-    headerName: 'SĐT phụ huynh',
-    width: 150
+    field: 'point',
+    headerName: 'Điểm trừ',
+    width: 120
   },
 ];
 
-const fetchAPIDebounced = AwesomeDebouncePromise(StudentsService.getAllStudents, 500);
+const fetchAPIDebounced = AwesomeDebouncePromise(RegulationsService.getAllRegulations, 500);
 
-const StudentsPage = () => {
+const RegulationsPage = () => {
 
   const classes = useStyles();
 
-  const [ classOptions, setClassOptions ] = useState<IFilterOption[]>([]);
+  const [ criteriaOptions, setCriteriaOptions ] = useState<IFilterOption[]>([]);
 
   const { 
     pagingInfo,
@@ -162,18 +135,18 @@ const StudentsPage = () => {
   useEffect(() => {
 
     const initFilterData = async () => {
-      const { items } = await ClassesService.getClassForSimpleList();
+      const { items } = await RegulationsService.getCriteriaForSimpleList();
       const options: IFilterOption[] = items.map((el) => ({
         id: el.id,
         label: el.name,
         value: el.id
       }));
-      setClassOptions(options);
+      setCriteriaOptions(options);
     };
 
     initFilterData();
 
-    document.title = '2Scool | Quản lý học sinh';
+    document.title = '2Scool | Quản lý quy định nề nếp';
   }, []);
 
   const onPageChange = (param: GridPageChangeParams) => {
@@ -184,12 +157,12 @@ const StudentsPage = () => {
     setPageSize(param.pageSize);
   };
 
-  const onClassFilterChange = (options: IFilterOption[]) => {
-    const classIdList = options.map((x) => x.id);
+  const onCriteriaFilterChange = (options: IFilterOption[]) => {
+    const criteriaIdList = options.map((x) => x.id);
     setFilter({
-      key: "ClassId",
+      key: "CriteriaId",
       comparison: comparers.In,
-      value: classIdList.join(',')
+      value: criteriaIdList.join(',')
     });
   };
 
@@ -205,13 +178,13 @@ const StudentsPage = () => {
     <div style={{ flexGrow: 1 }}>
       <Grid container style={{ flex: 1 }}>
         <Grid item xs={4} sm={3} md={2}>
-          <Sidebar activeKey={routes.StudentsManager} />
+          <Sidebar activeKey={routes.RegulationManager} />
         </Grid>
         <Grid style={{ background: '#fff', flexGrow: 1 }} item container xs={8} sm={9} md={10} direction='column'>
           <Grid item >
             <Header
-              searchBarPlaceholder="Tìm kiếm học sinh..."
-              onTextChange={(value) => setFilter({key: 'Name', comparison: comparers.Contains, value: value })} 
+              searchBarPlaceholder="Tìm kiếm quy định..."
+              onTextChange={(value) => setFilter({key: 'DisplayName', comparison: comparers.Contains, value: value })} 
             />
           </Grid>
           <Grid item container direction='column' style={{ flexGrow: 1 }}>
@@ -223,8 +196,8 @@ const StudentsPage = () => {
             }}
             >
               <Paper variant="outlined" elevation={1}>
-                <PageTitleBar 
-                  title={`Học sinh`} 
+                <PageTitleBar
+                  title={`Quy định nề nếp`} 
                   onMainButtonClick={() => ActionModal.show({
                     title: 'Thêm học sinh mới',
                     acceptText: 'Lưu',
@@ -239,9 +212,9 @@ const StudentsPage = () => {
                   filterComponent={(
                     <Box>
                       <FilterButton
-                        title="Lớp"
-                        options={classOptions}
-                        onSelectedOptionsChange={onClassFilterChange}
+                        title="Tiêu chí"
+                        options={criteriaOptions}
+                        onSelectedOptionsChange={onCriteriaFilterChange}
                       />
                     </Box>
                   )}
@@ -274,4 +247,4 @@ const StudentsPage = () => {
   );
 };
 
-export default StudentsPage;
+export default RegulationsPage;

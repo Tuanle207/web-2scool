@@ -44,3 +44,18 @@ body {
 .MuiDataGrid-row:hover {
   background-color:#81c2f7 !important;
 }
+
+.ReactModal__Overlay {
+  z-index: 1000;
+  background-color: rgba(#000, .7) !important;
+  opacity: 0;
+  transition: opacity 2000ms ease-in-out;
+}
+
+.ReactModal__Overlay--after-open {
+  opacity: 1;
+}
+
+.ReactModal__Overlay--before-close {
+  opacity: 0;
+}

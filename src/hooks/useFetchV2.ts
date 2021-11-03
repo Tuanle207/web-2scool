@@ -67,7 +67,11 @@ export const useFetchV2 = <T = any> ({ fetchFn, filter, pageIndex, pageSize }: I
   };
 
   const setPageSize = (pageSize: number) => {
-    setPagingInfo(prev => ({...prev, pageSize}));
+    setPagingInfo(prev => ({...prev, pageIndex: 1, pageSize}));
+  };
+
+  const getFilterCount = () => {
+    return pagingInfo.filter?.filter((x) => !!x.value).length || 0;
   };
 
   const resetCache = () => {
@@ -83,6 +87,7 @@ export const useFetchV2 = <T = any> ({ fetchFn, filter, pageIndex, pageSize }: I
     setPageIndex,
     setPageSize,
     setFilter,
+    getFilterCount,
     data: res,
     resetCache,
     error,

@@ -5,11 +5,10 @@ const usePageTitleBarStyles = makeStyles((theme: Theme) => ({
     padding: theme.spacing(1, 4),
   },
   title: {
-  
+    userSelect: 'none',
   },
   button: {
-    // padding: theme.spacing(1, 2)
-    textTransform: 'none'
+    // textTransform: 'none'
   },
   buttonMoreOptions: {
     backgroundColor: '#EEF2F5',
