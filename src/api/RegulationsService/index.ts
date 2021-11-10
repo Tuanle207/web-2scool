@@ -24,7 +24,7 @@ const getCriteriaForSimpleList = async () => {
 
 const getAllRegulations = async (pagingInfo: Util.PagingInfo) => {
   const apiService = await getApiService();
-  const result = await apiService.post<Util.PagingModel<Regulation.RegulationForSimpleListDto>>(Endpoint.GetAllRegulations(), pagingInfo);
+  const result = await apiService.post<Util.PagingModel<Regulation.RegulationDto>>(Endpoint.GetAllRegulations(), pagingInfo);
   return result;
 };
 

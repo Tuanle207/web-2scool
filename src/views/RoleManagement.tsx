@@ -171,7 +171,10 @@ const RoleManagement = () => {
         </Grid>
         <Grid style={{ background: '#fff', flexGrow: 1 }} item container xs={8} sm={9} md={10} direction='column'>
           <Grid item >
-            <Header onTextChange={(value) => setFilter({key: 'Name', comparison: comparers.Contains, value: value })} />
+            <Header
+              onTextChange={(value) => setFilter({key: 'Name', comparison: comparers.Contains, value: value })}
+              pageName="Quản lý vai trò"
+            />
           </Grid>
           <Grid item container direction='column' style={{ flexGrow: 1 }}>
             <Grid item style={{ 

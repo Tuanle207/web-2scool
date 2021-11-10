@@ -3,6 +3,8 @@ const Endpoint = {
     `/api/app/grades/${id}`,
   GetAllGrades: () => 
     `/api/app/grades/paging`,
+  GetGradesForSimpleList: () => 
+  `/api/app/grades/simple-list`,
   CreateGrade: () =>
     `/api/app/grades`,
   UpdateGrade: (id: string) =>

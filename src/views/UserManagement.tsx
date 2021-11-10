@@ -174,6 +174,7 @@ const UserManagement = () => {
             <Header
               onTextChange={(value) => setFilter({key: 'Name', comparison: comparers.Contains, value: value })}
               searchBarPlaceholder="Tìm kiếm người dùng"
+              pageName="Quản lý người dùng"
             />
           </Grid>
           <Grid item container direction='column' style={{ flexGrow: 1 }}>

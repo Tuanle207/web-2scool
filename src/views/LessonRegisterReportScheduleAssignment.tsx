@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Container, Grid, Button, List, ListItem, Typography, TextField } from '@material-ui/core';
-import React, { useState } from 'react';
+import { Container, Grid, Button, List, ListItem, Typography, TextField, makeStyles } from '@material-ui/core';
+import React, { useEffect, useState } from 'react';
 import Header from '../components/Header';
 import Sidebar from '../components/Sidebar';
 import { Class, Identity, TaskAssignment, Util } from '../interfaces';
@@ -15,9 +15,8 @@ import { toast } from 'react-toastify';
 import ActionModal from '../components/Modal';
 import { routes } from '../routers/routesDictionary';
 import useStyles from '../assets/jss/views/LessonRegisterReportSchedule';
-import { DataGrid, GridColDef, GridValueFormatterParams } from '@material-ui/data-grid';
-import { useHistory } from 'react-router';
-
+import { DataGrid, GridColDef, GridValueFormatterParams, GridCellParams, GridApi, GridEditCellPropsParams } from '@material-ui/data-grid';
+import Rating from '@material-ui/lab/Rating';
 
 interface IAssignClass {
   classId: string;
@@ -25,63 +24,83 @@ interface IAssignClass {
   assigned: boolean;
 }
 
-const AssignCard = ({
-  index,
-  selectedUser,
-  onSelectedUserChange,
-  userOptions,
-  iclass,
-  editable = false
-}: {
-  index: number;
-  iclass: Class.ClassForSimpleListDto;
-  userOptions: Identity.UserForTaskAssignmentDto[];
-  selectedUser?: TaskAssignment.UserProfleForTaskAssignmentDto;
-  onSelectedUserChange: (selectedUser: Identity.UserForTaskAssignmentDto | null) => void;
-  editable: boolean;
-}) => {
+const useStyles2 = makeStyles({
+  root: {
+    // flex: 1,
+    width: "100%",
+    display: 'flex',
+    justifyContent: "center",
+    alignItems: "center",
+    // paddingRight: 16,
+  },
+});
 
+function RatingEditInputCell(props: GridCellParams) {
+  const { id, value, api, field } = props;
+  const classes = useStyles2();
+
+  const [ userOptions, setuserOptions ] = useState<Identity.UserForTaskAssignmentDto[]>([])
   const [ selected, setSelected ] = React.useState<Identity.UserForTaskAssignmentDto | null>(null);
-
-  React.useEffect(() => {
-    if (selectedUser) {
-      const user = userOptions.find(x => x.userProfileId === selectedUser?.id);
-      if (user) {
-        setSelected(user);
-      }
-    }
-  }, []);
-
-  const handleOnChange = (value: Identity.UserForTaskAssignmentDto | null) => {
-    setSelected(value);
-    onSelectedUserChange(value);
-  };
   
 
+  useEffect(() => {
+    const initData = async () => {
+      const classItem = (api as GridApi).getCellValue(id, 'classAssigned') as Class.ClassForSimpleListDto;
+      const classId = classItem.id;
+      const { items } = await IdentityService.getUsersForTaskAssignment(classId);
+      setuserOptions(items);
+      setSelected(value as Identity.UserForTaskAssignmentDto);
+    };
+    initData();
+  }, []);
+
+
+  const handleOnChange = (value: Identity.UserForTaskAssignmentDto | null) => {
+    let setValue = {...value};
+    if (value === null) {
+      setValue = userOptions[0];
+    }
+    setSelected(value);
+    (api as GridApi).setEditCellProps({id, field, props: { value: setValue }});
+    (api as GridApi).commitCellChange({ id, field, props: { value: setValue } });
+    (api as GridApi).setCellMode(id, field, 'view');
+  };
+
+  // const handleRef = (element: any) => {
+  //   if (element) {
+  //     element.querySelector(`input[value="${value}"]`).focus();
+  //   }
+  // };
+
   return (
-    <Grid container justify='center' alignItems='center' >
-      <p>{iclass.name}</p>
+    <div className={classes.root}>
       <Autocomplete
-        id={`lr-report-schedule-${index}`}
-        disabled={!editable}
-        style={{width: 300, marginLeft: 32}}
+        style={{ height: "100%" }}
+        fullWidth
         options={userOptions.sort((x, y) => x.name.localeCompare(y.name))}
         getOptionLabel={(option) => option.name}
         getOptionSelected={(option, value) => option.id === value.id}
         value={selected}
         onChange={(e, newValue) => handleOnChange(newValue)}
-        size='small'
+        size="medium"
         renderInput={(params) => (
-          <TextField {...params} 
+          <TextField
+            {...params}
+            style={{ height: "100%" }}
             variant='outlined' 
-            label='Học sinh giữ sổ đầu bài' 
             placeholder='Chọn học sinh' 
           />
+          // <input style={{height: 100}}  />
         )}
       />
-    </Grid>
+    </div>
   );
-};
+}
+
+function renderRatingEditInputCell(params: GridCellParams) {
+  return <RatingEditInputCell {...params} />;
+}
+
 
 const cols: GridColDef[] = [
   {
@@ -102,10 +121,12 @@ const cols: GridColDef[] = [
     field: 'assignee',
     headerName: 'Cờ đỏ chấm ',
     flex: 1,
+    renderEditCell: renderRatingEditInputCell,
     valueFormatter: (params: GridValueFormatterParams) => {
       const value = params.value as TaskAssignment.UserProfleForTaskAssignmentDto;
       return value.name;
-    }
+    },
+    editable: true,
   },
   {
     field: 'belongsToClass',
@@ -116,31 +137,12 @@ const cols: GridColDef[] = [
       return value.class.name;
     }
   },
-  {
-    field: 'startTime',
-    headerName: 'Bắt đầu từ',
-    width: 150,
-    valueFormatter: (params: GridValueFormatterParams) => {
-      const value = params.value as Date;
-      return formatDate(value.toLocaleString());
-    }
-  },
-  {
-    field: 'endTime',
-    headerName: 'Đến',
-    width: 150,
-    valueFormatter: (params: GridValueFormatterParams) => {
-      const value = params.value as Date;
-      return formatDate(value.toLocaleString());
-    }
-  }
 ];
 
 
 
-const LessonRegisterReportSchedule = () => {
+const LessonRegisterReportScheduleAssignment = () => {
 
-  const history = useHistory();
   const classes = useStyles();
 
   const [updatedTime, setUpdatedTime] = React.useState(new Date());
@@ -161,6 +163,10 @@ const LessonRegisterReportSchedule = () => {
     getData();
 
   }, []);
+
+  useEffect(() => {
+    console.log({data});
+  }, [data]);
 
 
   const getData = async () => {
@@ -205,50 +211,59 @@ const LessonRegisterReportSchedule = () => {
     return classData.find(x => x.id === classId);
   };
 
+  const onEditChange = (params: GridEditCellPropsParams, event?: React.SyntheticEvent<Element, Event> | undefined) => {
+    console.log({params, event});
+  };
+
+  const onCellEditCommit = (params: GridEditCellPropsParams, event?: React.SyntheticEvent<Element, Event> | undefined) => {
+    console.log({params, event});
+
+    console.log("changing bro...");
+    console.log({data});
+  };
+
   const handleSubmit = () => {
 
-    history.push(routes.LRReportScheduleAssignment);
+    if (!edit) {
+      setEdit(true);
+      return;
+    }
 
-    // if (!edit) {
-    //   setEdit(true);
-    //   return;
-    // }
+    // no unassigned class
+    if (assignClasses.findIndex(x => x.assigned === false || !x.user) !== -1) {
+      return toast.info('Vui lòng phân công đầy đủ cho các lớp trước khi lưu!', {
+        autoClose: 5000
+      });
+    }
 
-    // // no unassigned class
-    // if (assignClasses.findIndex(x => x.assigned === false || !x.user) !== -1) {
-    //   return toast.info('Vui lòng phân công đầy đủ cho các lớp trước khi lưu!', {
-    //     autoClose: 5000
-    //   });
-    // }
+    // oke
+    ActionModal.show({
+      title: 'Xác nhận cập nhật phân công giữ sổ đầu bài?',
+      onAccept: async () => {
+        try {
+          const body: TaskAssignment.CreateUpdateTaskAssignmentDto = {
+            items: [],
+            taskType: taskType.LessonRegisterReport
+          };
 
-    // // oke
-    // ActionModal.show({
-    //   title: 'Xác nhận cập nhật phân công giữ sổ đầu bài?',
-    //   onAccept: async () => {
-    //     try {
-    //       const body: TaskAssignment.CreateUpdateTaskAssignmentDto = {
-    //         items: [],
-    //         taskType: taskType.LessonRegisterReport
-    //       };
+          body.items = assignClasses.map(x => ({
+            assigneeId: x.user!.id,
+            classId: x.classId,
+            startTime: new Date(),
+            endTime: new Date()
+          }));
 
-    //       body.items = assignClasses.map(x => ({
-    //         assigneeId: x.user!.id,
-    //         classId: x.classId,
-    //         startTime: new Date(),
-    //         endTime: new Date()
-    //       }));
-
-    //       await TaskAssignmentService.createUpdate(body);
+          await TaskAssignmentService.createUpdate(body);
           
-    //       toast.success('Phân công lịch trực cờ đỏ thành công!');
+          toast.success('Phân công lịch trực cờ đỏ thành công!');
 
-    //       setEdit(false);
-    //     } catch (err) {
-    //       console.log(err);
-    //       toast.error('Đã có lỗi xảy ra! Không thể lưu phân công!');
-    //     }
-    //   }
-    // });
+          setEdit(false);
+        } catch (err) {
+          console.log(err);
+          toast.error('Đã có lỗi xảy ra! Không thể lưu phân công!');
+        }
+      }
+    });
   }
   
   const handleSelectedUserItemChange = (classId: string, selectedUser: Identity.UserForTaskAssignmentDto  | null) => {
@@ -303,6 +318,26 @@ const LessonRegisterReportSchedule = () => {
             </Grid>              
             <Grid item container direction={'row'} style={{ flex: '1 1 0', minHeight: 0, flexWrap: 'nowrap', padding: 16, paddingBottom: 0, overflowX: 'hidden', overflowY: 'auto' }}>
               <Container className={classes.datagridContainer}>
+                {/* <List>
+                  {
+                    assignClasses
+                      .sort((x, y) => 
+                        getClass(x.classId)!.name.localeCompare(getClass(y.classId)!.name))
+                      .map((el, index) => (
+                      <ListItem key={el.classId}>
+                        <AssignCard 
+                          index={index}
+                          iclass={getClass(el.classId)!}
+                          userOptions={userData.filter(x => x.class.id === el.classId)}
+                          selectedUser={el.user} 
+                          onSelectedUserChange={(value) => handleSelectedUserItemChange(el.classId, value)}
+                          editable={edit}
+                          />
+                      </ListItem>
+                    ))
+                  }
+                 
+                </List> */}
                 <DataGrid
                   columns={cols}
                   rows={data}
@@ -311,6 +346,8 @@ const LessonRegisterReportSchedule = () => {
                   paginationMode='server'
                   hideFooter
                   hideFooterPagination
+                  onEditCellChange={onEditChange}
+                  onEditCellChangeCommitted={onCellEditCommit}
                 />
               </Container>
             </Grid>
@@ -321,4 +358,4 @@ const LessonRegisterReportSchedule = () => {
   );
 };
 
-export default LessonRegisterReportSchedule;
+export default LessonRegisterReportScheduleAssignment;

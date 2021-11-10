@@ -8,7 +8,7 @@ import FilterButton, { IFilterOption } from '../components/FilterButton';
 import { DataGrid, GridColDef, GridPageChangeParams, GridValueFormatterParams,
   GridApi, GridRowId } from '@material-ui/data-grid';
 import { Student, Class, Identity } from '../interfaces';
-import { ClassesService, IdentityService, StudentsService } from '../api';
+import { ClassesService, IdentityService, StudentsService, GradesService } from '../api';
 import { useFetchV2 } from '../hooks/useFetchV2';
 import PersonAddIcon from '@material-ui/icons/PersonAdd';
 import DeleteIcon from '@material-ui/icons/Delete';
@@ -146,6 +146,7 @@ const StudentsPage = () => {
   const classes = useStyles();
 
   const [ classOptions, setClassOptions ] = useState<IFilterOption[]>([]);
+  const [ gradeOptions, setGradeOptions ] = useState<IFilterOption[]>([]);
 
   const { 
     pagingInfo,
@@ -162,13 +163,20 @@ const StudentsPage = () => {
   useEffect(() => {
 
     const initFilterData = async () => {
-      const { items } = await ClassesService.getClassForSimpleList();
-      const options: IFilterOption[] = items.map((el) => ({
+      const { items: classItems } = await ClassesService.getClassForSimpleList();
+      const { items: gradeItems } = await GradesService.getGradesForSimpleList();
+      const classOptions: IFilterOption[] = classItems.map((el) => ({
         id: el.id,
         label: el.name,
         value: el.id
       }));
-      setClassOptions(options);
+      const gradeOptions: IFilterOption[] = gradeItems.map((el) => ({
+        id: el.id,
+        label: el.displayName,
+        value: el.id
+      }));
+      setClassOptions(classOptions);
+      setGradeOptions(gradeOptions);
     };
 
     initFilterData();
@@ -193,6 +201,16 @@ const StudentsPage = () => {
     });
   };
 
+  
+  const onGradeFilterChange = (options: IFilterOption[]) => {
+    const gradeIdList = options.map((x) => x.id);
+    setFilter({
+      key: "Class.GradeId",
+      comparison: comparers.In,
+      value: gradeIdList.join(',')
+    });
+  };
+
   const onRequestCreate = async (data: Student.CreateUpdateStudentDto) => {
     await StudentsService.createStudent(data);
     toast('Thêm học sinh thành công', {
@@ -212,6 +230,7 @@ const StudentsPage = () => {
             <Header
               searchBarPlaceholder="Tìm kiếm học sinh..."
               onTextChange={(value) => setFilter({key: 'Name', comparison: comparers.Contains, value: value })} 
+              pageName="Quản lý học sinh"
             />
           </Grid>
           <Grid item container direction='column' style={{ flexGrow: 1 }}>
@@ -237,13 +256,18 @@ const StudentsPage = () => {
                   })}
                   filterCount={getFilterCount()}
                   filterComponent={(
-                    <Box>
+                    <>
                       <FilterButton
                         title="Lớp"
                         options={classOptions}
                         onSelectedOptionsChange={onClassFilterChange}
                       />
-                    </Box>
+                      <FilterButton
+                        title="Khối"
+                        options={gradeOptions}
+                        onSelectedOptionsChange={onGradeFilterChange}
+                      />
+                    </>
                   )}
                 />
               </Paper>

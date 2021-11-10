@@ -43,6 +43,12 @@ const getAllGrades =  async (pagingInfo: Util.PagingInfo) => {
   }
 };
 
+const getGradesForSimpleList = async () => {
+  const apiService = await getApiService();
+  const result = await apiService.get<Util.PagingModel<Grade.GradeForSimpleListDto>>(Endpoint.GetGradesForSimpleList());
+  return result;
+};
+
 const removeGrade =  async ({id}: {id: string}) => {
   try {
     const apiService = await getApiService();
@@ -56,6 +62,7 @@ const removeGrade =  async ({id}: {id: string}) => {
 const GradesService = {
   createGrade,
   getAllGrades,
+  getGradesForSimpleList,
   getGradeById,
   removeGrade,
   updateGrade

@@ -14,6 +14,13 @@ const usePageTitleBarStyles = makeStyles((theme: Theme) => ({
     backgroundColor: '#EEF2F5',
     marginRight: theme.spacing(1.25)
   },
+  filter: {
+    display: "flex",
+    flexDirection: "row",
+    "& > *": {
+      margin: theme.spacing(0, 1)
+    }
+  }
 }));
 
 export default usePageTitleBarStyles;

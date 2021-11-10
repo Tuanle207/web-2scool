@@ -163,6 +163,7 @@ const TeachersPage = () => {
             <Header
               onTextChange={(value) => setFilter({key: 'Name', comparison: comparers.Contains, value: value })}
               searchBarPlaceholder="Tìm kiếm giáo viên..."
+              pageName="Quản lý giáo viên"
             />
           </Grid>
           <Grid item container direction='column' style={{ flexGrow: 1 }}>

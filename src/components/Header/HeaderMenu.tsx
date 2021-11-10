@@ -2,12 +2,26 @@ import { Menu, MenuItem, withStyles, MenuProps } from '@material-ui/core';
 
 const StyledMenu = withStyles((theme) => ({
   paper: {
-    border: '1px solid #d3d4d5',
-    padding: theme.spacing(2, 0),
+    overflow: "visible",
+    border: "1px solid #d3d4d5",
+    "&::before": {
+      content: '""',
+      height: 16,
+      width: 16,
+      position: "absolute",
+      backgroundColor: theme.palette.common.white,
+      top: -8,
+      right: 20,
+      zIndex: 0,
+      transform: "rotate(45deg)",
+      border: "1px solid #d3d4d5",
+      borderBottom: "none",
+      borderRight: "none"
+    }
   },
 }))((props: MenuProps) => (
   <Menu
-    elevation={0}
+    elevation={3}
     getContentAnchorEl={null}
     anchorOrigin={{
       vertical: 'bottom',
@@ -23,7 +37,7 @@ const StyledMenu = withStyles((theme) => ({
 
 const StyledMenuItem = withStyles((theme) => ({
   root: {
-    padding: theme.spacing(1, 4),
+    padding: theme.spacing(.5, 2),
     '&:hover': {
       backgroundColor: theme.palette.primary.main,
       '& .MuiListItemIcon-root, & .MuiListItemText-primary': {

@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Container, Grid, Button, makeStyles, Typography } from '@material-ui/core';
+import { Container, Grid, Button, makeStyles, Typography, Paper, Box } from '@material-ui/core';
 import React from 'react';
 import { useHistory } from 'react-router-dom';
 import Header from '../components/Header';
@@ -13,57 +13,42 @@ import AlarmIcon from '@material-ui/icons/Alarm';
 import PermContactCalendarIcon from '@material-ui/icons/PermContactCalendar';
 import { routes } from '../routers/routesDictionary';
 import { sleep } from '../utils/SetTimeOut';
-
+import usePageTitleBarStyles from '../assets/jss/components/PageTitleBar/usePageTitleBarStyles';
 
 const useStyles = makeStyles(theme => ({
+  root: {
+    height: '100%', 
+    width: '100%',
+    '& .MuiDataGrid-root': {
+      backgroundColor: '#fff',
+      padding: theme.spacing(0, 2),
+    },
+    '& .MuiDataGrid-root *': {
+      '&::-webkit-scrollbar': {
+        width: 8,
+        height: 8
+      }
+    },
+    '& .MuiDataGrid-iconSeparator': {
+      color: theme.palette.divider,
+      
+      '&:hover': {
+        color: theme.palette.common.black
+      }
+    },
+    '& .MuiDataGrid-colCell': {
+      // borderRight: '1px solid #303030',
+    },
+    '& .MuiDataGrid-colCellTitle': {
+      fontWeight: 700,
+    }
+  },
   container: {
     height: '100%',
 
     '& .MuiGrid-container': {
       flexWrap: 'nowrap'
     }
-  },
-  actionGroup: {
-    padding: theme.spacing(1, 4),
-    borderBottom: `1px solid ${theme.palette.divider}`
-  },
-  list: {
-    // overflowY: 'scroll'
-    // padding: '20px 100px' 
-  },
-  datagridContainer: {
-    // height: '100%', 
-    width: '100%',
-    '& .MuiDataGrid-columnSeparator': {
-      display: 'none'
-    },
-    '& .MuiDataGrid-colCellTitle': {
-      fontWeight: 700,
-    },
-    '& .MuiDataGrid-root': {
-      border: 'none',
-      '& .MuiDataGrid-withBorder': {
-        borderRight: 'none',
-      }
-    },
-    '& .MuiDataGrid-root.MuiDataGrid-colCellMoving': {
-      backgroundColor: 'inherit'
-    }
-  },
-
-  dateCardContainer: {
-    padding: theme.spacing(1, 2), 
-    border: '1px solid #000',
-    boxShadow: '2px 2px 6px #000',
-    cursor: 'pointer',
-    '&:hover': {
-      backgroundColor: theme.palette.primary.light,
-      color: theme.palette.common.white
-    }
-  },
-  dateCardContainerActive: {
-    backgroundColor: theme.palette.primary.main,
-    color: theme.palette.common.white
   },
 }));
 
@@ -125,6 +110,7 @@ const cols: GridColDef[] = [
 const DCPReportSchedule = () => {
 
   const classes = useStyles();
+  const titleBarStyles = usePageTitleBarStyles();
   const history = useHistory();
 
   const [data, setData] = React.useState<TaskAssignment.TaskAssignmentDto[]>([]);
@@ -165,6 +151,10 @@ const DCPReportSchedule = () => {
     }
   }
 
+  const onMainButtonClick = () => {
+    history.push(routes.DCPReportScheduleAssignment);
+  };
+
   return (
     <div style={{ height: '100%' }}>
       <Grid container className={classes.container}>
@@ -172,38 +162,48 @@ const DCPReportSchedule = () => {
           <Sidebar activeKey={routes.DCPReportSchedule} />
         </Grid>
         <Grid style={{ height: '100%' }} item container xs={8} sm={9} md={10} direction={'column'}>
-          <Header />
-          <Grid item container direction='column' style={{ flex: 1, minHeight: 0, flexWrap: 'nowrap' }}>
-            <Grid item container alignItems='center' className={classes.actionGroup}>
-              <Grid item container direction='row' alignItems='center' style={{paddingTop: 12, paddingBottom: 12, flex: 1}}>
-                <Grid item container direction={'row'} alignItems={'center'}>
-                  <AlarmIcon style={{ marginRight: 8 }}/>
-                  <Typography variant={'body2'}>{`Cập nhật lần cuối vào ${getDayOfWeek(updatedTime.toLocaleString())} - ${formatTime(updatedTime.toLocaleString())}`}</Typography>
+          {/* <Header pageName="Phân công trực cờ đỏ" /> */}
+          <Grid item >
+            <Header
+              pageName="Phân công trực cờ đỏ"
+            />
+          </Grid>
+          <Grid item container direction='column' style={{ flexGrow: 1 }}>
+            <Grid item style={{ 
+              backgroundColor: "#e8e8e8", 
+              paddingTop: 16, 
+              paddingRight: 24, 
+              paddingLeft: 24 
+            }}
+            >
+              <Paper variant="outlined" elevation={1}>
+                <Grid item container alignItems="center" className={titleBarStyles.container}>
+                  <Grid item container direction="row" alignItems="center">
+                    <AlarmIcon style={{ marginRight: 8 }}/>
+                    <Typography variant="body2">{`Cập nhật lần cuối vào ${getDayOfWeek(updatedTime.toLocaleString())} - ${formatTime(updatedTime.toLocaleString())}`}</Typography>
+                  </Grid>
+                  <Grid item container direction="row" alignItems="center" justify="center">
+                    <PermContactCalendarIcon style={{ marginRight: 8 }}/>
+                    <Typography variant="body2">{`Phân công bởi Lê Anh Tuấn`}</Typography>
+                  </Grid>
+                  <Grid item container justify="flex-end">
+                    <Button variant="contained"
+                      color={'primary'}
+                      onClick={onMainButtonClick}
+                    >
+                      Cập nhật
+                    </Button>
+                  </Grid>
                 </Grid>
-                <Grid item container direction={'row'} alignItems={'center'}>
-                  <PermContactCalendarIcon style={{ marginRight: 8 }}/>
-                  <Typography variant={'body2'}>{`Phân công bởi Lê Anh Tuấn`}</Typography>
-                </Grid>
-              </Grid>
-              <Button 
-                variant={'contained'} 
-                color={'primary'}
-                style={{marginLeft: 'auto'}}
-                onClick={() => history.push('dcp-report-schedules-assignment')}>
-                Phân công lịch trực
-              </Button>
-
-              {/* <Grid item container alignItems='flex-end' justify='flex-end'>
-                
-              </Grid> */}
-            </Grid>              
-            <Grid item container direction={'row'} style={{ flex: 1, minHeight: 0, flexWrap: 'nowrap', padding: 16, paddingBottom: 0 }}>
-              <Container className={classes.datagridContainer}>
+              </Paper>
+            </Grid>
+            <Grid item style={{ flexGrow: 1, paddingTop: 16, paddingBottom: 16, backgroundColor: '#e8e8e8' }}>
+              <Container className={classes.root}>
                 <DataGrid
                   columns={cols}
                   rows={data}
                   loading={loading}
-                  // error={error}
+                  error={error}
                   paginationMode='server'
                   hideFooter
                   hideFooterPagination

@@ -12,4 +12,9 @@ export namespace Grade {
     displayName: string;
     description: string;
   }
+
+  export interface GradeForSimpleListDto {
+    id: string;
+    displayName: string;
+  }
 }

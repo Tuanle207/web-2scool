@@ -18,6 +18,8 @@ import { comparers } from '../appConsts';
 import { toast } from 'react-toastify';
 import { routes } from '../routers/routesDictionary';
 import useStyles from '../assets/jss/views/StudentsPage';
+import regulationType from '../appConsts/regulationType';
+import CreateOrUpdateRegulationModal from '../components/Modal/CreateOrUpdateRegulationModal';
 
 interface RowMenuProps {
   api: GridApi;
@@ -102,8 +104,24 @@ const cols: GridColDef[] =  [
   {
     field: 'criteria',
     headerName: 'Tiêu chí',
-    width: 250,
+    width: 220,
     valueFormatter: (params: GridValueFormatterParams) => (params.value as Regulation.CriteriaDto).displayName
+  },
+  {
+    field: 'type',
+    headerName: 'Loại quy định',
+    width: 130,
+    valueFormatter: (params: GridValueFormatterParams) => {
+      const value = params.value as string;
+      switch (value) {
+        case regulationType.Student:
+          return "Học sinh";
+        case regulationType.Class:
+          return "Lớp";
+        default:
+          return "Không XĐ";
+      }
+    }
   },
   {
     field: 'point',
@@ -119,6 +137,11 @@ const RegulationsPage = () => {
   const classes = useStyles();
 
   const [ criteriaOptions, setCriteriaOptions ] = useState<IFilterOption[]>([]);
+  const [ regulationTypeOptions ] = useState<IFilterOption[]>([
+    { id: regulationType.Student, label: "Học sinh", value: regulationType.Student },
+    { id: regulationType.Class, label: "Lớp", value: regulationType.Class },
+  ]);
+  const [ creationModalShow, setCreationModalShow ] = useState(false);
 
   const { 
     pagingInfo,
@@ -166,6 +189,15 @@ const RegulationsPage = () => {
     });
   };
 
+  const onRegulationTypeFilterChange = (options: IFilterOption[]) => {
+    const regulationTypeList = options.map((x) => x.id);
+    setFilter({
+      key: "Type",
+      comparison: comparers.In,
+      value: regulationTypeList.join(',')
+    });
+  };
+
   const onRequestCreate = async (data: Student.CreateUpdateStudentDto) => {
     await StudentsService.createStudent(data);
     toast('Thêm học sinh thành công', {
@@ -184,7 +216,8 @@ const RegulationsPage = () => {
           <Grid item >
             <Header
               searchBarPlaceholder="Tìm kiếm quy định..."
-              onTextChange={(value) => setFilter({key: 'DisplayName', comparison: comparers.Contains, value: value })} 
+              onTextChange={(value) => setFilter({key: 'DisplayName', comparison: comparers.Contains, value: value })}
+              pageName="Quản lý quy định nề nếp" 
             />
           </Grid>
           <Grid item container direction='column' style={{ flexGrow: 1 }}>
@@ -198,29 +231,32 @@ const RegulationsPage = () => {
               <Paper variant="outlined" elevation={1}>
                 <PageTitleBar
                   title={`Quy định nề nếp`} 
-                  onMainButtonClick={() => ActionModal.show({
-                    title: 'Thêm học sinh mới',
-                    acceptText: 'Lưu',
-                    cancelText: 'Hủy',
-                    component: <CreateOrUpdateStudentRequest />,
-                    onAccept: onRequestCreate
-                  })}
-                  onOptionsButtonClick={() => toast('default toast', {
-                    type: toast.TYPE.INFO,
-                  })}
+                  onMainButtonClick={() => setCreationModalShow(true)}
                   filterCount={getFilterCount()}
                   filterComponent={(
-                    <Box>
+                    <>
                       <FilterButton
                         title="Tiêu chí"
                         options={criteriaOptions}
                         onSelectedOptionsChange={onCriteriaFilterChange}
                       />
-                    </Box>
+                      <FilterButton
+                        title="Loại quy định"
+                        options={regulationTypeOptions}
+                        onSelectedOptionsChange={onRegulationTypeFilterChange}
+                      />
+                    </>
                   )}
                 />
               </Paper>
             </Grid>
+            <CreateOrUpdateRegulationModal
+              open={creationModalShow}
+              onRequestClose={() => setCreationModalShow(false)}
+              dataId="as"
+              criteriaOptions={criteriaOptions}
+              regulationTypeOptions={regulationTypeOptions}
+            />
             <Grid item style={{ flexGrow: 1, paddingTop: 16, paddingBottom: 16, backgroundColor: '#e8e8e8' }}>
               <Container className={classes.root}>
                 <DataGrid

@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import AwesomeDebouncePromise from 'awesome-debounce-promise';
 import { Container, Grid, IconButton, Paper, Tooltip } from '@material-ui/core';
 import { DataGrid, GridApi, GridColDef, GridPageChangeParams, GridRowId, GridValueFormatterParams } from '@material-ui/data-grid';
@@ -9,13 +9,14 @@ import Header from '../components/Header';
 import { toast } from 'react-toastify';
 import PageTitleBar from '../components/PageTitleBar';
 import { Class, Grade, Teacher } from '../interfaces';
-import { ClassesService } from '../api';
+import { ClassesService, GradesService } from '../api';
 import { useFetchV2 } from '../hooks';
 import ActionModal from '../components/Modal';
 import CreateOrUpdateClassRequest from '../components/Modal/CreateOrUpdateClassRequest';
 import { comparers } from '../appConsts';
 import { routes } from '../routers/routesDictionary';
 import useStyles from '../assets/jss/views/ClassesPage';
+import FilterButton, { IFilterOption } from '../components/FilterButton';
 
 interface RowMenuProps {
   api: GridApi;
@@ -122,6 +123,8 @@ const ClassesPage = () => {
 
   const classes = useStyles();
 
+  const [ gradeOptions, setGradeOptions ] = useState<IFilterOption[]>([]);
+
   const { 
     pagingInfo,
     setFilter,
@@ -134,6 +137,19 @@ const ClassesPage = () => {
   } = useFetchV2({ fetchFn: fetchAPIDebounced });
   
   useEffect(() => {
+
+    const initFilterData = async () => {
+      const { items } = await GradesService.getGradesForSimpleList();
+      const options: IFilterOption[] = items.map((el) => ({
+        id: el.id,
+        label: el.displayName,
+        value: el.id
+      }));
+      setGradeOptions(options);
+    };
+
+    initFilterData();
+
     document.title = '2Scool | Quản lý lớp học';
   }, []);
 
@@ -143,6 +159,15 @@ const ClassesPage = () => {
 
   const onPageSizeChange = (param: GridPageChangeParams) => {
     setPageSize(param.pageSize);
+  };
+
+  const onGradeFilterChange = (options: IFilterOption[]) => {
+    const gradeList = options.map((x) => x.value);
+    setFilter({
+      key: "GradeId",
+      comparison: comparers.In,
+      value: gradeList.join(',')
+    });
   };
 
   const onRequestCreate = async (data: Class.CreateUpdateClassDto) => {
@@ -164,6 +189,7 @@ const ClassesPage = () => {
             <Header
               onTextChange={(value) => setFilter({key: 'Name', comparison: comparers.Contains, value: value })}
               searchBarPlaceholder="Tìm kiếm lớp học..."
+              pageName="Quản lý lớp học"
             />
           </Grid>
           <Grid item container direction='column' style={{ flexGrow: 1 }}>
@@ -187,6 +213,15 @@ const ClassesPage = () => {
                   onOptionsButtonClick={() => toast('default toast', {
                     type: toast.TYPE.INFO,
                   })}
+                  filterComponent={(
+                    <>
+                      <FilterButton
+                        title="Khối"
+                        options={gradeOptions}
+                        onSelectedOptionsChange={onGradeFilterChange}
+                      />
+                    </>
+                  )}
                 />
               </Paper>
             </Grid>

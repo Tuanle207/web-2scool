@@ -23,15 +23,17 @@ const PageTitleBar: FC<Props> = ({
 
   return (
     <Grid item container alignItems={'center'} className={classes.container}>
-      <Tooltip title="Bộ lọc" style={{ marginRight: 24 }}>
+      <Tooltip title="Bộ lọc" style={{ marginRight: 16 }}>
       <Badge badgeContent={filterCount} color="primary" >
         <FilterIcon fontSize="small" />
       </Badge>
         
       </Tooltip>
+      <Box className={classes.filter}>
       {
         filterComponent
       }
+      </Box>
       <Box style={{ marginLeft: "auto" }}>
         <Button variant="contained"
           color={'primary'}

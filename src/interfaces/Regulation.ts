@@ -25,9 +25,17 @@ export namespace Regulation {
     name: string;
     displayName: string;
     point: number;
+    type: string;
     criteriaId: string;
     criteria: CriteriaDto;
     isActive: boolean;
     creationTime: Date;
+  }
+
+  export interface CreateUpdateRegulationDto {
+    displayName: string;
+    point: number;
+    criteriaId: string;
+    type: string;
   }
 }

@@ -1,6 +1,6 @@
 import { FC, memo, useState } from 'react';
 import { AppBar, IconButton, Badge, Toolbar,
-  InputBase, Menu, MenuItem, ListItemIcon, ListItemText, Typography, Grid } from '@material-ui/core';
+  InputBase, Menu, MenuItem, ListItemIcon, ListItemText, Typography } from '@material-ui/core';
   import { StyledMenu, StyledMenuItem } from './HeaderMenu';
   import ExitToAppIcon from '@material-ui/icons/ExitToApp';
   import AccountCircle from '@material-ui/icons/AccountCircle';
@@ -20,13 +20,15 @@ interface Props {
   onTextChange?: (text: string) => void;
   postlogoutAsync: () => void;
   searchBarPlaceholder?: string;
+  pageName?: string;
 }
 
 const Header: FC<Props> = ({ 
   postlogoutAsync, 
   onTextChange, 
   hiddenSearchBar = false,
-  searchBarPlaceholder = "Tìm kiếm..."
+  searchBarPlaceholder = "Tìm kiếm...",
+  pageName = "",
  }) => {
 
   const classes = useHeaderStyles();
@@ -139,7 +141,7 @@ const Header: FC<Props> = ({
     <div className={classes.grow}>
       <AppBar color='transparent' position="static">
         <Toolbar className={classes.toolbar}>
-          <Typography variant='h5' display='inline'>Quản lý học sinh</Typography>
+          <Typography variant='h5' display='inline'>{ pageName }</Typography>
             <div className={classes.search} style={hiddenSearchBar ? { visibility: 'hidden' } : {}} >
               <div className={classes.searchIcon}>
                 <SearchIcon />

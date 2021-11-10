@@ -14,6 +14,7 @@ export const routes = {
   DCPReportSchedule: '/phan-cong-lich-cham-diem-ne-nep',
   DCPReportScheduleAssignment: '/cap-nhat-lich-cham-diem-ne-nep',
   LRReportSchedule: '/phan-cong-giu-so-dau-bai',
+  LRReportScheduleAssignment: '/cap-nhat-phan-cong-giu-so-dau-bai',
   DCPRanking: '/xep-hang-ne-nep',
   DCPStatistics: '/thong-ke-ne-nep',
   CoursesManager: '/quan-ly-khoa-hoc',
