@@ -7,7 +7,7 @@ const sleepWithCallback = async (fn: Function, ms: number) => {
   return fn();
 };
 
-const sleep =  async ( ms: number) => {
+const sleep = async ( ms: number) => {
   await timeout(ms || 1000);
 };
 

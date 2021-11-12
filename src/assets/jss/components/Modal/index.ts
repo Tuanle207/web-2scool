@@ -24,6 +24,7 @@ const modalStyles: {[key: string]: CSSProperties} = {
   },
   warning: {
     display: "flex",
+    justifyContent: "center",
     flexDirection: "row",
     marginBottom: theme.spacing(2),
     color: theme.palette.warning.dark

@@ -1,10 +1,12 @@
-import { Box, Button, Grid, TextField, Select, MenuItem, FormControl, InputLabel, FormHelperText, RadioGroup, FormControlLabel, Radio, FormLabel } from '@material-ui/core';
+import { Box, Button, Grid, TextField, Select, MenuItem, FormControl, InputLabel, 
+  FormHelperText, RadioGroup, FormControlLabel, Radio, FormLabel } from '@material-ui/core';
 import { FC, useEffect, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import ActionModal, { IActionModalProps } from './ActionModal';
 import { Regulation } from '../../interfaces';
 import useModalStyles from './modal.style';
 import { IFilterOption } from '../FilterButton';
+import { sleepWithCallback } from '../../utils/SetTimeOut';
 
 interface ICreateOrUpdateRegulationModalProps extends IActionModalProps {
   onSuccess?: (data: any) => void;
@@ -29,7 +31,7 @@ const CreateOrUpdateRegulationModal: FC<Omit<ICreateOrUpdateRegulationModalProps
   const [ title, setTitle ] = useState('Thêm quy định mới');
   const [ notifyIsDirty, setNotifyIsDirty] = useState(false);
 
-  const { control, handleSubmit, reset, formState: { isDirty } } = useForm<Regulation.CreateUpdateRegulationDto>({
+  const { control, handleSubmit, reset, formState: { isDirty, isSubmitting } } = useForm<Regulation.CreateUpdateRegulationDto>({
     defaultValues: {
       displayName: ''
     }
@@ -53,8 +55,8 @@ const CreateOrUpdateRegulationModal: FC<Omit<ICreateOrUpdateRegulationModalProps
     }
   };
 
-  const onSubmit = (data: Regulation.CreateUpdateRegulationDto) => {
-    console.log({data});
+  const onSubmit = async (data: Regulation.CreateUpdateRegulationDto) => {
+    
   };
   
   return (
@@ -192,6 +194,7 @@ const CreateOrUpdateRegulationModal: FC<Omit<ICreateOrUpdateRegulationModalProps
             variant="contained"
             color="primary"
             type="submit"
+            disabled={isSubmitting}
           >
             { dataId ? "Lưu thay đổi" : "Thêm" }
           </Button>

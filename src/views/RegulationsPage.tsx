@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import AwesomeDebouncePromise from 'awesome-debounce-promise';
-import { Box, Container, Grid, IconButton, Paper, Tooltip } from '@material-ui/core';
+import { Container, Grid, IconButton, Paper, Tooltip } from '@material-ui/core';
 import Sidebar from '../components/Sidebar';
 import Header from '../components/Header';
 import FilterButton, { IFilterOption } from '../components/FilterButton';
@@ -13,7 +13,6 @@ import { useFetchV2 } from '../hooks/useFetchV2';
 import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@material-ui/icons/Edit';
 import ActionModal from '../components/Modal';
-import CreateOrUpdateStudentRequest from '../components/Modal/CreateOrUpdateStudentRequest';
 import { comparers } from '../appConsts';
 import { toast } from 'react-toastify';
 import { routes } from '../routers/routesDictionary';
@@ -51,20 +50,20 @@ const RowMenuCell = (props: RowMenuProps) => {
 
   return (
     <div>
-      <Tooltip title='Cập nhật thông tin học sinh này'>
+      <Tooltip title="Cập nhật thông tin quy định này">
           <IconButton  
-            onClick={() => ActionModal.show({
-              title: 'Cập nhật thông tin học sinh',
-              acceptText: 'Lưu',
-              cancelText: 'Hủy',
-              component: <CreateOrUpdateStudentRequest id={id.toString()}/>,
-              onAccept: onRequestUpdate
-            })} 
+            // onClick={() => ActionModal.show({
+            //   title: "Cập nhật thông tin học sinh",
+            //   acceptText: "Lưu",
+            //   cancelText: "Hủy",
+            //   component: <CreateOrUpdateStudentRequest id={id.toString()}/>,
+            //   onAccept: onRequestUpdate
+            // })} 
           >
             <EditIcon />
           </IconButton>
         </Tooltip>
-      <Tooltip title='Xóa học sinh này'>
+      <Tooltip title="Xóa học sinh này">
         <IconButton
           onClick={() => ActionModal.show({
             title: `Xác nhận xóa học sinh ${api.getCellValue(id, 'name')}?`,

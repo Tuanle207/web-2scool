@@ -34,7 +34,7 @@ const DCPReportsApprovalPage = () => {
       {
         key: 'StartDate',
         comparison: comparers.Eq,
-        value: formatDate(new Date().toLocaleString(), 'MM/DD/YYYY')
+        value: formatDate(new Date(2020, 1, 1).toLocaleString(), 'MM/DD/YYYY')
       },
       {
         key: 'EndDate',
@@ -136,7 +136,7 @@ const DCPReportsApprovalPage = () => {
           <Sidebar activeKey={routes.DCPReportApproval} />
         </Grid>
         <Grid style={{ height: '100%' }} item container xs={8} sm={9} md={10} direction='column'>
-          <Header />
+          <Header pageName="Duyệt chấm điểm nề nếp" />
           <Grid item container direction='column' style={{ flex: 1, minHeight: 0, flexWrap: 'nowrap' }}>
             <Grid item container justify='space-between' alignItems='center' className={classes.actionGroup}>
               <Grid item container direction='row' alignItems='center' style={{width: 'auto'}}>

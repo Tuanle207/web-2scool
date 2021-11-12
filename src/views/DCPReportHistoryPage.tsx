@@ -39,7 +39,7 @@ const DCPReportsApprovalPage = () => {
       {
         key: 'StartDate',
         comparison: comparers.Eq,
-        value: formatDate(new Date().toLocaleString(), 'MM/DD/YYYY')
+        value: formatDate(new Date(2020, 1, 1).toLocaleString(), 'MM/DD/YYYY')
       },
       {
         key: 'EndDate',
