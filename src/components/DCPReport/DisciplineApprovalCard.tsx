@@ -65,30 +65,36 @@ const DisciplineApprovalCard = ({data}: {data: DcpReport.DcpReportDto}) => {
   return (
     <Grid key={data.id} container direction={'row'} className={classes.container} >
       <Grid item container direction={'row'} justify={'flex-start'} style={{flex: 4}}>
-        <Grid item container alignItems={'center'} style={{flex: 1}}>
-          <Grid item>
-            <AlarmIcon />
+        <Tooltip title="Thời gian chấm">
+          <Grid item container alignItems={'center'} style={{flex: 1}}>
+            <Grid item>
+              <AlarmIcon />
+            </Grid>
+            <Grid item style={{marginLeft: 8}}>
+              <Typography variant={'body1'} > {`${getDayOfWeek(data.creationTime.toLocaleString())} - ${formatTime(data.creationTime.toLocaleString())}`} </Typography>
+            </Grid>
           </Grid>
-          <Grid item style={{marginLeft: 8}}>
-            <Typography variant={'body1'} > {`${getDayOfWeek(data.creationTime.toLocaleString())} - ${formatTime(data.creationTime.toLocaleString())}`} </Typography>
+        </Tooltip>
+        <Tooltip title="Người chấm">
+          <Grid item container alignItems={'center'} style={{flex: 1}}>
+            <Grid item>
+              <PermContactCalendarIcon />
+            </Grid>
+            <Grid item style={{marginLeft: 8}}>
+              <Typography variant={'body1'} >{data.creator ? data.creator.name : ''}</Typography>
+            </Grid>
           </Grid>
-        </Grid>
-        <Grid item container alignItems={'center'} style={{flex: 1}}>
-          <Grid item>
-            <PermContactCalendarIcon />
+        </Tooltip>
+        <Tooltip title="Lớp được chấm">
+          <Grid item container alignItems={'center'} style={{marginTop: 16}}>
+            <Grid item>
+              <BxBxsBookReaderIcon />
+            </Grid>
+            <Grid item style={{marginLeft: 8}}>
+              <Typography variant={'body1'} > {data.dcpClassReports.map((el) => el.class.name).join(', ')} </Typography>
+            </Grid>
           </Grid>
-          <Grid item style={{marginLeft: 8}}>
-            <Typography variant={'body1'} >{data.creator ? data.creator.name : ''}</Typography>
-          </Grid>
-        </Grid>
-        <Grid item container alignItems={'center'} style={{marginTop: 16}}>
-          <Grid item>
-            <BxBxsBookReaderIcon />
-          </Grid>
-          <Grid item style={{marginLeft: 8}}>
-            <Typography variant={'body1'} > {data.dcpClassReports.map((el) => el.class.name).join(', ')} </Typography>
-          </Grid>
-        </Grid>
+        </Tooltip>
       </Grid>
       <Grid item container 
         direction='column'

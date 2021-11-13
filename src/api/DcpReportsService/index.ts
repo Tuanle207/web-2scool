@@ -93,7 +93,7 @@ const cancelAssessDcpReport = async (id: string) => {
 const getMyDcpReports = async (input: Util.PagingInfo) => {
   try {
     const apiService = await getApiService();
-    const result = await apiService.post<DcpReport.DcpReportDto>(Endpoint.GetMyDcpReports(), input);
+    const result = await apiService.post<Util.PagingModel<DcpReport.DcpReportDto>>(Endpoint.GetMyDcpReports(), input);
     return result;
   } catch (error) {
     throw error;
@@ -103,7 +103,7 @@ const getMyDcpReports = async (input: Util.PagingInfo) => {
 const getDcpReportsForApproval = async (input: Util.PagingInfo) => {
   try {
     const apiService = await getApiService();
-    const result = await apiService.post<DcpReport.DcpReportDto>(Endpoint.GetDcpReportsForApproval(), input);
+    const result = await apiService.post<Util.PagingModel<DcpReport.DcpReportDto>>(Endpoint.GetDcpReportsForApproval(), input);
     return result;
   } catch (error) {
     throw error;

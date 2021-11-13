@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Grid, Box, Button, List, ListItem, Chip } from '@material-ui/core';
+import { Grid, Box, Button, List, Paper, ListItem, Chip, Tooltip } from '@material-ui/core';
 import { MuiPickersUtilsProvider, KeyboardDatePicker } from '@material-ui/pickers';
 import DateFnsUtils from '@date-io/date-fns';
 import React from 'react';
@@ -13,6 +13,7 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import { formatDate } from '../utils/TimeHelper';
 import { comparers, dcpReportStatus } from '../appConsts';
 import { routes } from '../routers/routesDictionary';
+import { ReactComponent as FilterIcon } from '../assets/img/filter.svg';
 import useStyles from '../assets/jss/views/DCPReportHistoryPage';
 
 
@@ -140,83 +141,112 @@ const DCPReportsApprovalPage = () => {
         <Grid item xs={4} sm={3} md={2}>
           <Sidebar activeKey={routes.DCPReportHistory} />
         </Grid>
-        <Grid style={{ height: '100%' }} item container xs={8} sm={9} md={10} direction='column'>
-          <Header />
-          <Grid item container direction='column' style={{ flex: 1, minHeight: 0, flexWrap: 'nowrap' }}>
-            <Grid item container justify='space-between' alignItems='center' className={classes.actionGroup}>
-              <Grid item container direction='row' alignItems='center' style={{width: 'auto'}}>
-                <MuiPickersUtilsProvider utils={DateFnsUtils}>
-                  <Box>
-                    <KeyboardDatePicker
-                      disableToolbar
-                      fullWidth
-                      variant="dialog"
-                      format="dd/MM/yyyy"
-                      margin="dense"
-                      id="get-discipline-report-filter"
-                      label="Chọn ngày chấm"
-                      value={dateFilter}
-                      onChange={handleOnDateChange}
-                      KeyboardButtonProps={{
-                        'aria-label': 'change date',
-                      }}
-                    />
-                  </Box>
-                </MuiPickersUtilsProvider>
-                <Chip 
-                    clickable label='Hôm nay' 
-                    onClick={handleTodayFilterClick}
-                    variant={dateFilterType === 'today' ? 'default' : 'outlined'} 
-                    color={dateFilterType === 'today' ? 'primary' : 'default'} style={{marginLeft: 16}}
-                    />
-                <Chip clickable label='Tuần này' 
-                  onClick={handleWeekFilterClick}
-                  variant={dateFilterType === 'week' ? 'default' : 'outlined'} 
-                  color={dateFilterType === 'week' ? 'primary' : 'default'}
-                  style={{marginLeft: 8}}
-                />
-              </Grid>
+        <Grid style={{ background: '#fff', flexGrow: 1 }} item container xs={8} sm={9} md={10} direction='column'>
+          <Grid item >
+            <Header
+              pageName="Lịch sử duyệt chấm điểm nề nếp"
+            />
+          </Grid>
+          <Grid item container direction='column' style={{ flex: 1, minHeight: 0, flexWrap: 'nowrap', background: "#e8e8e8" }}>
+            <Grid item container
+              style={{
+                paddingTop: 16, 
+                paddingRight: 24, 
+                paddingLeft: 24,
+                marginBottom: 16,
+                background: "#e8e8e8"
+              }}
+            >
+              <Paper variant="outlined" elevation={1}  style={{ width: "100%" }}>
+                <Grid item container direction='row' alignItems='center' style={{ padding: "5px 32px" }}>
+                  <Tooltip title="Bộ lọc" style={{ marginRight: 16 }}>
+                    <FilterIcon fontSize="small" />
+                  </Tooltip>
+                  <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                    <Box>
+                      <KeyboardDatePicker
+                        disableToolbar
+                        fullWidth
+                        size="small"
+                        variant="dialog"
+                        format="dd/MM/yyyy"
+                        margin="dense"
+                        id="get-discipline-report-filter"
+                        value={dateFilter}
+                        onChange={handleOnDateChange}
+                        KeyboardButtonProps={{
+                          'aria-label': 'change date',
+                        }}
+                      />
+                    </Box>
+                  </MuiPickersUtilsProvider>
+                  <Chip 
+                      clickable label='Hôm nay' 
+                      onClick={handleTodayFilterClick}
+                      variant={dateFilterType === 'today' ? 'default' : 'outlined'} 
+                      color={dateFilterType === 'today' ? 'primary' : 'default'} style={{marginLeft: 16}}
+                      />
+                  <Chip clickable label='Tuần này' 
+                    onClick={handleWeekFilterClick}
+                    variant={dateFilterType === 'week' ? 'default' : 'outlined'} 
+                    color={dateFilterType === 'week' ? 'primary' : 'default'}
+                    style={{marginLeft: 8}}
+                  />
+                </Grid>
+              </Paper>
+              
               
             </Grid>              
-            <Grid item container direction='column' style={{ flex: '1 1 0', minHeight: 0, overflowX: 'hidden', overflowY: 'auto' }}>
-              <List className={classes.list}>
-                {
-                  items.map(el => (
-                  <ListItem key={el.id}>
-                    <DisciplineApprovalCard data={el} />
-                  </ListItem>))
-                }
-                {
-                  loading && (
-                    
-                    <Grid container justify='center' alignItems='center'>
-                      <p className={classes.emptyText}>Đang tải ...</p>
-                    </Grid>
-                  )
-                }
-                {
-                  !loading && pagingInfo.pageIndex! + 1 < data.totalCount / pagingInfo.pageSize! && (
-                    <Grid container justify='center' alignItems='center' style={{marginTop: 8, marginBottom: 8}}>
-                      <Button
-                        variant='contained'
-                        color='primary'
-                        startIcon={<ExpandMoreIcon />}
-                        onClick={() => setPageIndex((pagingInfo.pageIndex || 0) + 1)}
-                      >
-                        Tải thêm
-                      </Button>
-                    </Grid>
-                  )
-                }
-              </List>
-              {
-                !loading && items.length === 0 && (
-                  
-                  <Grid container justify='center' alignItems='center' style={{flex: 1}}>
-                    <p className={classes.emptyText}>Không có phiếu chấm điểm nào!</p>
-                  </Grid>
-                )
-              }
+            <Grid item container direction="column" style={{
+              flex: '1 1 0', 
+              minHeight: 0, 
+              overflowX: 'hidden', 
+              background: "#e8e8e8",
+              }}>
+              <Paper variant="outlined" elevation={1} style={{
+                margin: "16px 24px",
+                marginTop: 0,
+                height: "100%",
+                overflowY: "auto"
+              }}>
+                <List className={classes.list}>
+                  {
+                    items.map(el => (
+                    <ListItem key={el.id}>
+                      <DisciplineApprovalCard data={el} />
+                    </ListItem>))
+                  }
+                  {
+                    loading && (
+                      
+                      <Box className={classes.utilBox} >
+                        <p className={classes.emptyText}>Đang tải ...</p>
+                      </Box>
+                    )
+                  }
+                  {
+                    !loading && pagingInfo.pageIndex! + 1 < data.totalCount / pagingInfo.pageSize! && (
+                      <Box className={classes.utilBox} >
+                        <Button
+                          variant='contained'
+                          color='primary'
+                          startIcon={<ExpandMoreIcon />}
+                          onClick={() => setPageIndex((pagingInfo.pageIndex || 0) + 1)}
+                        >
+                          Tải thêm
+                        </Button>
+                      </Box>
+                    )
+                  }
+                  {
+                    !loading && items.length === 0 && (
+                      <Box className={classes.utilBox} >
+                        <p className={classes.emptyText}>Không có phiếu chấm điểm nào đang chờ duyệt!</p>
+                      </Box>
+                    )
+                  }
+                </List>
+              </Paper>
             </Grid>
           </Grid>
         </Grid>

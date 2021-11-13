@@ -47,9 +47,9 @@ body {
 
 .ReactModal__Overlay {
   z-index: 1000;
-  background-color: rgba(#000, .7) !important;
+  background-color: rgba(0, 0, 0, 0.5) !important;
   opacity: 0;
-  transition: opacity 2000ms ease-in-out;
+  transition: opacity 200ms ease-in-out;
 }
 
 .ReactModal__Overlay--after-open {

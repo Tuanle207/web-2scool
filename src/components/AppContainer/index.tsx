@@ -43,6 +43,7 @@ const AppContainer: React.FC<IAppContainerProps> = () => {
             position={toast.POSITION.BOTTOM_RIGHT}
             autoClose={2000}
             hideProgressBar
+            theme="light"
             limit={6}
           />
           <ActionModal />

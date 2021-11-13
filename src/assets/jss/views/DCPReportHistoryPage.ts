@@ -6,12 +6,21 @@ const useStyles = makeStyles(theme => ({
     borderBottom: `1px solid ${theme.palette.divider}`
   },
   list: {
-    // overflowY: 'scroll'
-    padding: '20px 100px' 
+    position: "relative",
+    minHeight: "100%",
+    padding: '20px 100px',
+    borderRadius: 4,
+    marginTop: 0,
+    background: theme.palette.common.white,
   },
   emptyText: {
-    color: theme.palette.grey[500],
     textAlign: 'center'
+  },
+  utilBox: {
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
   }
 }));
 

@@ -29,7 +29,7 @@ export class ReduxStore {
       reducer: this.persistedReducer,
       middleware: ENV.enableLogger ? [
         this.sagaMiddleware,
-        createLogger()
+        // createLogger()
       ] : [this.sagaMiddleware]
     });
     this.persistor = persistStore(this.store);

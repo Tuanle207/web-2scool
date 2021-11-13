@@ -88,6 +88,7 @@ export const useFetchV2 = <T = any> ({ fetchFn, filter, pageIndex, pageSize }: I
     setPageSize,
     setFilter,
     getFilterCount,
+    updateData: setRes,
     data: res,
     resetCache,
     error,

@@ -67,7 +67,7 @@ const LRCard = ({
             <PhotoIcon className={classes.imgIcon} />
           </Tooltip>
           <img 
-            src={`http://${photo}`}
+            src={`https://${photo}`}
             alt='test img'
           />
         </Grid>
@@ -113,10 +113,9 @@ const LessonRegisterReport = () => {
           <Sidebar activeKey={routes.MyLRReport} />
         </Grid>
         <Grid style={{ height: '100%' }} item container xs={8} sm={9} md={10} direction='column'>
-          <Header />
+          <Header pageName="Nộp sổ đầu bài" />
           <Grid item container direction='column' style={{ flex: 1, minHeight: 0, flexWrap: 'nowrap' }}>
             <Grid item container justify='space-between' alignItems='center' className={classes.actionGroup}>
-               
                
               <Grid item container alignItems='flex-end' justify='flex-end' style={{width: 'auto'}}>
                 <Button variant={'contained'} color={'primary'} onClick={() => history.push(routes.CreateLRReport)} >

@@ -2,66 +2,102 @@ import { Box, Button, Grid, TextField, Select, MenuItem, FormControl, InputLabel
   FormHelperText, RadioGroup, FormControlLabel, Radio, FormLabel } from '@material-ui/core';
 import { FC, useEffect, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
-import ActionModal, { IActionModalProps } from './ActionModal';
+import { toast } from 'react-toastify';
+import DataModal, { IDataModalProps } from './DataModal';
 import { Regulation } from '../../interfaces';
 import useModalStyles from './modal.style';
 import { IFilterOption } from '../FilterButton';
-import { sleepWithCallback } from '../../utils/SetTimeOut';
+import { RegulationsService } from '../../api';
 
-interface ICreateOrUpdateRegulationModalProps extends IActionModalProps {
-  onSuccess?: (data: any) => void;
-  dataId?: string;
+interface ICreateOrUpdateRegulationModalProps extends IDataModalProps{
+  onSuccess?: (data: Regulation.RegulationDto) => void;
+  item?: Regulation.RegulationDto;
   criteriaOptions?: IFilterOption[];
   regulationTypeOptions?: IFilterOption[];
+  onClose?: () => void;
 }
 
-const CreateOrUpdateRegulationModal: FC<Omit<ICreateOrUpdateRegulationModalProps, "children">> = ({
-  open,
-  dataId,
+const CreateOrUpdateRegulationModal: FC<ICreateOrUpdateRegulationModalProps> = ({
+  isOpen,
+  item,
   onRequestClose,
   onSuccess = () => {},
   confirmBeforeExit,
   criteriaOptions = [],
   regulationTypeOptions = [],
+  onClose = () => {},
   ...rest
 }) => {
   
   const styles = useModalStyles();
 
   const [ title, setTitle ] = useState('Thêm quy định mới');
-  const [ notifyIsDirty, setNotifyIsDirty] = useState(false);
+  const [ notifyIsDirty, setNotifyIsDirty] = useState(true);
 
-  const { control, handleSubmit, reset, formState: { isDirty, isSubmitting } } = useForm<Regulation.CreateUpdateRegulationDto>({
-    defaultValues: {
-      displayName: ''
-    }
-  });
+  const { control, handleSubmit, reset, formState: { isDirty, isSubmitting }, } = useForm<Regulation.CreateUpdateRegulationDto>();
 
   useEffect(() => {
-    if (dataId) {
+    if (item) {
       setTitle('Cập nhật quy định');
-      
-      // init data
+      reset({
+        displayName: item.displayName,
+        point: item.point,
+        criteriaId: item.criteriaId,
+        type: item.type,
+      })
+    } else {
+      setTitle('Thêm quy định mới');
     }
-  }, [dataId]);
+  }, [item]);
+
+
+  const handleClose = (data?: Regulation.RegulationDto) => {
+    reset({});
+    onRequestClose();
+    setNotifyIsDirty(false);
+    if (data) {
+      onSuccess(data);
+    }
+    onClose();
+  };
 
   const onCancel = () => {
     if (isDirty && !notifyIsDirty) {
       setNotifyIsDirty(true);
     } else {
-      onRequestClose();
-      setNotifyIsDirty(false);
-      reset();
+      handleClose();
     }
   };
 
   const onSubmit = async (data: Regulation.CreateUpdateRegulationDto) => {
-    
+    const TOAST_ID = toast.loading("Đang lưu quy định...");
+    try {
+      let result: Regulation.RegulationDto;
+      if (item) {
+        result = await RegulationsService.updateRegulation(item.id, data);
+      } else {
+        result = await RegulationsService.createRegulation(data);
+      }
+      toast.update(TOAST_ID, {
+        render: "Lưu thành công!",
+        type: "success",
+        isLoading: false,
+        autoClose: 3000,
+      });
+      handleClose(result);
+    } catch (err: any) {
+      toast.update(TOAST_ID, {
+        render: err?.message || '',
+        type: "error",
+        isLoading: false,
+        autoClose: 3000,
+      })
+    }
   };
-  
+
   return (
-    <ActionModal
-      open={open}
+    <DataModal
+      isOpen={isOpen}
       onRequestClose={onCancel}
       confirmBeforeExit={notifyIsDirty}
       title={title}
@@ -75,17 +111,14 @@ const CreateOrUpdateRegulationModal: FC<Omit<ICreateOrUpdateRegulationModalProps
             rules={{
               required: "Bạn cần nhập tên quy định",
             }}
-            render={({field: { ref, value, onChange, onBlur }, fieldState: { error }}) => (
+            render={({field, fieldState: { error }}) => (
               <TextField
                 className={styles.field}
                 label="Tên quy định"
                 autoComplete="off"
                 fullWidth
                 variant="outlined"
-                ref={ref}
-                value={value}
-                onChange={onChange}
-                onBlur={onBlur}
+                {...field}
                 error={!!error}
                 helperText={error?.message}
               />
@@ -104,7 +137,7 @@ const CreateOrUpdateRegulationModal: FC<Omit<ICreateOrUpdateRegulationModalProps
                 }
               }
             }}
-            render={({field: { ref, value, onChange, onBlur }, fieldState: { error }}) => (
+            render={({field, fieldState: { error }}) => (
               <TextField
                 className={styles.field}
                 label="Điểm trừ"
@@ -112,10 +145,7 @@ const CreateOrUpdateRegulationModal: FC<Omit<ICreateOrUpdateRegulationModalProps
                 fullWidth
                 variant="outlined"
                 type="number"
-                ref={ref}
-                value={value}
-                onChange={onChange}
-                onBlur={onBlur}
+                {...field}
                 error={!!error}
                 helperText={error?.message}
               />
@@ -196,11 +226,11 @@ const CreateOrUpdateRegulationModal: FC<Omit<ICreateOrUpdateRegulationModalProps
             type="submit"
             disabled={isSubmitting}
           >
-            { dataId ? "Lưu thay đổi" : "Thêm" }
+            { item ? "Lưu thay đổi" : "Thêm" }
           </Button>
         </Grid>
       </Box>
-    </ActionModal>
+    </DataModal>
   );
 };
 

@@ -3,7 +3,9 @@ import { Util } from '../../interfaces';
 import { AppConfigsActions } from '../actions';
 
 const initialState: Util.AppConfig = {
-
+  auth: {
+    grantedPolicies: {}
+  }
 } as Util.AppConfig;
 
 export default createReducer(initialState, build => {

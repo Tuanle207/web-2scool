@@ -14,19 +14,21 @@ interface IFilterButtonProps {
   title: string;
   options?: IFilterOption[];
   onSelectedOptionsChange?: (selectedOptions: IFilterOption[]) => void;
+  defaultSelecteOptions?: IFilterOption[];
 }
 
 const FilterButton: FC<IFilterButtonProps> = ({
   title,
   options = [],
-  onSelectedOptionsChange = () => {}
+  onSelectedOptionsChange = () => {},
+  defaultSelecteOptions = []
 }) => {
 
   const styles = useFilterButtonStyles();
 
   const [ active, setActive ] = useState(false);
   const [ displayTitle, setDisplayTitle ] = useState(title);
-  const [ selectedOptions, setSelectedOptions ] = useState<IFilterOption[]>([]);
+  const [ selectedOptions, setSelectedOptions ] = useState<IFilterOption[]>(defaultSelecteOptions);
 
   const onButtonClick = () => {
     setActive((prev) => !prev);

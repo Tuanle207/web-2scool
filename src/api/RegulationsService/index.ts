@@ -28,15 +28,21 @@ const getAllRegulations = async (pagingInfo: Util.PagingInfo) => {
   return result;
 };
 
+const getRegulation = async (id: string) => {
+  const apiService = await getApiService();
+  const result = await apiService.get<Regulation.RegulationDto>(Endpoint.GetRegulation(id));
+  return result;
+};
+
 const createRegulation = async (input: Regulation.CreateUpdateRegulationDto) => {
   const apiService = await getApiService();
   const result = await apiService.post<Regulation.RegulationDto>(Endpoint.CreateRegulation(), input);
   return result;
 };
 
-const updateRegulation = async (input: Regulation.CreateUpdateRegulationDto) => {
+const updateRegulation = async (id: string, input: Regulation.CreateUpdateRegulationDto) => {
   const apiService = await getApiService();
-  const result = await apiService.post<Regulation.RegulationDto>(Endpoint.CreateRegulation(), input);
+  const result = await apiService.put<Regulation.RegulationDto>(Endpoint.UpdateRegulation(id), input);
   return result;
 };
 
@@ -52,6 +58,7 @@ const RegulationsService ={
   createRegulation,
   updateRegulation,
   deleteRegulation,
+  getRegulation,
 };
 
 export default RegulationsService

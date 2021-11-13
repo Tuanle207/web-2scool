@@ -6,7 +6,7 @@ import Header from '../components/Header';
 import FilterButton, { IFilterOption } from '../components/FilterButton';
 import PageTitleBar from '../components/PageTitleBar';
 import { DataGrid, GridColDef, GridPageChangeParams, GridValueFormatterParams,
-  GridApi, GridRowId } from '@material-ui/data-grid';
+  GridApi, GridRowId, GridCellParams } from '@material-ui/data-grid';
 import { Student, Regulation } from '../interfaces';
 import { RegulationsService, StudentsService } from '../api';
 import { useFetchV2 } from '../hooks/useFetchV2';
@@ -25,51 +25,11 @@ interface RowMenuProps {
   id: GridRowId;
 }
 
-const RowMenuCell = (props: RowMenuProps) => {
-  const { api, id } = props;
-
-  const reloadCurrentPageData = () => {
-    api.setPage(api.getState().pagination.page);
-  };
-
-  const onRequestUpdate = async (data: Student.CreateUpdateStudentDto) => {
-    await StudentsService.updateStudent({id: id.toString(), data});
-    toast('Cập nhật thông tin học sinh thành công', {
-      type: toast.TYPE.SUCCESS
-    });
-    reloadCurrentPageData();
-  };
-
-  const onRequestDelete = async () => {
-    await StudentsService.removeStudent({id: id.toString()});
-    toast(`Xóa học sinh ${api.getCellValue(id, 'name')} thành công`, {
-      type: toast.TYPE.SUCCESS
-    });
-    reloadCurrentPageData();
-  };
-
+const RowDeleteCell = (props: RowMenuProps) => {
   return (
     <div>
-      <Tooltip title="Cập nhật thông tin quy định này">
-          <IconButton  
-            // onClick={() => ActionModal.show({
-            //   title: "Cập nhật thông tin học sinh",
-            //   acceptText: "Lưu",
-            //   cancelText: "Hủy",
-            //   component: <CreateOrUpdateStudentRequest id={id.toString()}/>,
-            //   onAccept: onRequestUpdate
-            // })} 
-          >
-            <EditIcon />
-          </IconButton>
-        </Tooltip>
       <Tooltip title="Xóa học sinh này">
-        <IconButton
-          onClick={() => ActionModal.show({
-            title: `Xác nhận xóa học sinh ${api.getCellValue(id, 'name')}?`,
-            onAccept: onRequestDelete
-          })}
-        >
+        <IconButton>
           <DeleteIcon />
         </IconButton>
       </Tooltip>
@@ -77,13 +37,36 @@ const RowMenuCell = (props: RowMenuProps) => {
   );
 };
 
+const RowUpdateCell = (props: RowMenuProps) => {
+  return (
+    <div>
+      <Tooltip title="Cập nhật thông tin quy định này">
+          <IconButton  >
+            <EditIcon />
+          </IconButton>
+        </Tooltip>
+    </div>
+  );
+};
+
 const cols: GridColDef[] =  [
   {
-    field: 'actions',
-    headerName: 'Hành động',
-    renderCell: RowMenuCell,
+    field: 'updateAction',
+    renderCell: RowUpdateCell,
+    headerName: ' ',
     sortable: false,
-    width: 150,
+    width: 50,
+    headerAlign: 'left',
+    filterable: false,
+    align: 'center',
+    disableColumnMenu: true,
+  },
+  {
+    field: 'deleteAction',
+    renderCell: RowDeleteCell,
+    headerName: ' ',
+    sortable: false,
+    width: 50,
     headerAlign: 'left',
     filterable: false,
     align: 'center',
@@ -141,6 +124,8 @@ const RegulationsPage = () => {
     { id: regulationType.Class, label: "Lớp", value: regulationType.Class },
   ]);
   const [ creationModalShow, setCreationModalShow ] = useState(false);
+  const [ updateModalShow, setUpdateModalShow ] = useState(false);
+  const [ editItem, setEditItem ] = useState<Regulation.RegulationDto>();
 
   const { 
     pagingInfo,
@@ -151,7 +136,7 @@ const RegulationsPage = () => {
     data,
     loading,
     error,
-    resetCache
+    resetCache,
   } = useFetchV2({ fetchFn: fetchAPIDebounced });
 
   useEffect(() => {
@@ -197,11 +182,38 @@ const RegulationsPage = () => {
     });
   };
 
-  const onRequestCreate = async (data: Student.CreateUpdateStudentDto) => {
-    await StudentsService.createStudent(data);
-    toast('Thêm học sinh thành công', {
-      type: toast.TYPE.SUCCESS
+  const onCellClick = (params: GridCellParams) => {
+    const { id, colDef, api } = params;
+    const value = colDef.field;
+
+    if (value === "updateAction") {
+      updateItem(id.toString(), api);
+    } else if (value === "deleteAction") {
+      deleteItem(id.toString(), api);
+    }
+  };
+
+  const updateItem = (id: string, api: GridApi) => {
+    // setEditItemId(id);
+    const item = data.items.find((x) => x.id === id);
+    if (item) {
+      setEditItem(item);
+    }
+    setUpdateModalShow(true);
+  };
+
+  const deleteItem = async (id: string, api: GridApi) => {
+    ActionModal.show({
+      title: `Xác nhận xóa quy định này?`,
+      onAccept: async () => {
+        await RegulationsService.deleteRegulation(id);
+        toast.success(`Xóa quy định thành công thành công`);
+        resetCache();
+      }
     });
+  };
+
+  const onDataChange = (newItem: Regulation.RegulationDto) => {
     resetCache();
   };
 
@@ -250,11 +262,19 @@ const RegulationsPage = () => {
               </Paper>
             </Grid>
             <CreateOrUpdateRegulationModal
-              open={creationModalShow}
+              isOpen={creationModalShow}
               onRequestClose={() => setCreationModalShow(false)}
-              dataId="as"
               criteriaOptions={criteriaOptions}
               regulationTypeOptions={regulationTypeOptions}
+              onSuccess={onDataChange}
+            />
+            <CreateOrUpdateRegulationModal
+              isOpen={updateModalShow}
+              onRequestClose={() => setUpdateModalShow(false)}
+              item={editItem}
+              criteriaOptions={criteriaOptions}
+              regulationTypeOptions={regulationTypeOptions}
+              onSuccess={onDataChange}
             />
             <Grid item style={{ flexGrow: 1, paddingTop: 16, paddingBottom: 16, backgroundColor: '#e8e8e8' }}>
               <Container className={classes.root}>
@@ -272,6 +292,7 @@ const RegulationsPage = () => {
                   rowsPerPageOptions={[5, 15, 30, 50]}
                   onPageSizeChange={onPageSizeChange}
                   pagination
+                  onCellClick={onCellClick}
                 />
               </Container>
             </Grid>
