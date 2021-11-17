@@ -12,7 +12,7 @@ import { AppBar, IconButton, Badge, Toolbar,
   import { withRedux } from '../../utils/ReduxConnect';
   import { AuthActions } from '../../store/actions';
   import { routes } from '../../routers/routesDictionary';
-  import { useDebouncedCallback } from 'use-debounce/lib';
+  import { useDebouncedCallback } from 'use-debounce';
   import useHeaderStyles from '../../assets/jss/components/Header/headerStyles';
 
 interface Props {
