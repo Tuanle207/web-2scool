@@ -34,15 +34,6 @@ const useStyles = makeStyles(theme => ({
     '& .MuiDataGrid-root.MuiDataGrid-colCellMoving': {
       backgroundColor: 'unset'
     },
-    '& .MuiDataGrid-row:first-child': {
-      backgroundColor: '#18a61a'
-    },
-    '& .MuiDataGrid-row:nth-child(2)': {
-      backgroundColor: '#81c2f7'
-    },
-    '& .MuiDataGrid-row:nth-child(3)': {
-      backgroundColor: '#e6e5fe'
-    }
   },
 
   dateCardContainer: {
@@ -59,6 +50,17 @@ const useStyles = makeStyles(theme => ({
     backgroundColor: theme.palette.primary.main,
     color: theme.palette.common.white
   },
+
+  top1Item: {
+    backgroundColor: '#18a61a',
+    color: theme.palette.common.white
+  },
+  top2Item: {
+    backgroundColor: '#81c2f7'
+  },
+  top3Item: {
+    backgroundColor: '#e6e5fe',
+  }
 }));
 
 export default useStyles;

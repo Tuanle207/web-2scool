@@ -6,7 +6,7 @@ import React from 'react';
 import Header from '../components/Header';
 import Sidebar from '../components/Sidebar';
 import { Stats } from '../interfaces';
-import { DataGrid, GridColDef } from '@material-ui/data-grid';
+import { DataGrid, GridColDef, GridRowParams } from '@material-ui/data-grid';
 import { StatisticsService } from '../api';
 import { getPreviousMonday } from '../utils/TimeHelper';
 import { FindInPage } from '@material-ui/icons';
@@ -166,8 +166,20 @@ const DCPRankingPage = () => {
       startTime: dateFilter.startTime!,
       endTime: dateFilter.endTime!
     });
-  }
+  };
 
+
+  const getRowClass = (param: GridRowParams): string => {
+    const ranking = param.getValue('ranking') as number;
+    if (ranking === 1) {
+      return classes.top1Item;
+    } else if (ranking === 2){
+      return classes.top2Item;
+    } else if  (ranking === 3){
+      return classes.top3Item;
+    }
+    return "";
+  };
 
   const handleViewTypeChange = (mode: ViewType) => {
     if (mode !== viewType) {
@@ -275,6 +287,7 @@ const DCPRankingPage = () => {
                   loading={loading}
                   hideFooter
                   getRowId={data => data.classId}
+                  getRowClassName={getRowClass}
                 />
               </Container>
             </Grid>

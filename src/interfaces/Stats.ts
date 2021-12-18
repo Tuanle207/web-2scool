@@ -6,7 +6,7 @@ export namespace Stats {
     className: string;
     formTeacherName: string;
     faults: number;
-    enaltyPoints: number;
+    penaltyPoints: number;
     totalPoints: number;
   }
 
