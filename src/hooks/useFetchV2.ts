@@ -50,15 +50,20 @@ export const useFetchV2 = <T = any> ({ fetchFn, filter, pageIndex, pageSize }: I
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ pagingInfo ]);
 
-  const setFilter = (filter: Util.PagingFilter) => {
-    const newFilter = pagingInfo.filter || [];
-    const existedFilter = newFilter.find(f => f.key === filter.key);
-    if (existedFilter) {
-      existedFilter.comparison = filter.comparison;
-      existedFilter.value = filter.value;
-    } else {
+  const setFilter = (...filters: Util.PagingFilter[]) => {
+    const keys = filters.map((x) => x.key);
+    const newFilter = (pagingInfo.filter || []).filter((x) => !keys.includes(x.key));
+
+    filters.forEach((filter) =>  {
       newFilter.push(filter);
-    }
+    });
+    // const existedFilter = newFilter.find(f => f.key === filter.key);
+    // if (existedFilter) {
+    //   existedFilter.comparison = filter.comparison;
+    //   existedFilter.value = filter.value;
+    // } else {
+    //   newFilter.push(filter);
+    // }
     setPagingInfo(prev => ({...prev, filter: newFilter}));
   };
 

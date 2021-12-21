@@ -1,4 +1,4 @@
-import { FC, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { ClickAwayListener, Box, Chip, Button } from '@material-ui/core'
 import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
 import ArrowDropUpIcon from '@material-ui/icons/ArrowDropUp';
@@ -14,21 +14,26 @@ interface IFilterButtonProps {
   title: string;
   options?: IFilterOption[];
   onSelectedOptionsChange?: (selectedOptions: IFilterOption[]) => void;
-  defaultSelecteOptions?: IFilterOption[];
+  defaultSelectedOptions?: IFilterOption[];
 }
 
 const FilterButton: FC<IFilterButtonProps> = ({
   title,
   options = [],
   onSelectedOptionsChange = () => {},
-  defaultSelecteOptions = []
+  defaultSelectedOptions = []
 }) => {
 
   const styles = useFilterButtonStyles();
 
   const [ active, setActive ] = useState(false);
   const [ displayTitle, setDisplayTitle ] = useState(title);
-  const [ selectedOptions, setSelectedOptions ] = useState<IFilterOption[]>(defaultSelecteOptions);
+  const [ selectedOptions, setSelectedOptions ] = useState<IFilterOption[]>(defaultSelectedOptions);
+
+  useEffect(() => {
+    updateTitle(selectedOptions);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const onButtonClick = () => {
     setActive((prev) => !prev);
@@ -67,11 +72,10 @@ const FilterButton: FC<IFilterButtonProps> = ({
   };
 
   const onClearClick = () => {
-    const options: IFilterOption[] = [];
-    setSelectedOptions(options);
-    onSelectedOptionsChange(options);
+    setSelectedOptions(defaultSelectedOptions);
+    onSelectedOptionsChange(defaultSelectedOptions);
     setActive(false);
-    updateTitle(options);
+    updateTitle(defaultSelectedOptions);
   };
 
   const isOptionSelected = (id: string) => {

@@ -21,6 +21,64 @@ const useStyles = makeStyles(theme => ({
     top: "50%",
     left: "50%",
     transform: "translate(-50%, -50%)",
+  },
+  root: {
+    height: '100%', 
+    width: '100%',
+    '& .MuiDataGrid-root': {
+      backgroundColor: '#fff',
+      padding: theme.spacing(0, 2),
+    },
+    '& .MuiDataGrid-root *': {
+      '&::-webkit-scrollbar': {
+        width: 8,
+        height: 8
+      }
+    },
+    '& .MuiDataGrid-iconSeparator': {
+      color: theme.palette.divider,
+      
+      '&:hover': {
+        color: theme.palette.common.black
+      }
+    },
+    '& .MuiDataGrid-colCell': {
+      // borderRight: '1px solid #303030',
+    },
+    '& .MuiDataGrid-root .MuiDataGrid-cell:focus-within': {
+      outline: 'none',
+    },
+    '& .MuiDataGrid-root .MuiDataGrid-cell:focus': {
+      outline: 'none',
+    },
+    '& .MuiDataGrid-root .MuiDataGrid-cell:focus-visible': {
+      outline: 'none',
+    },
+    '& .MuiDataGrid-colCellTitle': {
+      fontWeight: 700,
+    },
+    
+  },
+  pendingStatus: {
+    color: theme.palette.primary.main,
+    borderColor: theme.palette.primary.main,
+    '& > svg': {
+      color: theme.palette.primary.main,
+    }
+  },
+  approvedStatus: {
+    color: theme.palette.success.main,
+    borderColor: theme.palette.success.main,
+    '& > svg': {
+      color: theme.palette.success.main,
+    }
+  },
+  rejectedStatus: {
+    color: theme.palette.error.main,
+    borderColor: theme.palette.error.main,
+    '& > svg': {
+      color: theme.palette.error.main
+    }
   }
 }));
 

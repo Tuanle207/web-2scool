@@ -26,7 +26,10 @@ const useStyles = makeStyles(theme => ({
     },
     '& .MuiDataGrid-colCellTitle': {
       fontWeight: 700,
-    }
+    },
+    '& > .MuiDataGrid-columnSeparator': {
+      visibility: 'hidden',
+    },
   }
 }));
 

@@ -18,7 +18,7 @@ export namespace Util {
   export interface PagingFilter {
     key: string;
     comparison: string;
-    value: string | number | Array<string> | Array<number>;
+    value: string;
   }
 
   export interface PagingInfo {
