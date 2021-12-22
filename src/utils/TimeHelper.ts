@@ -25,6 +25,10 @@ const getDayOfWeek = (date: string) => {
   return dayOfWeek === 0 ? 'CN' : `T${dayOfWeek + 1}`;
 };
 
+const formatFullDateTime = (date: string) => {
+  return `${getDayOfWeek(date)} ${formatDate(date, 'HH:mm, DD/MM/YYYY')}`;
+};
+
 
 /**
  * 
@@ -84,5 +88,6 @@ export {
   toLocalISOString,
   getDayOfWeek,
   addDays,
-  getPreviousMonday
+  getPreviousMonday,
+  formatFullDateTime,
 };

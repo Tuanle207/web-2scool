@@ -57,13 +57,7 @@ export const useFetchV2 = <T = any> ({ fetchFn, filter, pageIndex, pageSize }: I
     filters.forEach((filter) =>  {
       newFilter.push(filter);
     });
-    // const existedFilter = newFilter.find(f => f.key === filter.key);
-    // if (existedFilter) {
-    //   existedFilter.comparison = filter.comparison;
-    //   existedFilter.value = filter.value;
-    // } else {
-    //   newFilter.push(filter);
-    // }
+    
     setPagingInfo(prev => ({...prev, filter: newFilter}));
   };
 
@@ -76,7 +70,7 @@ export const useFetchV2 = <T = any> ({ fetchFn, filter, pageIndex, pageSize }: I
   };
 
   const getFilterCount = () => {
-    return pagingInfo.filter?.filter((x) => !!x.value).length || 0;
+    return [...new Set(pagingInfo.filter?.filter((x) => !!x).map((x) => x.key))].length || 0;
   };
 
   const resetCache = () => {

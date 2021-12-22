@@ -106,14 +106,14 @@ const sidebarItems: Util.IObject<ISidebarInfo[]> = {
     {
       key: routes.DCPReportApproval,
       Icon: CheckCircleIcon,
-      title: 'Duyệt',
+      title: 'Duyệt nề nếp',
       route: routes.DCPReportApproval,
       policyName: policies.DcpReportApproval
     },
     {
       key: routes.DCPReportHistory,
       Icon: HistoryIcon,
-      title: 'Lịch sử duyệt',
+      title: 'Duyệt sổ đầu bài',
       route: routes.DCPReportHistory,
       policyName: policies.GetDcpReportApprovalHistory
     },

@@ -37,8 +37,11 @@ const useStyles = makeStyles(theme => ({
     overflow: 'hidden'
   },
   dcpReportAction: {
-    padding: theme.spacing(2), 
-    borderTop: `1px solid ${theme.palette.divider}`
+    backgroundColor: theme.palette.common.white,
+    border: `1px solid ${theme.palette.divider}`,
+    marginTop: 8,
+    borderRadius: 4,
+    padding: theme.spacing(1),
   },
   acceptBtn: {
     padding: theme.spacing(1,3),
@@ -66,7 +69,6 @@ const useStyles = makeStyles(theme => ({
     '& > li:hover': {
       borderColor: theme.palette.primary.main,
       '& p, & button': {
-        // color: theme.palette.common.white,
       }
     }
   },
@@ -93,6 +95,83 @@ const useStyles = makeStyles(theme => ({
       color: theme.palette.grey[500]
     }
   },
+  root: {
+    height: '100%', 
+    width: '100%',
+    '& .MuiDataGrid-root': {
+      backgroundColor: '#fff',
+      padding: theme.spacing(0, 2),
+    },
+    '& .MuiDataGrid-root *': {
+      '&::-webkit-scrollbar': {
+        width: 8,
+        height: 8
+      }
+    },
+    '& .MuiDataGrid-iconSeparator': {
+      color: theme.palette.divider,
+      
+      '&:hover': {
+        color: theme.palette.common.black
+      }
+    },
+    '& .MuiDataGrid-colCell': {
+      // borderRight: '1px solid #303030',
+    },
+    '& .MuiDataGrid-root .MuiDataGrid-cell:focus-within': {
+      outline: 'none',
+    },
+    '& .MuiDataGrid-root .MuiDataGrid-cell:focus': {
+      outline: 'none',
+    },
+    '& .MuiDataGrid-root .MuiDataGrid-cell:focus-visible': {
+      outline: 'none',
+    },
+    '& .MuiDataGrid-colCellTitle': {
+      fontWeight: 700,
+    },
+  },
+  classRoot: {
+    height: '100%', 
+    '& .MuiDataGrid-root': {
+      backgroundColor: '#fff',
+      height: '100%',
+    },
+    '& .MuiDataGrid-row': {
+
+      borderRadius: 4,
+      cursor: 'pointer',
+      minHeight: '0 !important',
+
+      '& > *':  {
+        userSelect: 'none',
+      },
+    },
+    '& .MuiDataGrid-row.Mui-selected': {
+      // backgroundColor: theme.palette.primary.main,
+      // color: '#fff',
+    },
+    '& .MuiDataGrid-cell': {
+      minHeight: '0 !important',
+      lineHeight: '1.5 !important',
+      padding: theme.spacing(1, 1),
+      paddingLeft: theme.spacing(2)
+    },
+    '& .MuiDataGrid-root .MuiDataGrid-withBorder': {
+      borderRight: 'none',
+    },
+    '& .MuiDataGrid-columnSeparator': {
+      display: 'none',
+    },
+  },
+  classDetail: { 
+    background: '#fff', 
+    height: 40, 
+    marginBottom: 8, 
+    borderRadius: 4,
+    border: `1px solid ${theme.palette.divider}`,
+    padding: theme.spacing(0, 3)
+  }
 }));
 
 export default useStyles;

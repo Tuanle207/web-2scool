@@ -1,15 +1,13 @@
-import { Container, Grid, Button, makeStyles, List, ListItem, Typography, IconButton, Tooltip, Paper } from '@material-ui/core';
-import React from 'react';
+import { Grid, Button, Typography, IconButton, Tooltip, Paper } from '@material-ui/core';
+import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import Header from '../components/Header';
 import Sidebar from '../components/Sidebar';
-import { DcpReport, Regulation } from '../interfaces';
-import { DataGrid, GridApi, GridColDef, GridValueFormatterParams } from '@material-ui/data-grid';
-import { Alarm, CheckSharp, Clear, FindInPage, PermContactCalendar, Remove } from '@material-ui/icons';
-import GroupIcon from '@material-ui/icons/Group';
-import EditIcon from '@material-ui/icons/Edit';
+import { Class, DcpReport, Regulation } from '../interfaces';
+import { DataGrid, GridColDef, GridValueFormatterParams } from '@material-ui/data-grid';
+import { Alarm, CheckSharp, Clear, FindInPage, PermContactCalendar } from '@material-ui/icons';
 import { DcpReportsService } from '../api';
-import { formatTime, getDayOfWeek } from '../utils/TimeHelper';
+import { formatFullDateTime } from '../utils/TimeHelper';
 import StudentList from '../components/Modal/StudentList';
 import ActionModal from '../components/Modal';
 import { toast } from 'react-toastify';
@@ -21,17 +19,35 @@ import { dcpReportStatus, dcpReportStatusDic } from '../appConsts';
 import { routes } from '../routers/routesDictionary';
 import useStyles from '../assets/jss/views/DCPReportPage';
 
+const classCols: GridColDef[] = [
+  {
+    
+    field: 'id',
+    headerName: 'Mã',
+    hide: true
+  },
+  {
+    field: 'class',
+    headerName: 'Lớp chấm',
+    flex: 1,
+    valueFormatter: (params: GridValueFormatterParams) => {
+      const item = params.value as Class.ClassForSimpleListDto;
+      return item.name;
+    },
+    hideSortIcons: true,
+  }
+];
+
 const cols: GridColDef[] = [
   {
     field: 'id',
     headerName: 'Mã',
-    // width: 0,
     hide: true
   },
   {
     field: 'regulation',
     headerName: 'Vi phạm',
-    width: 200,
+    flex: 1,
     valueFormatter: (params: GridValueFormatterParams) => {
       const item = params.value as Regulation.RegulationForSimpleListDto;
       return item.name;
@@ -49,6 +65,9 @@ const cols: GridColDef[] = [
   {
     field: 'points',
     headerName: 'Điểm',
+    width: 70,
+    align: 'center',
+    headerAlign: 'center',
     valueFormatter: (params: GridValueFormatterParams) => {
       const value = params.value as number;
       return value;
@@ -57,7 +76,7 @@ const cols: GridColDef[] = [
   {
     field: 'relatedStudents',
     headerName: 'Học sinh vi phạm',
-    flex: 1,
+    width: 160,
     valueFormatter: (params: GridValueFormatterParams) => {
       const students = (params.value) as DcpReport.DcpStudentReportDto[];
       if (!students || students.length === 0) {
@@ -67,17 +86,13 @@ const cols: GridColDef[] = [
     }
   },
   {
-    field: '',
-    // disableClickEventBubbling: true,
+    field: 'studentdetails',
+    headerClassName: 'hiddenDataGridHeader',
+    width: 80,
     renderCell: (params) => {
-      const onClick = () => {
-        const api: GridApi = params.api;
-        // console.log({x: params.getValue('id')});
-      };
-
       return (
         <Tooltip title='Xem chi tiết'>
-          <IconButton color='primary' onClick={onClick}>
+          <IconButton color='primary' >
             <FindInPage />
           </IconButton>
         </Tooltip>
@@ -91,40 +106,92 @@ const DCPReportPage = () => {
   const classes = useStyles();
   const params = useParams<{dcpReportId: string}>();
 
-  const [data, setData] = React.useState<DcpReport.DcpReportDto>({} as DcpReport.DcpReportDto);
-  const [selectedClassId, setSelectedClassId] = React.useState<string | null>(null);
+  const [data, setData] = useState<DcpReport.DcpReportDto>({} as DcpReport.DcpReportDto);
+  const [selectedClassId, setSelectedClassId] = useState<string | null>(null);
+  const [ loading, setLoading ] = useState(false);
 
-  React.useEffect(() => {
+  const [faults, setFaults] = useState<any[]>([]);
+  const [className, setClassName] = useState<string>('Lớp...');
+  const [faultsCount, setFaultsCount] =  useState('...');
+  const [faultsPoint, setFaultsPoint] =  useState('...');
+
+  useEffect(() => {
     document.title = '2Cool | Chi tiết phiếu chấm điểm nề nếp';
 
     fetchDcpReport();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const fetchDcpReport = () => {
-    const { dcpReportId } = params;
-    if (!dcpReportId) {
-      return;
+  useEffect(() => {
+    if (selectedClassId) {
+      setDisplayClassItem();
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedClassId]);
 
-    DcpReportsService.getDcpReportById(dcpReportId).then(res => {
+  const fetchDcpReport = async () => {
+    try {
+      setLoading(true);
+
+      const { dcpReportId } = params;
+      if (!dcpReportId) {
+        return;
+      }
+
+      const res = await DcpReportsService.getDcpReportById(dcpReportId);
       setData(res);
       if (res.dcpClassReports && res.dcpClassReports.length > 0)  {
         setSelectedClassId(res.dcpClassReports[0].classId);
       }
-    });
-  } 
+    } finally {
+      setLoading(false);
+    }
+    
+  };
 
-  const getFaults = (): DcpReport.DcpClassReportItemDto[] => {
+  const setDisplayClassItem = () => {
+    const faultItems = getFaults();
+    setFaults(faultItems);
+    setFaultsCount(getFaultsCount().toString());
+    setFaultsPoint(getFaultsPoint().toString());
+    setClassName(getClass());
+  };
+
+  const getFaults = (): any[] => {
     if (!data.dcpClassReports) {
       return [];
     }
-    const items = data.dcpClassReports.find(x => x.classId === selectedClassId);
-    const faults = items ? items.faults : [];
-    return faults.map(el => ({
+    const item = data.dcpClassReports.find(x => x.classId === selectedClassId);
+    const faults = item ? item.faults : [];
+    const result = faults.map(el => ({
       ...el,
       criteria: el.regulation.criteria,
       points: -el.regulation.point
     }));
+    return result;
+  };
+
+  const getFaultsCount = () => {
+    const faults = getFaults();
+    const count = faults.length;
+    return count;
+  };
+
+  const getFaultsPoint = () => {
+    const faults = getFaults();
+    let count = 0;
+    faults.forEach((x) => {
+      count += x.regulation.point;
+    })
+    return count;
+  };
+
+  const getClass = () => {
+    if (!data.dcpClassReports) {
+      return '';
+    }
+    const item = data.dcpClassReports.find(x => x.classId === selectedClassId);
+    return item?.class.name || '';
   };
 
   const handleAccept = () => {
@@ -211,98 +278,85 @@ const DCPReportPage = () => {
         <Grid item xs={4} sm={3} md={2}>
           <Sidebar activeKey={routes.DCPReportApprovalDetail} />
         </Grid>
-        <Grid style={{ height: '100%' }} item container xs={8} sm={9} md={10} direction={'column'}>
-          <Header />
-          <Grid item container direction={'column'} style={{ flex: 1, minHeight: 0, flexWrap: 'nowrap' }}>
-            <Grid item container justify={'space-between'} className={classes.actionGroup}>
-              <Grid item container direction={'row'} alignItems={'center'}>
-                <Alarm style={{ marginRight: 8 }}/>
-                <Typography variant={'body2'}>{data.creationTime ? `${getDayOfWeek(data.creationTime.toLocaleString())} - ${formatTime(data.creationTime.toLocaleString())}` : ''}</Typography>
-              </Grid>
-              <Grid item container direction={'row'} justify={'center'} alignItems={'center'}>
-                <PermContactCalendar style={{ marginRight: 8 }}/>
-                <Typography variant={'body2'}>{data.creator ? data.creator.name : ''}</Typography>
-              </Grid>
-              <Grid item container direction={'row'} justify={'center'} alignItems={'center'}>
-                {
-                  data.status === dcpReportStatus.Created ? <PauseCircleOutlineIcon style={{ marginRight: 8 }}/> :
-                  data.status === dcpReportStatus.Approved ? <CheckCircleIcon style={{marginRight: 8}} /> :
-                  <HighlightOffIcon style={{marginRight: 8}} />
-                }
-                <Typography variant={'body2'}>{dcpReportStatusDic[data.status]}</Typography>
-              </Grid>
-             
-            </Grid>              
-            <Grid item container direction={'row'} style={{ flex: 1, minHeight: 0, flexWrap: 'nowrap', padding: 16, paddingBottom: 0 }}>
-              <Grid item style={{ minHeight: 0, overflowY: 'auto' }}>
-                <Paper elevation={3} style={{width: '100%', height: '100%', minHeight: 0, overflowY: 'auto'}}>
-                  <List className={classes.classList}>
+        <Grid style={{ background: '#fff', flexGrow: 1}} item container xs={8} sm={9} md={10} direction={'column'}>
+          <Grid item>
+            <Header pageName="Chi tiết phiếu chấm nề nếp" />
+          </Grid>
+
+          <Grid item container direction='column' style={{ flex: 1, minHeight: 0, flexWrap: 'nowrap', background: "#e8e8e8" }}>
+            <Grid item container
+              style={{
+                paddingTop: 16, 
+                paddingRight: 24, 
+                paddingLeft: 24,
+                background: "#e8e8e8"
+              }}
+            >
+              <Paper variant="outlined" elevation={1}  style={{ width: "100%" }}>
+                <Grid item container direction='row' alignItems='center' style={{ padding: "5px 32px", height: 54 }}>
+                  <Grid item container direction={'row'} alignItems={'center'}>
+                    <Alarm style={{ marginRight: 8 }}/>
+                    <Typography variant={'body2'}>{data.creationTime ? formatFullDateTime(data.creationTime.toLocaleString()) : ''}</Typography>
+                  </Grid>
+                  <Grid item container direction={'row'} justify={'center'} alignItems={'center'}>
+                    <PermContactCalendar style={{ marginRight: 8 }}/>
+                    <Typography variant={'body2'}>{data.creator ? `Được chấm bởi ${data.creator.name}` : ''}</Typography>
+                  </Grid>
+                  <Grid item container direction={'row'} justify={'center'} alignItems={'center'}>
                     {
-                      (data.dcpClassReports || []).map((el, i) => (
-                      <ListItem 
-                        key={i} 
-                        className={el.classId === selectedClassId ? classes.activeSelectedItem : ''}
-                        style={{paddingRight: 8}}
-                      >
-                        <Grid 
-                          container 
-                          direction='column' 
-                          alignItems='center' 
-                          className={classes.classItem}
-                          onClick={() => setSelectedClassId(el.classId)}
-                        >
-                          <Grid item container alignItems='center' direction='row'>
-                            <GroupIcon color={selectedClassId === el.classId ? 'primary' : 'inherit'} style={{marginLeft: 16, marginRight: 8}} />
-                            <p>{el.class.name}</p>
-                          </Grid>
-                          <Grid item container direction='row' justify='space-between' style={{marginTop: 8}}>
-                            <Grid item container alignItems='center' direction='row' style={{width: 'auto'}}>
-                              <Remove color={selectedClassId === el.classId ? 'primary' : 'inherit'} style={{marginLeft: 16, marginRight: 8}} />
-                              <p>{el.penaltyTotal} điểm</p>
-                            </Grid>
-                            <Grid item container alignItems='center' direction='row'style={{width: 'auto'}}>
-                              <EditIcon color={selectedClassId === el.classId ? 'primary' : 'inherit'} style={{marginLeft: 16, marginRight: 8}} />
-                              <p>{el.faults.length} vi phạm</p>
-                            </Grid>
-                          </Grid>
-                        </Grid>
-                      </ListItem>))
+                      data.status === dcpReportStatus.Created ? <PauseCircleOutlineIcon style={{ marginRight: 8 }}/> :
+                      data.status === dcpReportStatus.Approved ? <CheckCircleIcon style={{marginRight: 8}} /> :
+                      <HighlightOffIcon style={{marginRight: 8}} />
                     }
-                  </List>
-                  {
-                    selectedClassId && getFaults().length === 0 && (
-                      <Grid container justify='center' alignItems='center' className={classes.emptySelectedList} >
-                        <p>Chưa chọn lớp nào</p>
-                      </Grid>
-                    )
-                  }
-                </Paper>
-              </Grid>
-              <Grid item container direction={'column'} style={{ flex: 1, flexWrap: 'nowrap' }}>
-                <Grid item style={{ flex: 1, minHeight: 0, overflowY: 'auto' }}>
-                  <Container className={classes.datagridContainer}>
-                    <DataGrid
-                      columns={cols}
-                      rows={getFaults()}
-                      autoHeight
-                      disableExtendRowFullWidth
-                      hideFooterPagination
-                      disableColumnFilter
-                      disableColumnMenu
-                      hideFooterSelectedRowCount
-                      onCellClick={(params) => {
-                        if (params.colIndex === 4) {
-                          const students = params.getValue('relatedStudents') as DcpReport.DcpStudentReportDto[] || [];
-                          ActionModal.show({
-                            title: 'Danh sách học sinh vi phạm',
-                            component: <StudentList students={students} />
-                          });
-                        }
-                      }}
-                    />
-                  </Container>
+                    <Typography variant={'body2'}>{dcpReportStatusDic[data.status]}</Typography>
+                  </Grid>
                 </Grid>
-                <Grid item container justify={'flex-end'} className={classes.dcpReportAction}>
+              </Paper>
+            </Grid>              
+            <Grid item container direction="row" style={{ flex: 1, minHeight: 0, flexWrap: 'nowrap', padding: '16px 24px' }}>
+              <Grid item style={{ width: 140, height: '100%', marginRight: 16 }} className={`${classes.root} ${classes.classRoot}`}>
+                <DataGrid
+                  columns={classCols}
+                  rows={data.dcpClassReports || []}
+                  autoHeight
+                  disableExtendRowFullWidth
+                  disableColumnFilter
+                  disableColumnMenu
+                  loading={loading}
+                  hideFooter
+                  onCellClick={async (params) => {
+                    const classId = params.getValue('classId') as string;
+                    setSelectedClassId(classId);
+                  }}
+                />
+              </Grid>
+              <Grid item container direction="column" style={{ flex: 1, height: '100%' }}>
+                <Grid item container direction="row" justify="space-between" alignItems="center" className={classes.classDetail}>
+                  <Typography variant={'body2'}>{`${className}`}</Typography>
+                  <Typography variant={'body2'}>{`Số lỗi: ${faultsCount}`}</Typography>
+                  <Typography variant={'body2'}>{`Số điểm trừ: ${faultsPoint}`}</Typography>
+                </Grid>
+                <Grid item container style={{ flex: 1 }} className={classes.root} >
+                  <DataGrid
+                    columns={cols}
+                    rows={faults}
+                    loading={loading}
+                    disableExtendRowFullWidth
+                    disableColumnFilter
+                    disableColumnMenu
+                    hideFooter
+                    onCellClick={(params) => {
+                      if (params.colIndex === 4) {
+                        const students = params.getValue('relatedStudents') as DcpReport.DcpStudentReportDto[] || [];
+                        ActionModal.show({
+                          title: 'Danh sách học sinh vi phạm',
+                          component: <StudentList students={students} />
+                        });
+                      }
+                    }}
+                  />
+                </Grid>
+                <Grid item container justify="flex-end" className={classes.dcpReportAction} >
                   {
                     data.status === dcpReportStatus.Created && (
                       <Button 
@@ -332,7 +386,6 @@ const DCPReportPage = () => {
                       >Bỏ duyệt</Button>
                     )
                   }
-                  
                 </Grid>
               </Grid>
             </Grid>

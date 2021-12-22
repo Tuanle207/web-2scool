@@ -1,20 +1,18 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Grid, Box, Button, Paper, Container, Chip, Tooltip, IconButton, Menu, MenuItem,
+import { Grid, Box, Badge, Paper, Container, Chip, Tooltip, IconButton, Menu, MenuItem,
   ListItemIcon, ListItemText } from '@material-ui/core';
 import { MuiPickersUtilsProvider, KeyboardDatePicker } from '@material-ui/pickers';
 import { DataGrid, GridColDef, GridPageChangeParams, GridValueFormatterParams,
-  GridApi, GridRowId, GridCellParams } from '@material-ui/data-grid';
+  GridCellParams } from '@material-ui/data-grid';
 import DateFnsUtils from '@date-io/date-fns';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import AwesomeDebouncePromise from 'awesome-debounce-promise';
 import Header from '../components/Header';
 import Sidebar from '../components/Sidebar';
-import DisciplineApprovalCard from '../components/DCPReport/DisciplineApprovalCard';
 import { DcpReportsService } from '../api';
-import { useFetch, useFetchV2, usePagingInfo } from '../hooks';
+import { useFetchV2 } from '../hooks';
 import { DcpReport, User } from '../interfaces';
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import { formatDate, formatTime, getDayOfWeek } from '../utils/TimeHelper';
+import { formatDate, formatFullDateTime } from '../utils/TimeHelper';
 import { comparers, dcpReportStatus, dcpReportStatusDic } from '../appConsts';
 import { routes, routeWithParams } from '../routers/routesDictionary';
 import FilterButton, { IFilterOption } from '../components/FilterButton';
@@ -29,12 +27,7 @@ import MoreHorizIcon from '@material-ui/icons/MoreHoriz';
 import useStyles from '../assets/jss/views/DCPReportHistoryPage';
 
 
-interface RowMenuProps {
-  api: GridApi;
-  id: GridRowId;
-}
-
-const DetailCell = (props: RowMenuProps) => {
+const DetailCell = (props: GridCellParams) => {
   
   const history = useHistory();
   const { id } = props;
@@ -52,11 +45,10 @@ const DetailCell = (props: RowMenuProps) => {
   );
 };
 
-const MenuCell = (props: RowMenuProps) => {
+const MenuCell = (props: GridCellParams) => {
 
   const history = useHistory();
   const { api, id } = props;
-  const [open, setOpen] = useState(false);
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -67,8 +59,43 @@ const MenuCell = (props: RowMenuProps) => {
     setAnchorEl(null);
   };
 
+  const reloadCurrentPageData = () => {
+    api.setPage(api.getState().pagination.page);
+  };
+
   const navigateToDcpReportApprovalDetail = () => {
+    handleClose();
     history.push(routeWithParams(routes.DCPReportApprovalDetail, id.toString()));
+  };
+
+  const acceptDcpReport = async () => {
+    try {
+      handleClose();
+      await DcpReportsService.acceptDcpReport([id.toString()]);
+      reloadCurrentPageData();
+    } catch {
+
+    }
+  };
+
+  const rejectDcpReport = () => {
+    try {
+      handleClose();
+      DcpReportsService.rejectDcpReport(id.toString());
+      reloadCurrentPageData();
+    } catch {
+
+    }
+  };
+
+  const cancelAssessDcpReport = () => {
+    try {
+      handleClose();
+      DcpReportsService.cancelAssessDcpReport(id.toString());
+      reloadCurrentPageData();
+    } catch {
+
+    }
   };
 
   const status = api.getCellValue(id, 'status');
@@ -91,13 +118,13 @@ const MenuCell = (props: RowMenuProps) => {
           {
             status === dcpReportStatus.Created ? (
               <>
-                <MenuItem>
+                <MenuItem onClick={acceptDcpReport}>
                   <ListItemIcon style={{minWidth: 30}}>
                     <DoneIcon fontSize="small" />
                   </ListItemIcon>
                   <ListItemText primary="Chấp nhận" />
                 </MenuItem>
-                <MenuItem>
+                <MenuItem onClick={rejectDcpReport}>
                   <ListItemIcon style={{minWidth: 30}}>
                     <WarningIcon fontSize="small" />
                   </ListItemIcon>
@@ -105,7 +132,7 @@ const MenuCell = (props: RowMenuProps) => {
                 </MenuItem>
               </>
             ) : (
-              <MenuItem>
+              <MenuItem onClick={cancelAssessDcpReport}>
                 <ListItemIcon style={{minWidth: 30}}>
                   <RestoreIcon fontSize="small" />
                 </ListItemIcon>
@@ -182,7 +209,7 @@ const cols: GridColDef[] =  [
     headerAlign: 'center',
     valueFormatter: (params: GridValueFormatterParams) => {
       const creationTime = (params.value as Date).toLocaleString();
-      return `${getDayOfWeek(creationTime)} ${formatTime(creationTime, 'HH:mm')}, ${formatDate(creationTime)}`;
+      return formatFullDateTime(creationTime);
     }
   },
   {
@@ -288,7 +315,6 @@ const DCPReportsApprovalPage = () => {
       setPageIndex(0);
       resetCache();
     }
-    
   };
 
   const handleWeekFilterClick = () => {
@@ -376,10 +402,12 @@ const DCPReportsApprovalPage = () => {
                 background: "#e8e8e8"
               }}
             >
-              <Paper variant="outlined" elevation={1}  style={{ width: "100%" }}>
-                <Grid item container direction='row' alignItems='center' style={{ padding: "5px 32px" }}>
+              <Paper variant="outlined" elevation={1} style={{ width: "100%" }}>
+                <Grid item container direction='row' alignItems='center' style={{ padding: "5px 32px", height: 54 }}>
                   <Tooltip title="Bộ lọc" style={{ marginRight: 16 }}>
-                    <FilterIcon fontSize="small" />
+                      <Badge badgeContent={getFilterCount()} color="primary" >
+                        <FilterIcon fontSize="small" />
+                      </Badge>
                   </Tooltip>
                   <MuiPickersUtilsProvider utils={DateFnsUtils}>
                     <Box>
