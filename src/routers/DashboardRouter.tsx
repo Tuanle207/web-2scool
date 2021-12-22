@@ -12,7 +12,7 @@ import MyDCPReportPage from '../views/MyDCPReportPage';
 import UserManagement from '../views/UserManagement';
 import RoleManagement from '../views/RoleManagement';
 import DCPReportCreatePage from '../views/DCPReportCreatePage';
-import DCPReportHistoryPage from '../views/DCPReportHistoryPage';
+import DCPReportHistoryPage from '../views/LRReportApprovalPage';
 import DCPRankingPage from '../views/DCPRankingPage';
 import DCPStatisticsPage from '../views/DCPStatisticsPage';
 import ErrorPage from '../views/ErrorPage';
@@ -49,10 +49,10 @@ const DashboardRouter = () => {
           policyName={policies.GetDcpReportDetail}
           component={DCPReportPage}
         />
-         <ProtectedRoute 
-          path={routes.DCPReportHistory}
+        <ProtectedRoute 
+          path={routes.LRReportApproval}
           exact
-          policyName={policies.GetDcpReportApprovalHistory}
+          policyName={policies.LRReportApproval}
           component={DCPReportHistoryPage}
         />
         <ProtectedRoute 

@@ -78,20 +78,20 @@ const MenuCell = (props: GridCellParams) => {
     }
   };
 
-  const rejectDcpReport = () => {
+  const rejectDcpReport = async () => {
     try {
       handleClose();
-      DcpReportsService.rejectDcpReport(id.toString());
+      await DcpReportsService.rejectDcpReport(id.toString());
       reloadCurrentPageData();
     } catch {
 
     }
   };
 
-  const cancelAssessDcpReport = () => {
+  const cancelAssessDcpReport = async () => {
     try {
       handleClose();
-      DcpReportsService.cancelAssessDcpReport(id.toString());
+      await DcpReportsService.cancelAssessDcpReport(id.toString());
       reloadCurrentPageData();
     } catch {
 

@@ -5,7 +5,7 @@ import Header from '../components/Header';
 import Sidebar from '../components/Sidebar';
 import { LrReportsService } from '../api';
 import { useFetch, usePagingInfo } from '../hooks';
-import { Class, DcpReport } from '../interfaces';
+import { Class, LrReport } from '../interfaces';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import { formatTime, getDayOfWeek } from '../utils/TimeHelper';
 import { Alarm as AlarmIcon  } from '@material-ui/icons';
@@ -17,6 +17,7 @@ import SettingsIcon from '@material-ui/icons/Settings';
 import { useHistory } from 'react-router';
 import useStyles from '../assets/jss/views/LessonRegisterReport';
 import { routes } from '../routers/routesDictionary';
+import { getFullUrl } from '../utils/ImageHelper';
 
 const LRCard = ({
   index,
@@ -67,8 +68,8 @@ const LRCard = ({
             <PhotoIcon className={classes.imgIcon} />
           </Tooltip>
           <img 
-            src={`https://${photo}`}
-            alt='test img'
+            src={getFullUrl(photo)}
+            alt='Anh chup so dau bai'
           />
         </Grid>
       </Grid>
@@ -91,11 +92,11 @@ const LessonRegisterReport = () => {
 
   const {pagingInfo, setPageIndex} = usePagingInfo();
   
-  const {loading, data, error, resetCache} = useFetch<DcpReport.LRReportDto>(
+  const {loading, data } = useFetch<LrReport.LRReportDto>(
     LrReportsService.getMyLrReports, 
     { ...pagingInfo, pageIndex: pagingInfo.pageIndex! + 1 }
   );
-  const [items, setItems] = React.useState<DcpReport.LRReportDto[]>([]);
+  const [items, setItems] = React.useState<LrReport.LRReportDto[]>([]);
 
   React.useEffect(() => {
     const firstItem = data.items.length > 0 ? data.items[0] : null;

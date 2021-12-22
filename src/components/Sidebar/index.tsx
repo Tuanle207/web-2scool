@@ -2,7 +2,6 @@ import { FC, useState, useEffect } from 'react';
 import { Box, Collapse, Container, Divider, List, ListItem, ListItemText } from '@material-ui/core';
 import { Dashboard } from '@material-ui/icons';
 import { Link, useHistory, useLocation } from 'react-router-dom';
-import HistoryIcon from '@material-ui/icons/History';
 import { Util } from '../../interfaces';
 import { policies } from '../../appConsts';
 import CheckCircleIcon from '@material-ui/icons/CheckCircle';
@@ -22,6 +21,7 @@ import { ReactComponent as StudentIcon } from '../../assets/img/student.svg';
 import { ReactComponent as RoleIcon } from '../../assets/img/permission.svg';
 import { ReactComponent as UserIcon } from '../../assets/img/user.svg';
 import { ReactComponent as RegulationIcon } from '../../assets/img/regulation.svg';
+import { ReactComponent as LrBookIcon } from '../../assets/img/lesson-register.svg';
 import { routes } from '../../routers/routesDictionary';
 import { AppConfigSelector } from '../../store/selectors';
 import { useSelector } from 'react-redux';
@@ -111,11 +111,11 @@ const sidebarItems: Util.IObject<ISidebarInfo[]> = {
       policyName: policies.DcpReportApproval
     },
     {
-      key: routes.DCPReportHistory,
-      Icon: HistoryIcon,
+      key: routes.LRReportApproval,
+      Icon: LrBookIcon,
       title: 'Duyệt sổ đầu bài',
-      route: routes.DCPReportHistory,
-      policyName: policies.GetDcpReportApprovalHistory
+      route: routes.LRReportApproval,
+      policyName: policies.LRReportApproval
     },
     {
       key: 'my-report',
@@ -240,10 +240,10 @@ const Sidebar: FC<ISidebarProps> = ({ activeKey }) => {
                 <ListItem 
                   key={item.key}
                   button
-                  onClick={() =>  setExpandTaskAssignment((prevOpen) => !prevOpen)} 
-
+                  onClick={() => setExpandTaskAssignment((prevOpen) => !prevOpen)} 
+                 
                 >
-                  <item.Icon style={{marginRight: 8, marginBottom: 4, color: '#fff', fill: '#fff'}} />
+                  <item.Icon style={{marginRight: 8, marginLeft: 4, marginBottom: 4, color: '#fff', fill: '#fff'}} />
                   <ListItemText primary={item.title} />
                   {
                     expandTaskAssignment ? 
@@ -258,7 +258,7 @@ const Sidebar: FC<ISidebarProps> = ({ activeKey }) => {
                   onClick={() => setExpandCreateReport((prevOpen) => !prevOpen)} 
 
                 >
-                  <item.Icon style={{marginRight: 8, marginBottom: 4, color: '#fff', fill: '#fff'}} />
+                  <item.Icon style={{marginRight: 8, marginLeft: 4, marginBottom: 4, color: '#fff', fill: '#fff'}} />
                   <ListItemText primary={item.title} />
                   {
                     expandCreateReport ? 
@@ -268,7 +268,7 @@ const Sidebar: FC<ISidebarProps> = ({ activeKey }) => {
                 </ListItem>
               ) :
               item.key === 'task-assignments-post' ? (
-                <Collapse component="li" in={expandTaskAssignment} timeout="auto" unmountOnExit>
+                <Collapse component="li" in={expandTaskAssignment} timeout="auto" unmountOnExit >
                   <List disablePadding>
                       {
                         item.subItems && item.subItems.map(el => (
@@ -288,7 +288,7 @@ const Sidebar: FC<ISidebarProps> = ({ activeKey }) => {
               ) : 
               item.key === 'my-report-post' ? (
                 <Collapse component="li" in={expandCreateReport} timeout="auto" unmountOnExit>
-                  <List disablePadding>
+                  <List disablePadding style={{ paddingLeft: 18 }}>
                       {
                         item.subItems && item.subItems.map(el => (
                           <ListItem 

@@ -8,6 +8,7 @@ import { Teacher } from './Teacher';
 import { Identity } from './Identity';
 import { Regulation } from './Regulation';
 import { DcpReport } from './DcpReport';
+import { LrReport } from './LrReport';
 import { Stats } from './Stats';
 import { TaskAssignment } from './TaskAssignment';
 import { Profile } from './Profile';
@@ -23,6 +24,7 @@ export type {
   Identity,
   Regulation,
   DcpReport,
+  LrReport,
   Stats,
   TaskAssignment,
   Profile

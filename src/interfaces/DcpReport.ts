@@ -53,22 +53,4 @@ export namespace DcpReport {
     relatedStudentIds: string[];
   }
 
-  export interface LRReportDto {
-    id: string;
-    totalPoint: number;
-    absenceNo: number;
-    attachedPhotos: string[];
-    status: string;
-    class: Class.ClassForSimpleListDto;
-    creationTime: Date;
-    creatorId: string;
-  }
-
-  export interface CreateUpdateLRReportDto {
-    classId: string;
-    photo: File;
-    absenceNo: number;
-    totalPoint: number;
-  }
-
 }

@@ -1,9 +1,9 @@
-import { DcpReport, Util } from '../../interfaces';
+import { LrReport, Util } from '../../interfaces';
 import { getApiService } from '../BaseApiService';
 import Endpoint from './@endpoint';
 
 
-const createLrReport = async (input: DcpReport.CreateUpdateLRReportDto) => {
+const createLrReport = async (input: LrReport.CreateUpdateLRReportDto) => {
   try {
     const apiService = await getApiService();
     
@@ -23,7 +23,7 @@ const createLrReport = async (input: DcpReport.CreateUpdateLRReportDto) => {
 const getAllLrReports = async (input: Util.PagingInfo) => {
   try {
     const apiService = await getApiService();
-    const result = await apiService.post<DcpReport.LRReportDto>(Endpoint.GetAllLrReports(), input);
+    const result = await apiService.post<LrReport.LRReportDto>(Endpoint.GetAllLrReports(), input);
     return result;
   } catch (error) {
     throw error;
@@ -33,7 +33,7 @@ const getAllLrReports = async (input: Util.PagingInfo) => {
 const getLrReportById = async (id: string) => {
   try {
     const apiService = await getApiService();
-    const result = await apiService.get<DcpReport.LRReportDto>(Endpoint.GetLrReportById(id));
+    const result = await apiService.get<LrReport.LRReportDto>(Endpoint.GetLrReportById(id));
     return result;
   } catch (error) {
     throw error;
@@ -50,7 +50,7 @@ const deleteLrReportById = async (id: string) => {
   }
 };
 
-const updateLrReport = async (id: string, input: DcpReport.CreateUpdateLRReportDto) => {
+const updateLrReport = async (id: string, input: LrReport.CreateUpdateLRReportDto) => {
   try {
     const apiService = await getApiService();
 
@@ -97,7 +97,7 @@ const cancelAssessLrReport = async (id: string) => {
 const getMyLrReports = async (input: Util.PagingInfo) => {
   try {
     const apiService = await getApiService();
-    const result = await apiService.post<DcpReport.LRReportDto>(Endpoint.GetMyLrReports(), input);
+    const result = await apiService.post<Util.PagingModel<LrReport.LRReportDto>>(Endpoint.GetMyLrReports(), input);
     return result;
   } catch (error) {
     throw error;
@@ -107,7 +107,7 @@ const getMyLrReports = async (input: Util.PagingInfo) => {
 const getLrReportsForApproval = async (input: Util.PagingInfo) => {
   try {
     const apiService = await getApiService();
-    const result = await apiService.post<DcpReport.LRReportDto>(Endpoint.GetLrReportsForApproval(), input);
+    const result = await apiService.post<Util.PagingModel<LrReport.LRReportDto>>(Endpoint.GetLrReportsForApproval(), input);
     return result;
   } catch (error) {
     throw error;
