@@ -2,21 +2,22 @@
 import { Grid, Box, Badge, Paper, Container, Chip, Tooltip, IconButton, Menu, MenuItem,
   ListItemIcon, ListItemText, Button } from '@material-ui/core';
 import { MuiPickersUtilsProvider, KeyboardDatePicker } from '@material-ui/pickers';
-import { DataGrid, GridColDef, GridPageChangeParams, GridValueFormatterParams,
+import Carousel, { Modal, ModalGateway, ViewType } from 'react-images'
+import { DataGrid, GridColDef, GridApi, GridPageChangeParams, GridValueFormatterParams,
   GridCellParams } from '@material-ui/data-grid';
 import DateFnsUtils from '@date-io/date-fns';
 import React, { useEffect, useState } from 'react';
+import { useHistory } from 'react-router';
 import AwesomeDebouncePromise from 'awesome-debounce-promise';
 import Header from '../components/Header';
 import Sidebar from '../components/Sidebar';
-import { DcpReportsService } from '../api';
+import { LrReportsService } from '../api';
 import { useFetchV2 } from '../hooks';
-import { DcpReport } from '../interfaces';
+import { LrReport, Class } from '../interfaces';
 import { formatDate, formatFullDateTime } from '../utils/TimeHelper';
 import { comparers, dcpReportStatus, dcpReportStatusDic } from '../appConsts';
 import { routes, routeWithParams } from '../routers/routesDictionary';
 import FilterButton, { IFilterOption } from '../components/FilterButton';
-import { useHistory } from 'react-router-dom';
 import { ReactComponent as FilterIcon } from '../assets/img/filter.svg';
 import ErrorIcon from '@material-ui/icons/Error';
 import DoneIcon from '@material-ui/icons/Done';
@@ -26,25 +27,36 @@ import MoreHorizIcon from '@material-ui/icons/MoreHoriz';
 import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@material-ui/icons/Edit';
 import AddIcon from '@material-ui/icons/Add';
+import { getFullUrl } from '../utils/ImageHelper';
 import useStyles from '../assets/jss/views/DCPReportHistoryPage';
-import ActionModal from '../components/Modal';
-import { toast } from 'react-toastify';
 
 
-const DetailCell = (props: GridCellParams) => {
-  
-  const history = useHistory();
-  const { id } = props;
+const DetailCell = (params: GridCellParams) => {
+  const { api, id } = params;
+  const [ openModal, setOpenModal ] = useState(false);
 
-  const navigateToDcpReportApprovalDetail = () => {
-    history.push(routeWithParams(routes.DCPReportDetail, id.toString()));
+  const toggleModal = () => {
+    setOpenModal((prev) => !prev);
   };
 
+  const images = ((api as GridApi).getCellValue(id, 'attachedPhotos') as string[] || [])
+    .map((src) => ({source: getFullUrl(src)} as ViewType));
+
   return (
-    <IconButton size="small" color="primary" onClick={navigateToDcpReportApprovalDetail}
-    >
-      <PageviewIcon />
-    </IconButton>
+    <Box>
+      <IconButton size="small" color="primary" onClick={toggleModal}
+      >
+        <PageviewIcon />
+      </IconButton>
+      <ModalGateway>
+        {openModal ? (
+          <Modal onClose={toggleModal}>
+            <Carousel views={images} />
+          </Modal>
+        ) : null}
+      </ModalGateway>
+    </Box>
+    
 
   );
 };
@@ -52,8 +64,14 @@ const DetailCell = (props: GridCellParams) => {
 const MenuCell = (props: GridCellParams) => {
 
   const history = useHistory();
+
   const { api, id } = props;
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const [ openModal, setOpenModal ] = useState(false);
+
+  const toggleModal = () => {
+    setOpenModal((prev) => !prev);
+  };
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
@@ -67,37 +85,34 @@ const MenuCell = (props: GridCellParams) => {
     api.setPage(api.getState().pagination.page);
   };
 
-  const navigateToDcpReportDetail = () => {
-    handleClose();
-    history.push(routeWithParams(routes.DCPReportDetail, id.toString()));
-  };
-
   const updateDcpReport = async () => {
-    handleClose();
-    history.push(routeWithParams(routes.UpdateDCPReport, id.toString()));
+    try {
+      handleClose();
+      history.push(routeWithParams(routes.LRReportApprovalDetail, id.toString()));
+    } catch {
+
+    }
   };
 
   const deleteDcpReport = async () => {
     try {
       handleClose();
+      await LrReportsService.deleteLrReportById(id.toString());
+      reloadCurrentPageData();
+    } catch {
 
-      ActionModal.show({
-        title: 'Xóa phiếu chấm này?',
-        onAccept: async () => {
-          await DcpReportsService.deleteDcpReportById(id.toString());
-          reloadCurrentPageData();
-        } 
-      });
-
-    } catch (err) {
-      console.log(err);
-      toast('Đã có lỗi xảy ra!', {
-        type: 'error'
-      });
     }
   };
 
+  const viewDetail = () => {
+    handleClose();
+    toggleModal();
+  };
+
+
   const status = api.getCellValue(id, 'status');
+  const images = ((api as GridApi).getCellValue(id, 'attachedPhotos') as string[] || [])
+    .map((src) => ({source: getFullUrl(src)} as ViewType));
 
   return (
     <div>
@@ -108,7 +123,7 @@ const MenuCell = (props: GridCellParams) => {
             open={Boolean(anchorEl)}
             onClose={handleClose}
         >
-          <MenuItem onClick={navigateToDcpReportDetail}>
+          <MenuItem onClick={viewDetail}>
             <ListItemIcon style={{minWidth: 30}}>
               <PageviewIcon fontSize="small" />
             </ListItemIcon>
@@ -141,6 +156,13 @@ const MenuCell = (props: GridCellParams) => {
       >
         <MoreHorizIcon />
       </IconButton>
+      <ModalGateway>
+        {openModal ? (
+          <Modal onClose={toggleModal}>
+            <Carousel views={images} />
+          </Modal>
+        ) : null}
+      </ModalGateway>
     </div>
   );
 };
@@ -150,6 +172,7 @@ const StatusCell = (params: GridCellParams) => {
 
   const status = params.value;
   const statusText = dcpReportStatusDic[params.value as string];
+
   return (
     <Chip
       icon={status === dcpReportStatus.Created ? <ErrorIcon /> 
@@ -169,13 +192,23 @@ const cols: GridColDef[] =  [
     hide: true
   },
   {
-    field: 'dcpClassReports',
-    headerName: 'Lớp được chấm',
+    field: 'class',
+    headerName: 'Lớp',
     flex: 1,
     valueFormatter: (params: GridValueFormatterParams) => {
-      const value = params.value as DcpReport.DcpClassReportDto[];
-      return value ? value.map(x => x.class.name).join(', ') : '';
+      const value = params.value as Class.ClassForSimpleListDto;
+      return value.name;
     }
+  },
+  {
+    field: 'totalPoint',
+    headerName: 'Điểm',
+    width: 120
+  },
+  {
+    field: 'absenceNo',
+    headerName: 'Vắng',
+    width: 120
   },
   {
     field: 'status',
@@ -220,9 +253,9 @@ const cols: GridColDef[] =  [
   },
 ];
 
-const fetchAPIDebounced = AwesomeDebouncePromise(DcpReportsService.getMyDcpReports, 500);
+const fetchAPIDebounced = AwesomeDebouncePromise(LrReportsService.getLrReportsForApproval, 500);
 
-const MyDCPReportPage = () => {
+const LRReportApprovalPage = () => {
   
   const history = useHistory();
   const classes = useStyles();
@@ -233,7 +266,7 @@ const MyDCPReportPage = () => {
     { id: dcpReportStatus.Rejected, label: dcpReportStatusDic[dcpReportStatus.Rejected], value: dcpReportStatus.Rejected, },
   ]);
 
-  const [ items, setItems ] = useState<DcpReport.DcpReportDto[]>([]);
+  const [ items, setItems ] = useState<LrReport.LRReportDto[]>([]);
   const [ dateFilter, setDateFilter ] = useState<Date | null>(new Date());
   const [ dateFilterType, setDateFilterType ] = useState<string>('today');
 
@@ -263,7 +296,7 @@ const MyDCPReportPage = () => {
   ] });
  
   useEffect(() => {
-    document.title = '2Cool | Phiếu chấm nề nếp của tôi';
+    document.title = '2Cool | Lịch sử nộp sổ đầu bài của tôi';
   }, []);
 
   useEffect(() => {
@@ -364,12 +397,12 @@ const MyDCPReportPage = () => {
     <div style={{ height: '100%' }}>
       <Grid container style={{ height: '100%' }}>
         <Grid item xs={4} sm={3} md={2}>
-          <Sidebar activeKey={routes.MyDCPReport} />
+          <Sidebar activeKey={routes.MyLRReport} />
         </Grid>
         <Grid style={{ background: '#fff', flexGrow: 1 }} item container xs={8} sm={9} md={10} direction='column'>
           <Grid item >
             <Header
-              pageName="Phiếu chấm nề nếp của tôi"
+              pageName="Lịch sử nộp sổ đầu bài của tôi"
             />
           </Grid>
           <Grid item container direction='column' style={{ flex: 1, minHeight: 0, flexWrap: 'nowrap', background: "#e8e8e8" }}>
@@ -423,14 +456,13 @@ const MyDCPReportPage = () => {
                     options={statusOptions}
                     onSelectedOptionsChange={onStatusFilterChange}
                   />
-                  <Button
-                    startIcon={<AddIcon/>}
+                  <Button 
                     variant={'contained'} 
-                    color={'primary'}
+                    color={'primary'} 
+                    startIcon={<AddIcon />}
                     style={{ marginLeft: "auto" }}
-                    onClick={() => history.push(routes.CreateDCPReport)}
-                    >
-                    Tạo phiếu chấm nề nếp
+                    onClick={() => history.push(routes.CreateLRReport)} >
+                    Nộp sổ đầu bài
                   </Button>
                 </Grid>
               </Paper>
@@ -462,4 +494,4 @@ const MyDCPReportPage = () => {
 
 };
 
-export default MyDCPReportPage;
+export default LRReportApprovalPage;

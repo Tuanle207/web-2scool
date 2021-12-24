@@ -96,6 +96,8 @@ const DCPReportCreatePage: React.FC<Props> = ({
     };
 
     initData();
+
+    document.title = '2Cool | Chấm điểm nề nếp';
   }, []);
 
   React.useEffect(() => {
@@ -231,7 +233,7 @@ const DCPReportCreatePage: React.FC<Props> = ({
           <Sidebar activeKey={routes.MyDCPReport} />
         </Grid>
         <Grid style={{ height: '100%' }} item container xs={8} sm={9} md={10} direction={'column'}>
-          <Header />
+          <Header pageName="Chấm điểm nề nếp" />
           <Grid item container direction='column' style={{ flex: 1, minHeight: 0, flexWrap: 'nowrap' }}>
             <Grid item container alignItems='center' justify='space-between' className={classes.actionGroup}>
               <Grid item container direction='row' justify='center' alignItems='center' style={{width: 'auto', marginLeft: 0}}>

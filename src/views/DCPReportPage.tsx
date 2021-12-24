@@ -1,6 +1,6 @@
 import { Grid, Button, Typography, IconButton, Tooltip, Paper } from '@material-ui/core';
-import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { useParams, useHistory } from 'react-router-dom';
 import Header from '../components/Header';
 import Sidebar from '../components/Sidebar';
 import { Class, DcpReport, Regulation } from '../interfaces';
@@ -15,8 +15,12 @@ import CheckCircleIcon from '@material-ui/icons/CheckCircle';
 import PauseCircleOutlineIcon from '@material-ui/icons/PauseCircleOutline';
 import HighlightOffIcon from '@material-ui/icons/HighlightOff';
 import RestoreIcon from '@material-ui/icons/Restore';
+import DeleteIcon from '@material-ui/icons/Delete';
+import EditIcon from '@material-ui/icons/Edit';
 import { dcpReportStatus, dcpReportStatusDic } from '../appConsts';
-import { routes } from '../routers/routesDictionary';
+import { routes, routeWithParams } from '../routers/routesDictionary';
+import { useSelector } from 'react-redux';
+import { AppConfigSelector } from '../store/selectors';
 import useStyles from '../assets/jss/views/DCPReportPage';
 
 const classCols: GridColDef[] = [
@@ -103,6 +107,7 @@ const cols: GridColDef[] = [
 
 const DCPReportPage = () => {
 
+  const history = useHistory();
   const classes = useStyles();
   const params = useParams<{dcpReportId: string}>();
 
@@ -114,6 +119,8 @@ const DCPReportPage = () => {
   const [className, setClassName] = useState<string>('Lớp...');
   const [faultsCount, setFaultsCount] =  useState('...');
   const [faultsPoint, setFaultsPoint] =  useState('...');
+
+  const currentUser = useSelector(AppConfigSelector.currentUser);
 
   useEffect(() => {
     document.title = '2Cool | Chi tiết phiếu chấm điểm nề nếp';
@@ -269,6 +276,42 @@ const DCPReportPage = () => {
           });
         }
       } 
+    });
+  };
+
+  const handleEdit = () =>  {
+    const { dcpReportId } = params;
+
+    if (!dcpReportId) {
+      return;
+    }
+
+    history.push(routeWithParams(routes.UpdateDCPReport, dcpReportId));
+  };
+
+  const handleDelete = () => {
+    const { dcpReportId } = params;
+
+    if (!dcpReportId) {
+      return;
+    }
+
+    ActionModal.show({
+      title: 'Xóa phiếu chấm này?',
+      onAccept: async () => {
+        try {
+          await DcpReportsService.deleteDcpReportById(dcpReportId);
+          fetchDcpReport();
+          toast('Xóa thành công!', {
+            type: 'success'
+          });
+        } catch (err) {
+          console.log(err);
+          toast('Đã có lỗi xảy ra!', {
+            type: 'error'
+          });
+        }
+      } 
     })
   };
 
@@ -276,7 +319,7 @@ const DCPReportPage = () => {
     <div style={{ height: '100%' }}>
       <Grid container className={classes.container}>
         <Grid item xs={4} sm={3} md={2}>
-          <Sidebar activeKey={routes.DCPReportApprovalDetail} />
+          <Sidebar activeKey={routes.DCPReportDetail} />
         </Grid>
         <Grid style={{ background: '#fff', flexGrow: 1}} item container xs={8} sm={9} md={10} direction={'column'}>
           <Grid item>
@@ -358,6 +401,25 @@ const DCPReportPage = () => {
                 </Grid>
                 <Grid item container justify="flex-end" className={classes.dcpReportAction} >
                   {
+                    (data.creatorId === currentUser.id &&  data.status === dcpReportStatus.Created) && (
+                      <>
+                        <Button 
+                          className={`${classes.rejectBtn} ${classes.acceptBtn}`} 
+                          style={{ marginRight: 16 }}
+                          variant={'contained'} 
+                          startIcon={<DeleteIcon />}
+                          onClick={handleDelete}
+                        >Xóa</Button>
+                        <Button
+                          style={{ marginRight: 16 }}
+                          variant={'contained'} 
+                          startIcon={<EditIcon />}
+                          onClick={handleEdit}
+                        >Cập nhật</Button>
+                      </>
+                    )
+                  }
+                  {
                     data.status === dcpReportStatus.Created && (
                       <Button 
                         className={classes.rejectBtn} 
@@ -374,7 +436,7 @@ const DCPReportPage = () => {
                         variant={'contained'} 
                         color={'primary'}
                         onClick={handleAccept}
-                      >Phê duyệt</Button>
+                      >Chấp nhận</Button>
                     )
                   }
                   {

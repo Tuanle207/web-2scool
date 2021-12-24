@@ -16,6 +16,7 @@ import AssignmentTurnedInIcon from '@material-ui/icons/AssignmentTurnedIn';
 import FlagIcon from '@material-ui/icons/Flag';
 import LocalLibraryIcon from '@material-ui/icons/LocalLibrary';
 import BookIcon from '@material-ui/icons/Book';
+import PostAddIcon from '@material-ui/icons/PostAdd';
 import { ReactComponent as TeacherIcon } from '../../assets/img/teacher.svg';
 import { ReactComponent as StudentIcon } from '../../assets/img/student.svg';
 import { ReactComponent as RoleIcon } from '../../assets/img/permission.svg';
@@ -119,7 +120,7 @@ const sidebarItems: Util.IObject<ISidebarInfo[]> = {
     },
     {
       key: 'my-report',
-      Icon: CreateIcon,
+      Icon: PostAddIcon,
       title: 'Chấm điểm',
       route: routes.MyDCPReport,
       policyName: policies.CreateNewDcpReport,
@@ -288,7 +289,7 @@ const Sidebar: FC<ISidebarProps> = ({ activeKey }) => {
               ) : 
               item.key === 'my-report-post' ? (
                 <Collapse component="li" in={expandCreateReport} timeout="auto" unmountOnExit>
-                  <List disablePadding style={{ paddingLeft: 18 }}>
+                  <List disablePadding >
                       {
                         item.subItems && item.subItems.map(el => (
                           <ListItem 

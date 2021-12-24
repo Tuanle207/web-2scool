@@ -20,7 +20,7 @@ import DCPReportUpdatePage from '../views/DCPReportUpdatePage';
 import DCPReportSchedule from '../views/DCPReportSchedule';
 import DCPReportScheduleAssignment from '../views/DCPReportScheduleAssignment';
 import LessonRegisterReportSchedule from '../views/LessonRegisterReportSchedule';
-import LessonRegisterReport from '../views/LessonRegisterReport';
+import MyLRReportPage from '../views/MyLRReportPage';
 import LessonRegisterReportCreate from '../views/LessonRegisterReportCreate';
 import ProfilePage from '../views/ProfilePage';
 import { policies } from '../appConsts';
@@ -44,7 +44,7 @@ const DashboardRouter = () => {
           component={DCPReportsApprovalPage}
         />
         <ProtectedRoute 
-          path={routes.DCPReportApprovalDetail}
+          path={routes.DCPReportDetail}
           exact
           policyName={policies.GetDcpReportDetail}
           component={DCPReportPage}
@@ -65,13 +65,7 @@ const DashboardRouter = () => {
           path={routes.MyLRReport}
           exact
           policyName={policies.GetMyLRReport}
-          component={LessonRegisterReport}
-        />
-        <ProtectedRoute 
-          path={routes.MyDCPReportDetail}
-          exact
-          policyName={policies.GetDcpReportDetail}
-          component={MyDCPReportPage}
+          component={MyLRReportPage}
         />
         <ProtectedRoute 
           path={routes.CreateDCPReport}

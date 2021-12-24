@@ -33,7 +33,7 @@ const DetailCell = (props: GridCellParams) => {
   const { id } = props;
 
   const navigateToDcpReportApprovalDetail = () => {
-    history.push(routeWithParams(routes.DCPReportApprovalDetail, id.toString()));
+    history.push(routeWithParams(routes.DCPReportDetail, id.toString()));
   };
 
   return (
@@ -65,7 +65,7 @@ const MenuCell = (props: GridCellParams) => {
 
   const navigateToDcpReportApprovalDetail = () => {
     handleClose();
-    history.push(routeWithParams(routes.DCPReportApprovalDetail, id.toString()));
+    history.push(routeWithParams(routes.DCPReportDetail, id.toString()));
   };
 
   const acceptDcpReport = async () => {
