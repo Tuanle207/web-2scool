@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Container, Grid, Button, List, ListItem, Typography, TextField } from '@material-ui/core';
+import { Container, Grid, Button, Typography, TextField } from '@material-ui/core';
 import React, { useState } from 'react';
 import Header from '../components/Header';
 import Sidebar from '../components/Sidebar';
@@ -11,8 +11,6 @@ import AlarmIcon from '@material-ui/icons/Alarm';
 import PermContactCalendarIcon from '@material-ui/icons/PermContactCalendar';
 import CheckIcon from '@material-ui/icons/Check';
 import { Autocomplete } from '@material-ui/lab';
-import { toast } from 'react-toastify';
-import ActionModal from '../components/Modal';
 import { routes } from '../routers/routesDictionary';
 import useStyles from '../assets/jss/views/LessonRegisterReportSchedule';
 import { DataGrid, GridColDef, GridValueFormatterParams } from '@material-ui/data-grid';

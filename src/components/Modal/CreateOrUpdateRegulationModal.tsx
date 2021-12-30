@@ -34,7 +34,8 @@ const CreateOrUpdateRegulationModal: FC<ICreateOrUpdateRegulationModalProps> = (
   const [ title, setTitle ] = useState('Thêm quy định mới');
   const [ notifyIsDirty, setNotifyIsDirty] = useState(true);
 
-  const { control, handleSubmit, reset, formState: { isDirty, isSubmitting }, } = useForm<Regulation.CreateUpdateRegulationDto>();
+  const { control, handleSubmit, reset, formState: { isDirty, isSubmitting }, } = 
+    useForm<Regulation.CreateUpdateRegulationDto>();
 
   useEffect(() => {
     if (item) {
@@ -44,10 +45,11 @@ const CreateOrUpdateRegulationModal: FC<ICreateOrUpdateRegulationModalProps> = (
         point: item.point,
         criteriaId: item.criteriaId,
         type: item.type,
-      })
+      });
     } else {
       setTitle('Thêm quy định mới');
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [item]);
 
 

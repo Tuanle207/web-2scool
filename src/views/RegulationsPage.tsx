@@ -7,8 +7,8 @@ import FilterButton, { IFilterOption } from '../components/FilterButton';
 import PageTitleBar from '../components/PageTitleBar';
 import { DataGrid, GridColDef, GridPageChangeParams, GridValueFormatterParams,
   GridApi, GridRowId, GridCellParams } from '@material-ui/data-grid';
-import { Student, Regulation } from '../interfaces';
-import { RegulationsService, StudentsService } from '../api';
+import { Regulation } from '../interfaces';
+import { RegulationsService } from '../api';
 import { useFetchV2 } from '../hooks/useFetchV2';
 import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@material-ui/icons/Edit';

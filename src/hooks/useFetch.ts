@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useReducer, useRef } from 'react';
 import HttpQueue from '../config/axios/HttpQuere';
 import { Util } from '../interfaces';
-import { cleanObject, deepCompare } from '../utils/ObjectHelper';
+import { cleanObject } from '../utils/ObjectHelper';
 
 enum FetchState {
   Fetching = 'fetching',

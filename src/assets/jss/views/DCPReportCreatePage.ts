@@ -115,10 +115,10 @@ const useStyles = makeStyles(theme => ({
     }
   },
   rulesCatSelector: {
-    width: 160,
+    width: 200,
   },
   rulesSelector: {
-    width: 300,
+    width: 320,
     marginLeft: theme.spacing(2)
   },
   emptySelectedList: {

@@ -1,6 +1,5 @@
 import AwesomeDebouncePromise from 'awesome-debounce-promise';
 import { useEffect, useRef, useState } from 'react';
-import { useDeepCompareEffect } from '.';
 import { Util } from '../interfaces'
 
 type FetchFn<T> =  (...args: any) => Promise<Util.PagingModel<T>>;

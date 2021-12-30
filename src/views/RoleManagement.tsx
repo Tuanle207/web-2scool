@@ -5,13 +5,13 @@ import { DataGrid, GridApi, GridColDef, GridPageChangeParams, GridRowId } from '
 import { toast } from 'react-toastify';
 import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@material-ui/icons/Edit';
+import SettingsIcon from '@material-ui/icons/Settings';
 import Sidebar from '../components/Sidebar';
 import Header from '../components/Header';
 import PageTitleBar from '../components/PageTitleBar';
 import { Identity } from '../interfaces';
 import { IdentityService } from '../api';
 import { useFetchV2 } from '../hooks';
-import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
 import CreateOrUpdateRoleRequest from '../components/Modal/CreateOrUpdateRoleRequest';
 import UpdateRolePermissionsRequest from '../components/Modal/UpdateRolePermissionsRequest';
 import ActionModal from '../components/Modal';
@@ -95,7 +95,7 @@ const RowMenuCell = (props: RowMenuProps) => {
             onAccept: onRequestPermissionsUpdate
           })}
         >
-          <ErrorOutlineIcon />
+          <SettingsIcon />
         </IconButton>
       </Tooltip>
     </div>

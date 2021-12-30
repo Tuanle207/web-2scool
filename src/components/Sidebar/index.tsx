@@ -1,4 +1,4 @@
-import { FC, useState, useEffect } from 'react';
+import { FC, useState } from 'react';
 import { Box, Collapse, Container, Divider, List, ListItem, ListItemText } from '@material-ui/core';
 import { Dashboard } from '@material-ui/icons';
 import { Link, useHistory, useLocation } from 'react-router-dom';
@@ -215,18 +215,22 @@ const Sidebar: FC<ISidebarProps> = ({ activeKey }) => {
     location.pathname.includes(routes.MyLRReport)
   );
 
+  const toggleExpandTaskAssignment = () => {
+    if (expandCreateReport){
+      setExpandCreateReport(false);
+    }
+    setExpandTaskAssignment((prevOpen) => !prevOpen);
+  };
+
+  const toggleExpandCreateReport = () => {
+    if (expandTaskAssignment){
+      setExpandTaskAssignment(false);
+    }
+    setExpandCreateReport((prevOpen) => !prevOpen);
+  };
+
   const grantedPolicies = useSelector(AppConfigSelector.grantedPolicies);
 
-  useEffect(() => {
-    if (activeKey && [
-      'report-schedule-assignment', 
-      'report-schedule-assignment', 
-      'lessons-register-report-schedule-assignment'
-    ].includes(activeKey)) {
-      setExpandTaskAssignment(true);
-    }
-  }, [activeKey]);
-  
   return (
     <Container className={styles.container}>
       <Box className={styles.filterBackground}></Box>
@@ -241,8 +245,7 @@ const Sidebar: FC<ISidebarProps> = ({ activeKey }) => {
                 <ListItem 
                   key={item.key}
                   button
-                  onClick={() => setExpandTaskAssignment((prevOpen) => !prevOpen)} 
-                 
+                  onClick={toggleExpandTaskAssignment} 
                 >
                   <item.Icon style={{marginRight: 8, marginLeft: 4, marginBottom: 4, color: '#fff', fill: '#fff'}} />
                   <ListItemText primary={item.title} />
@@ -256,7 +259,7 @@ const Sidebar: FC<ISidebarProps> = ({ activeKey }) => {
                 <ListItem 
                   key={item.key}
                   button
-                  onClick={() => setExpandCreateReport((prevOpen) => !prevOpen)} 
+                  onClick={toggleExpandCreateReport} 
 
                 >
                   <item.Icon style={{marginRight: 8, marginLeft: 4, marginBottom: 4, color: '#fff', fill: '#fff'}} />

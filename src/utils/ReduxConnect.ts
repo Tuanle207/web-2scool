@@ -1,6 +1,9 @@
 import { connect } from 'react-redux';
 import { Util } from '../interfaces';
 
+/**
+ * @deprecated This function should be replace with useSelector hook for better Typescript compatitity
+ */
 export function withRedux<TOwnProps>({ 
   component, 
   stateProps = () => ({}), 

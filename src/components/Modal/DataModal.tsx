@@ -1,4 +1,4 @@
-import { FC, useState, useEffect, ReactFragment, ReactChild } from 'react';
+import { FC, useState, useEffect } from 'react';
 import { Box, Grid, IconButton, Typography } from '@material-ui/core';
 import ReactModal from 'react-modal';
 import CloseIcon from '@material-ui/icons/Close';
@@ -56,7 +56,7 @@ const DataModal: FC<IDataModalProps> = ({
         </Box>
         <Box style={{ marginTop: 8 }}>
         {
-          confirmBeforeExit && (
+          warningNotified && (
             <Box className={styles.warning}>
               <WarningIcon fontSize="small" style={{ marginRight: 4 }} />
               <p>Nhấn lưu để lưu lại kết quả!</p>
