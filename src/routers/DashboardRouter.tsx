@@ -26,7 +26,6 @@ import ProfilePage from '../views/ProfilePage';
 import { policies } from '../appConsts';
 import { routes } from './routesDictionary';
 import RegulationsPage from '../views/RegulationsPage';
-import LessonRegisterReportScheduleAssignment from '../views/LessonRegisterReportScheduleAssignment';
 
 const DashboardRouter = () => {
   return (
@@ -102,12 +101,6 @@ const DashboardRouter = () => {
           exact
           policyName={policies.AssignLessonRegisterReport}
           component={LessonRegisterReportSchedule}
-        />
-        <ProtectedRoute 
-          path={routes.LRReportScheduleAssignment}
-          exact
-          policyName={policies.AssignLessonRegisterReport}
-          component={LessonRegisterReportScheduleAssignment}
         />
         <ProtectedRoute 
           path={routes.DCPRanking}

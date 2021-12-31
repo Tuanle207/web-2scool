@@ -2,6 +2,7 @@ import React from 'react';
 import { Box, Button, Grid, IconButton, Modal, Typography } from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';
 import modalStyles from '../../assets/jss/components/Modal';
+import { toast } from 'react-toastify';
 
 /**
  * used as paramater passes into SHOW modal method
@@ -98,6 +99,7 @@ class ActionModal extends React.Component<{}, ModalState> {
         })
         .catch(err => { // failed -> reject, handler error
           console.log('Đã có lỗi xảy ra', {err});
+          toast.error(`Đã có lỗi xảy ra: ${err?.message || ''}`)
         })
         .finally(() => { // finally
           // 5. Close modal

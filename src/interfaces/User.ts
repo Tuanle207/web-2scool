@@ -32,6 +32,7 @@ export namespace User {
   }
 
   export interface UserForSimpleListDto {
+    id: string;
     userName: string;
     email: string;
     name: string;
