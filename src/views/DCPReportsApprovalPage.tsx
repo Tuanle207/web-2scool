@@ -387,13 +387,13 @@ const DCPReportsApprovalPage = () => {
         <Grid item xs={4} sm={3} md={2}>
           <Sidebar activeKey={routes.DCPReportApproval} />
         </Grid>
-        <Grid style={{ background: '#fff', flexGrow: 1 }} item container xs={8} sm={9} md={10} direction='column'>
+        <Grid style={{ background: '#fff', flexGrow: 1 }} item container xs={8} sm={9} md={10} direction="column">
           <Grid item >
             <Header
               pageName="Duyệt chấm điểm nề nếp"
             />
           </Grid>
-          <Grid item container direction='column' style={{ flex: 1, minHeight: 0, flexWrap: 'nowrap', background: "#e8e8e8" }}>
+          <Grid item container direction="column" style={{ flex: 1, minHeight: 0, flexWrap: 'nowrap', background: "#e8e8e8" }}>
             <Grid item container
               style={{
                 paddingTop: 16, 

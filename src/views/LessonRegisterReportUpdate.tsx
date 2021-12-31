@@ -1,6 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { Grid, Button, Typography, Tooltip, TextField, Paper } from '@material-ui/core';
 import React from 'react';
+import { useHistory, useParams } from 'react-router-dom';
 import Header from '../components/Header';
 import Sidebar from '../components/Sidebar';
 import { Alarm as AlarmIcon  } from '@material-ui/icons';
@@ -9,9 +10,8 @@ import PhotoIcon from '@material-ui/icons/Photo';
 import ControlPointIcon from '@material-ui/icons/ControlPoint';
 import RemoveCircleOutlineIcon from '@material-ui/icons/RemoveCircleOutline';
 import AddAPhotoIcon from '@material-ui/icons/AddAPhoto';
-import SendIcon from '@material-ui/icons/Send';
+import DoneIcon from '@material-ui/icons/Done';
 import PlaceholderImage from '../assets/img/placeholder-img.png';
-import { useHistory } from 'react-router';
 import { formatTime, getDayOfWeek } from '../utils/TimeHelper';
 import { toast } from 'react-toastify';
 import { LrReportsService, TaskAssignmentService } from '../api';
@@ -19,12 +19,14 @@ import ActionModal from '../components/Modal';
 import { taskType } from '../appConsts';
 import { Class } from '../interfaces';
 import useStyles from '../assets/jss/views/LessonRegisterReportCreate';
+import { getFullUrl } from '../utils/ImageHelper';
 
 
-const LessonRegisterReportCreate = () => {
+const LessonRegisterReportUpdate = () => {
   
   const classes = useStyles();
   const history = useHistory();
+  const params = useParams<{lrReportId: string}>();
 
   const inputRef = React.useRef(null);
 
@@ -35,7 +37,9 @@ const LessonRegisterReportCreate = () => {
   const [reportClass, setReportClass] = React.useState<Class.ClassForSimpleListDto>();
 
   React.useEffect(() => {
-    document.title = '2Cool | Nộp sổ đầu bài';
+    getData();
+
+    document.title = '2Cool | Cập nhật phiếu nộp sổ đầu bài';
   }, []);
 
   React.useEffect(() => {
@@ -50,6 +54,16 @@ const LessonRegisterReportCreate = () => {
         }
       })
   }, [file]);
+
+  const getData = async() => {
+    const { lrReportId } = params;
+    const res = await LrReportsService.getLrReportById(lrReportId);
+    setFileUrl(getFullUrl(res.attachedPhotos[0]));
+    setNoPoint(res.totalPoint);
+    setNoAbsence(res.absenceNo);
+    setReportClass(res.class);
+  };
+
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files || [];
@@ -72,15 +86,16 @@ const LessonRegisterReportCreate = () => {
     if (noAbsence < 0) {
       return toast.error('Số lượt vắng không hợp lệ');
     }
-    if (file == null) {
+    if (file == null && (fileUrl === PlaceholderImage || !fileUrl)) {
       return toast.error('Vui lòng đính kèm ảnh Sổ Đầu Bài');
     }
+    const { lrReportId } = params;
     
     ActionModal.show({
-      title: 'Xác nhận gửi sổ đầu bài',
+      title: 'Xác nhận cập nhật phiếu nộp sổ đầu bài',
       onAccept: async () => {
         try {
-          await LrReportsService.createLrReport({
+          await LrReportsService.updateLrReport(lrReportId, {
             classId: reportClass.id,
             absenceNo: noAbsence,
             totalPoint: noPoint,
@@ -93,7 +108,7 @@ const LessonRegisterReportCreate = () => {
           toast.error('Đã có lỗi xảy ra!')
         }
       },
-    })
+    });
   };
 
   return (
@@ -103,7 +118,7 @@ const LessonRegisterReportCreate = () => {
           <Sidebar activeKey={'my-lr-report'} />
         </Grid>
         <Grid style={{ height: '100%' }} item container xs={8} sm={9} md={10} direction='column'>
-          <Header pageName="Nộp sổ đầu bài" />
+          <Header pageName="Cập nhật phiếu nộp sổ đầu bài" />
           <Grid item container direction='column' style={{ flex: 1, minHeight: 0, flexWrap: 'nowrap' }}>   
             <Grid item container direction='column' justify='center' alignItems='center' style={{ flex: 1, background: "#e8e8e8" }}>
               {
@@ -169,11 +184,11 @@ const LessonRegisterReportCreate = () => {
                         <Button
                           variant={'contained'} 
                           color={'primary'} 
-                          endIcon={<SendIcon />} 
+                          endIcon={<DoneIcon />} 
                           onClick={handleSubmit}
                           style={{marginRight: 200}}
                           >
-                          Gửi sổ đầu bài
+                          Cập nhật phiếu nộp sổ đầu bài
                         </Button>
                       </Grid>
                     </form>
@@ -194,4 +209,4 @@ const LessonRegisterReportCreate = () => {
 
 };
 
-export default LessonRegisterReportCreate;
+export default LessonRegisterReportUpdate;

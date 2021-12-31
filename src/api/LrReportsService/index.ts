@@ -9,7 +9,9 @@ const createLrReport = async (input: LrReport.CreateUpdateLRReportDto) => {
     
     var body = new FormData();
     body.append('ClassId', input.classId);
-    body.append('Photo', input.photo);
+    if (input.photo) {
+      body.append('Photo', input.photo);
+    }
     body.append('AbsenceNo', input.absenceNo.toString());
     body.append('TotalPoint', input.totalPoint.toString());
     
@@ -56,7 +58,9 @@ const updateLrReport = async (id: string, input: LrReport.CreateUpdateLRReportDt
 
     var body = new FormData();
     body.append('ClassId', input.classId);
-    body.append('Photo', input.photo);
+    if (input.photo) {
+      body.append('Photo', input.photo);
+    }
     body.append('AbsenceNo', input.absenceNo.toString());
     body.append('TotalPoint', input.totalPoint.toString());
 

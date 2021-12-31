@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from 'react';
-import { Container, Grid, Typography, IconButton } from '@material-ui/core';
+import { Container, Grid, Typography, IconButton, Paper } from '@material-ui/core';
 import Header from '../components/Header';
 import Sidebar from '../components/Sidebar';
 import { Class, Identity, TaskAssignment, User, Util } from '../interfaces';
@@ -11,11 +11,11 @@ import AlarmIcon from '@material-ui/icons/Alarm';
 import PermContactCalendarIcon from '@material-ui/icons/PermContactCalendar';
 import EditIcon from '@material-ui/icons/Edit';
 import { routes } from '../routers/routesDictionary';
-import useStyles from '../assets/jss/views/LessonRegisterReportSchedule';
 import { DataGrid, GridApi, GridCellParams, GridColDef, GridRowId, GridValueFormatterParams } from '@material-ui/data-grid';
 import ActionModal from '../components/Modal';
 import UpdateLRKeeperRequest from '../components/Modal/UpdateLRKeeperRequest';
 import { toast } from 'react-toastify';
+import useStyles from '../assets/jss/views/LessonRegisterReportSchedule';
 
 
 interface IAssignClass {
@@ -110,14 +110,15 @@ const LessonRegisterReportSchedule = () => {
 
   const classes = useStyles();
 
-  const [updatedTime, setUpdatedTime] = useState<Date>();
-  const [creatorInfo, setCreatorInfo] = useState<User.UserForSimpleListDto>();
+  const [ updatedTime, setUpdatedTime] = useState<Date>();
+  const [ creatorInfo, setCreatorInfo ] = useState<User.UserForSimpleListDto>();
 
   const [ userData, setUserData ] = useState<Identity.UserForTaskAssignmentDto[]>([]);
   const [ classData, setClassData ] = useState<Class.ClassForSimpleListDto[]>([]);
   const [ assignClasses, setAssignClasses ] = useState<IAssignClass[]>([]);
 
   const [ data, setData ] = useState<TaskAssignment.TaskAssignmentDto[]>([]);
+  const [ loading, setLoading ] = useState(true);
 
 
   useEffect(() => {
@@ -128,6 +129,7 @@ const LessonRegisterReportSchedule = () => {
   }, []);
 
   const getData = async () => {
+    setLoading(true);
     const promises: [
       Promise<Util.PagingModel<Class.ClassForSimpleListDto>>,
       Promise<Util.PagingModel<Identity.UserForTaskAssignmentDto>>,
@@ -146,6 +148,7 @@ const LessonRegisterReportSchedule = () => {
     setClassData(classRes.items);
     setUserData(userRes.items);
     parseAssignmentScheduleData(classRes.items, taskAssignRes.items);
+    setLoading(false);
   };
 
   const parseAssignmentScheduleData = (classItems: Class.ClassForSimpleListDto[],
@@ -167,7 +170,6 @@ const LessonRegisterReportSchedule = () => {
         user: status?.assignee
       });
     });
-    console.log({assigns});
     
     setAssignClasses(assigns);
   };
@@ -220,9 +222,11 @@ const LessonRegisterReportSchedule = () => {
     }
     setAssignClasses(newAssignment);
     await handleSubmit(newAssignment);
+    setLoading(true);
     const newDataRes = await TaskAssignmentService.getAll({taskType: taskType.LessonRegisterReport});
     setData(newDataRes.items);
     parseAssignmentScheduleData(classData, newDataRes.items);
+    setLoading(false);
   };
 
   const handleEditAssignment = (classId: string) => {
@@ -244,7 +248,7 @@ const LessonRegisterReportSchedule = () => {
     }
   };
 
-  const timeText = updatedTime ? `${getDayOfWeek(updatedTime.toLocaleString())} - ${formatTime(updatedTime.toLocaleString())}` : 'Không xác định';
+  const timeText = 'Cập nhật lần cuối vào ' + (updatedTime ? `${getDayOfWeek(updatedTime.toLocaleString())} - ${formatTime(updatedTime.toLocaleString())}` : 'Không xác định');
   const creatorText = creatorInfo ? `Phân công bởi ${creatorInfo.name}` : 'Chưa được ai phân công';
 
   return (
@@ -254,8 +258,54 @@ const LessonRegisterReportSchedule = () => {
           <Sidebar activeKey={routes.LRReportSchedule} />
         </Grid>
         <Grid style={{ height: '100%' }} item container xs={8} sm={9} md={10} direction={'column'}>
-          <Header />
-          <Grid item container direction='column' style={{ flex: 1, minHeight: 0, flexWrap: 'nowrap' }}>
+          <Grid item >
+            <Header
+              pageName="Phân công giữ sổ đầu bài"
+            />
+          </Grid>
+
+          <Grid item container direction='column' style={{ flex: 1, minHeight: 0, flexWrap: 'nowrap', background: "#e8e8e8" }}>
+            <Grid item container
+              style={{
+                paddingTop: 16, 
+                paddingRight: 24, 
+                paddingLeft: 24,
+                background: "#e8e8e8"
+              }}
+            >
+              <Paper variant="outlined" elevation={1} style={{ width: "100%" }}>
+                <Grid item container direction='row' alignItems='center' style={{ padding: "5px 32px", height: 54 }}>
+                  <Grid item container direction={'row'} alignItems={'center'}>
+                    <AlarmIcon style={{ marginRight: 8 }}/>
+                    <Typography variant={'body2'}>{timeText}</Typography>
+                  </Grid>
+                  <Grid item container direction={'row'} alignItems={'center'}>
+                    <PermContactCalendarIcon style={{ marginRight: 8 }}/>
+                    <Typography variant={'body2'}>{creatorText}</Typography>
+                  </Grid>
+                </Grid>
+              </Paper>
+            </Grid>              
+            <Grid item style={{ flexGrow: 1, paddingTop: 16, paddingBottom: 16, backgroundColor: '#e8e8e8'}}>
+              <Container className={classes.datagridContainer}>
+                <DataGrid
+                  columns={cols}
+                  rows={data}
+                  hideFooter
+                  hideFooterPagination
+                  loading={loading}
+                  onCellClick={(params: GridCellParams) =>  {
+                    if (params.colIndex === 5) {
+                      const classItem = params.getValue('classAssigned') as Class.ClassForSimpleListDto
+                      handleEditAssignment(classItem.id);
+                    }
+                  }}
+                />
+              </Container>
+            </Grid>
+          </Grid>
+
+          {/* <Grid item container direction='column' style={{ flex: 1, minHeight: 0, flexWrap: 'nowrap' }}>
             <Grid item container alignItems='center' className={classes.actionGroup}>
               <Grid item container direction='row' alignItems='center' style={{paddingTop: 12, paddingBottom: 12, flex: 1}}>
                 <Grid item container direction={'row'} alignItems={'center'}>
@@ -284,7 +334,7 @@ const LessonRegisterReportSchedule = () => {
                 />
               </Container>
             </Grid>
-          </Grid>
+          </Grid> */}
         </Grid>
       </Grid>
     </div>

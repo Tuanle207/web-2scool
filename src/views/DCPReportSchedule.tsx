@@ -1,10 +1,10 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Container, Grid, Button, makeStyles, Typography, Paper, Box } from '@material-ui/core';
-import React from 'react';
+import { Container, Grid, Button, makeStyles, Typography, Paper } from '@material-ui/core';
+import { useState, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 import Header from '../components/Header';
 import Sidebar from '../components/Sidebar';
-import { Class, TaskAssignment, Util } from '../interfaces';
+import { Class, TaskAssignment, User } from '../interfaces';
 import { DataGrid, GridColDef, GridValueFormatterParams } from '@material-ui/data-grid';
 import { TaskAssignmentService } from '../api';
 import { getDayOfWeek, formatTime, formatDate } from '../utils/TimeHelper';
@@ -113,13 +113,14 @@ const DCPReportSchedule = () => {
   const titleBarStyles = usePageTitleBarStyles();
   const history = useHistory();
 
-  const [data, setData] = React.useState<TaskAssignment.TaskAssignmentDto[]>([]);
-  const [loading, setLoading] = React.useState(false);
-  const [error, setError] = React.useState<string | null>(null);
-  const [updatedTime, setUpdatedTime] = React.useState(new Date());
-  const [creatorInfo, setCreatorInfo] = React.useState<Util.IObject>({});
+  const [data, setData] = useState<TaskAssignment.TaskAssignmentDto[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  React.useEffect(() => {
+  const [updatedTime, setUpdatedTime] = useState<Date>();
+  const [creatorInfo, setCreatorInfo] = useState<User.UserForSimpleListDto>();
+
+  useEffect(() => {
     
     document.title = '2Cool | Phân công trực cờ đỏ';
     getData();
@@ -135,12 +136,8 @@ const DCPReportSchedule = () => {
       setData(res.items);
       if (res.items.length > 0) {
         const firstItem = res.items[0];
-        if (firstItem.creationTime) {
-          setUpdatedTime(firstItem.creationTime);
-        }
-        if (firstItem.creator) {
-          setCreatorInfo(firstItem.creator);
-        }
+        setUpdatedTime(firstItem.creationTime);
+        setCreatorInfo(firstItem.creator);
       }
     } catch (error: any) {
       if (error?.message) {
@@ -155,6 +152,10 @@ const DCPReportSchedule = () => {
     history.push(routes.DCPReportScheduleAssignment);
   };
 
+  const timeText = 'Cập nhật lần cuối vào ' + (updatedTime ? `${getDayOfWeek(updatedTime.toLocaleString())} - ${formatTime(updatedTime.toLocaleString())}` : 'Không xác định');
+  const creatorText = creatorInfo ? `Phân công bởi ${creatorInfo.name}` : 'Chưa được ai phân công';
+
+
   return (
     <div style={{ height: '100%' }}>
       <Grid container className={classes.container}>
@@ -162,7 +163,6 @@ const DCPReportSchedule = () => {
           <Sidebar activeKey={routes.DCPReportSchedule} />
         </Grid>
         <Grid style={{ height: '100%' }} item container xs={8} sm={9} md={10} direction={'column'}>
-          {/* <Header pageName="Phân công trực cờ đỏ" /> */}
           <Grid item >
             <Header
               pageName="Phân công trực cờ đỏ"
@@ -180,11 +180,11 @@ const DCPReportSchedule = () => {
                 <Grid item container alignItems="center" className={titleBarStyles.container}>
                   <Grid item container direction="row" alignItems="center">
                     <AlarmIcon style={{ marginRight: 8 }}/>
-                    <Typography variant="body2">{`Cập nhật lần cuối vào ${getDayOfWeek(updatedTime.toLocaleString())} - ${formatTime(updatedTime.toLocaleString())}`}</Typography>
+                    <Typography variant="body2">{timeText}</Typography>
                   </Grid>
                   <Grid item container direction="row" alignItems="center" justify="center">
                     <PermContactCalendarIcon style={{ marginRight: 8 }}/>
-                    <Typography variant="body2">{`Phân công bởi Lê Anh Tuấn`}</Typography>
+                    <Typography variant="body2">{creatorText}</Typography>
                   </Grid>
                   <Grid item container justify="flex-end">
                     <Button variant="contained"

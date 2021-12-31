@@ -10,6 +10,7 @@ export const routes = {
   LRReportApproval: '/duyet-so-dau-bai',
   LRReportApprovalDetail: '/duyet-so-dau-bai/:lrReportId',
   CreateLRReport: '/tao-phieu-so-dau-bai',
+  UpdateLRReport: '/cap-nhat-phieu-so-dau-bai/:lrReportId',
   DCPReportSchedule: '/phan-cong-lich-cham-diem-ne-nep',
   DCPReportScheduleAssignment: '/cap-nhat-lich-cham-diem-ne-nep',
   LRReportSchedule: '/phan-cong-giu-so-dau-bai',

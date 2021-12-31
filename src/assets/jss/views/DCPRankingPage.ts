@@ -17,23 +17,46 @@ const useStyles = makeStyles(theme => ({
     // padding: '20px 100px' 
   },
   datagridContainer: {
-    // height: '100%', 
+    height: '100%', 
     width: '100%',
-    '& .MuiDataGrid-columnSeparator': {
-      display: 'none'
+    '& .MuiDataGrid-root': {
+      backgroundColor: '#fff',
+      padding: theme.spacing(0, 2),
+    },
+    '& .MuiDataGrid-root *': {
+      '&::-webkit-scrollbar': {
+        width: 8,
+        height: 8
+      }
+    },
+    '& .MuiDataGrid-row.Mui-selected': {
+      backgroundColor: theme.palette.primary.light,
+    },
+    '& .MuiDataGrid-iconSeparator': {
+      color: theme.palette.divider,
+      
+      '&:hover': {
+        color: theme.palette.common.black
+      }
+    },
+    '& .MuiDataGrid-colCell': {
+      // borderRight: '1px solid #303030',
+    },
+    '& .MuiDataGrid-root .MuiDataGrid-cell:focus-within': {
+      outline: 'none',
+    },
+    '& .MuiDataGrid-root .MuiDataGrid-cell:focus': {
+      outline: 'none',
+    },
+    '& .MuiDataGrid-root .MuiDataGrid-cell:focus-visible': {
+      outline: 'none',
     },
     '& .MuiDataGrid-colCellTitle': {
       fontWeight: 700,
     },
-    '& .MuiDataGrid-root': {
-      border: 'none',
-      '& .MuiDataGrid-withBorder': {
-        borderRight: 'none',
-      }
-    },
-    '& .MuiDataGrid-root.MuiDataGrid-colCellMoving': {
-      backgroundColor: 'unset'
-    },
+    '& .MuiDataGrid-colCellMoving': {
+      backgroundColor: "transparent",
+    }
   },
 
   dateCardContainer: {

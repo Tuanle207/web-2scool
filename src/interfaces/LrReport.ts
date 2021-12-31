@@ -18,7 +18,7 @@ export namespace LrReport {
 
   export interface CreateUpdateLRReportDto {
     classId: string;
-    photo: File;
+    photo: File | null;
     absenceNo: number;
     totalPoint: number;
   }

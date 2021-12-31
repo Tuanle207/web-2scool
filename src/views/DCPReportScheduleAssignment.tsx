@@ -47,7 +47,7 @@ const DCPReportScheduleAssignment = () => {
 
   const [usersListIds, setUsersListIds] = React.useState<string[]>([]);
 
-  const [date, setDate] = React.useState(new Date());
+  const [date] = React.useState(new Date());
 
   const [dateRange, setDateRange] = React.useState<{
     startTime: Date | null,
@@ -255,10 +255,6 @@ const DCPReportScheduleAssignment = () => {
   const getDisabled = (assignedUserId?: string) => {
     return selectedUserId === null || (!!assignedUserId && selectedUserId !== assignedUserId);
   };
-
-  React.useEffect(() => {
-    console.log({selectedUserId});
-  }, [selectedUserId]);
 
   return (
     <div style={{ height: '100%' }}>

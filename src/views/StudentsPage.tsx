@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import AwesomeDebouncePromise from 'awesome-debounce-promise';
-import { Box, Container, Grid, IconButton, Paper, Tooltip } from '@material-ui/core';
+import { Container, Grid, IconButton, Paper, Tooltip } from '@material-ui/core';
 import Sidebar from '../components/Sidebar';
 import Header from '../components/Header';
 import PageTitleBar from '../components/PageTitleBar';

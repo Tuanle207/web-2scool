@@ -24,7 +24,8 @@ const useStyles = makeStyles(theme => ({
   },
   formContainer: {
     display: 'flex',
-    padding: theme.spacing(6, 8)
+    padding: theme.spacing(6, 8),
+    flexWrap: 'wrap'
   }
 }));
 

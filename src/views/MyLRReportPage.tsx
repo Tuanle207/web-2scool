@@ -85,16 +85,16 @@ const MenuCell = (props: GridCellParams) => {
     api.setPage(api.getState().pagination.page);
   };
 
-  const updateDcpReport = async () => {
+  const updateLrReport = async () => {
     try {
       handleClose();
-      history.push(routeWithParams(routes.LRReportApprovalDetail, id.toString()));
+      history.push(routeWithParams(routes.UpdateLRReport, id.toString()));
     } catch {
 
     }
   };
 
-  const deleteDcpReport = async () => {
+  const deleteLrReport = async () => {
     try {
       handleClose();
       await LrReportsService.deleteLrReportById(id.toString());
@@ -132,13 +132,13 @@ const MenuCell = (props: GridCellParams) => {
           {
             status === dcpReportStatus.Created && (
               <>
-                <MenuItem onClick={updateDcpReport}>
+                <MenuItem onClick={updateLrReport}>
                   <ListItemIcon style={{minWidth: 30}}>
                     <EditIcon fontSize="small" />
                   </ListItemIcon>
                   <ListItemText primary="Cập nhật" />
                 </MenuItem>
-                <MenuItem onClick={deleteDcpReport}>
+                <MenuItem onClick={deleteLrReport}>
                   <ListItemIcon style={{minWidth: 30}}>
                     <DeleteIcon fontSize="small" />
                   </ListItemIcon>
@@ -253,7 +253,7 @@ const cols: GridColDef[] =  [
   },
 ];
 
-const fetchAPIDebounced = AwesomeDebouncePromise(LrReportsService.getLrReportsForApproval, 500);
+const fetchAPIDebounced = AwesomeDebouncePromise(LrReportsService.getMyLrReports, 500);
 
 const LRReportApprovalPage = () => {
   
