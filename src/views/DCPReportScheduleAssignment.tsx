@@ -263,7 +263,7 @@ const DCPReportScheduleAssignment = () => {
           <Sidebar activeKey={routes.DCPReportScheduleAssignment} />
         </Grid>
         <Grid style={{ height: '100%' }} item container xs={8} sm={9} md={10} direction={'column'}>
-          <Header />
+          <Header pageName="Phân công lịch trực cờ đỏ" />
           <Grid item container direction='column' style={{ flex: 1, minHeight: 0, flexWrap: 'nowrap' }}>
             <Grid item container justify='space-between' alignItems='center' className={classes.actionGroup}>
               <Grid item container direction='row' alignItems='center' style={{paddingTop: 12, paddingBottom: 12}}>

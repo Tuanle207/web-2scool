@@ -1,13 +1,13 @@
-import React from 'react';
-import { Container, Grid, Typography } from '@material-ui/core';
+import { useEffect } from 'react';
+import { Container, Grid, Paper, Typography } from '@material-ui/core';
 import Sidebar from '../components/Sidebar';
 import Header from '../components/Header';
 import { routes } from '../routers/routesDictionary';
 
 const Dashboard = () => {
 
-  React.useEffect(() => {
-    console.log('hello from dashboard');
+  useEffect(() => {
+    document.title = "Trang chủ";
   }, []);
 
   return (
@@ -18,13 +18,11 @@ const Dashboard = () => {
         </Grid>
         <Grid style={{ background: '#fff' }} item container xs={8} sm={9} md={10} direction='column'>
           <Grid item style={{ flex: 1 }}>
-            <Header />
-            <Grid item style={{ flex: 1 }}>
-              <Container style={{display: 'flex', justifyContent: 'center', justifyItems: 'center'}}>
-                <Typography>
-                  Not implemented yet!
-                </Typography>
-              </Container>
+            <Header pageName="Trang chủ" />
+            <Grid item style={{ flex: 1, margin: "16px 24px" }}>
+              <Paper elevation={3} variant="outlined">
+                
+              </Paper>
             </Grid>
           </Grid>
         </Grid>

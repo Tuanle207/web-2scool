@@ -12,6 +12,18 @@ export namespace Identity {
     phoneNumber: string;
   }
 
+  export interface UserDto {
+    id: string;
+    name: string;
+    userName: string;
+    email: string;
+    emailConfirmed: boolean;
+    phoneNumber: string;
+    phoneNumberConfirmed: boolean;
+    role: RoleForSimpleListDto;
+    roleId: string | null;
+  }
+
   export interface CreateUpdateUserDto extends Util.IHaveExtraProperties {
     userName: string;
     name: string;
@@ -31,6 +43,11 @@ export namespace Identity {
   }
 
   export interface RoleDto {
+    id: string;
+    name: string;
+  }
+
+  export interface RoleForSimpleListDto {
     id: string;
     name: string;
   }

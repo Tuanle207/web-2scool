@@ -2,17 +2,10 @@ import Endpoint from './@endpoint';
 import { getApiService } from '../BaseApiService';
 import { Identity, Util } from '../../interfaces';
 
-const getUsers = async () => {
+const getUsers = async (input: Util.PagingFilter) => {
   try {
     const apiService = await getApiService();
-    const result = await apiService.get<Util.PagingModel<Identity.UserDto>>(Endpoint.GetUsers());
-    var userIds = result.items.map(el => el.id);
-    const roles = await Promise.all(
-      userIds.map((id: string) => apiService.get<Identity.UserRoleResDto>(Endpoint.GetUserRoleById(id)))
-    );
-    result.items.forEach((user, index) => {
-      result.items[index].roles = roles[index].items;
-    })
+    const result = await apiService.post<Util.PagingModel<Identity.UserDto>>(Endpoint.GetUsers(), input);
     return result;
   } catch (error) {
     throw error;

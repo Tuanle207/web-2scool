@@ -402,7 +402,7 @@ const MyDCPReportPage = () => {
                         KeyboardButtonProps={{
                           'aria-label': 'change date',
                         }}
-                        style={{ width: 140 }}
+                        style={{ width: 160 }}
                       />
                     </Box>
                   </MuiPickersUtilsProvider>
