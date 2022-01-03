@@ -1,5 +1,17 @@
 export namespace Stats {
 
+  export interface OverallClassRanking {
+    ranking: number;
+    classId: string;
+    className: string;
+    formTeacherName: string;
+    totalAbsence: number;
+    faults: number;
+    penaltyPoints: number;
+    lRPoints: number;
+    dcpPoints: number;
+    rankingPoints: number;
+  }
   export interface DcpClassRanking {
     ranking: number;
     classId: string;

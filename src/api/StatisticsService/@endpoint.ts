@@ -1,4 +1,6 @@
 const Endpoint = {
+  GetOverallRanking: (query: string) =>
+    `/api/app/statistics/overall-ranking${query}`,
   GetDcpRanking: (query: string) =>
     `/api/app/statistics/dcp-ranking${query}`,
   GetClassesFaults: (query: string) =>
@@ -7,6 +9,8 @@ const Endpoint = {
     `/api/app/statistics/common-faults${query}`,
   GetStudentsWithMostFaults: (query: string) =>
     `/api/app/statistics/students-with-most-faults${query}`,
+  GetOverallRankingExcel: (query: string) =>
+    `/downloads/overall-ranking-excel${query}`,
   GetDcpRankingExcel: (query: string) =>
     `/downloads/dcp-ranking-excel${query}`,
   GetClassesFaultsExcel: (query: string) =>

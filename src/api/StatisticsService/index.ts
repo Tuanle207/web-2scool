@@ -3,6 +3,16 @@ import { getApiService } from '../BaseApiService';
 import ENV from '../../config/env';
 import Endpoint from './@endpoint';
 
+const getOverallRanking = async (input: Util.DateFilterDto) => {
+  try {
+    const apiService = await getApiService();
+    const query = `?StartTime=${input.startTime.toLocaleString()}&EndTime=${input.endTime.toLocaleString()}`;
+    const result = await apiService.get<Util.PagingModel<Stats.OverallClassRanking>>(Endpoint.GetOverallRanking(query));
+    return result;
+  } catch (error) {
+    throw error;
+  }
+};
 
 const getDcpRanking = async (input: Util.DateFilterDto) => {
   try {
@@ -41,6 +51,16 @@ const getStudentsWithMostFaults = async (input: Util.DateFilterDto) => {
     const query = `?StartTime=${input.startTime.toLocaleString()}&EndTime=${input.endTime.toLocaleString()}`;
     const result = await apiService.get<Util.PagingModel<Stats.StudentWithMostFaults>>(Endpoint.GetStudentsWithMostFaults(query));
     return result;
+  } catch (error) {
+    throw error;
+  }
+};
+
+const getOverallRankingExcel = async (input: Util.DateFilterDto) => {
+  try {
+    await getApiService();
+    const query = `?StartTime=${input.startTime.toLocaleString()}&EndTime=${input.endTime.toLocaleString()}`;
+    window.open(ENV.host + Endpoint.GetOverallRankingExcel(query), '_blank');
   } catch (error) {
     throw error;
   }
@@ -87,10 +107,12 @@ const getStudentsWithMostFaultsExcel = async (input: Util.DateFilterDto) => {
 };
 
 const StatisticsService = {
+  getOverallRanking,
   getDcpRanking,
   getClassesFaults,
   getCommonFaults,
   getStudentsWithMostFaults,
+  getOverallRankingExcel,
   getDcpRankingExcel,
   getClassesFaultsExcel,
   getCommonFaultsExcel,

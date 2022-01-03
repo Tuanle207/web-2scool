@@ -1,9 +1,9 @@
 /* eslint-disable react-hooks/exhaustive-deps */
+import { useState, useEffect } from 'react';
 import { Container, Grid, Box, IconButton, Chip, Tooltip, Paper,
   Badge } from '@material-ui/core';
 import { MuiPickersUtilsProvider, KeyboardDatePicker } from '@material-ui/pickers';
 import DateFnsUtils from '@date-io/date-fns';
-import React from 'react';
 import Header from '../components/Header';
 import Sidebar from '../components/Sidebar';
 import { Stats } from '../interfaces';
@@ -13,7 +13,6 @@ import { getPreviousMonday } from '../utils/TimeHelper';
 import { FindInPage } from '@material-ui/icons';
 import GetAppIcon from '@material-ui/icons/GetApp';
 import { ReactComponent as FilterIcon } from '../assets/img/filter.svg';
-import { sleep } from '../utils/SetTimeOut';
 import { routes } from '../routers/routesDictionary';
 import useStyles from '../assets/jss/views/DCPRankingPage';
 
@@ -39,7 +38,12 @@ const cols: GridColDef[] = [
   {
     field: 'formTeacherName',
     headerName: 'Giáo viên chủ nhiệm',
-    flex: 1
+    width: 120
+  },
+  {
+    field: 'totalAbsence',
+    headerName: 'Lượt vắng',
+    width: 120
   },
   {
     field: 'faults',
@@ -50,14 +54,24 @@ const cols: GridColDef[] = [
   },
   {
     field: 'penaltyPoints',
-    headerName: 'Tổng điểm trừ',
+    headerName: 'Điểm trừ',
     width: 150,
     align: 'center',
     headerAlign: 'right'
   },
   {
-    field: 'totalPoints',
-    headerName: 'Tổng điểm',
+    field: 'lrPoints',
+    headerName: 'Điểm sổ đầu bài',
+    width: 120
+  },
+  {
+    field: 'dcpPoints',
+    headerName: 'Điểm nề nếp',
+    width: 120
+  },
+  {
+    field: 'rankingPoints',
+    headerName: 'Điểm thi đua',
     width: 150,
     align: 'center',
     headerAlign: 'right'
@@ -86,21 +100,21 @@ const DCPRankingPage = () => {
 
   const classes = useStyles();
 
-  const [dateFilter, setDateFilter] = React.useState<{
+  const [dateFilter, setDateFilter] = useState<{
     startTime: Date | null,
     endTime: Date | null
   }>({startTime: getPreviousMonday(new Date()), endTime: new Date()})
 
-  const [data, setData] = React.useState<Stats.DcpClassRanking[]>([]);
-  const [loading, setLoading] = React.useState(false);
+  const [data, setData] = useState<Stats.OverallClassRanking[]>([]);
+  const [loading, setLoading] = useState(false);
   
-  const [viewType, setViewType] = React.useState<ViewType>('ByWeek');
+  const [viewType, setViewType] = useState<ViewType>('ByWeek');
 
-  React.useEffect(() => {
+  useEffect(() => {
     document.title = '2Cool | Xếp hạng thi đua nề nếp';
   }, []);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (dateFilter && dateFilter.startTime && dateFilter.endTime)  {
       fetchData();
     }
@@ -146,11 +160,11 @@ const DCPRankingPage = () => {
   };
 
   const fetchData = async () => {
-    try {
-      setLoading(true);
-      await sleep(200);
+    setLoading(true);
 
-      const res = await StatisticsService.getDcpRanking({
+    try {
+
+      const res = await StatisticsService.getOverallRanking({
         startTime: dateFilter.startTime!,
         endTime: dateFilter.endTime!
       });
@@ -164,7 +178,7 @@ const DCPRankingPage = () => {
   };
 
   const handleDownloadFile = () => {
-    StatisticsService.getDcpRankingExcel({
+    StatisticsService.getOverallRankingExcel({
       startTime: dateFilter.startTime!,
       endTime: dateFilter.endTime!
     });
