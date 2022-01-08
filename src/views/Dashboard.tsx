@@ -11,12 +11,18 @@ import { useSelector } from 'react-redux';
 import { AppConfigSelector } from '../store/selectors';
 import { policies } from '../appConsts';
 
-const getUniqueColor = () => {
-  let n = (Math.random() * 0xfffff * 1000000).toString(16);
-  return '#' + n.slice(0, 6);
-};
-
-const list100colors = Array.from(new Array(100)).map(() => getUniqueColor());
+const list100colors = [
+  '#000000',
+  '#FF0000',
+  '#00FF00',
+  '#0000FF',
+  '#FFFF00',
+  '#00FFFF',
+  '#FF00FF',
+  '#808080',
+  '#008000',
+  '#800080'
+];
 
 const Dashboard = () => {
 
