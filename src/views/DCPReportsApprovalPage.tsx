@@ -118,7 +118,7 @@ const MenuCell = (props: GridCellParams) => {
           </MenuItem>
           {
             status === dcpReportStatus.Created ? (
-              <>
+              <div>
                 <MenuItem onClick={acceptDcpReport}>
                   <ListItemIcon style={{minWidth: 30}}>
                     <DoneIcon fontSize="small" />
@@ -131,7 +131,7 @@ const MenuCell = (props: GridCellParams) => {
                   </ListItemIcon>
                   <ListItemText primary="Từ chối" />
                 </MenuItem>
-              </>
+              </div>
             ) : (
               <MenuItem onClick={cancelAssessDcpReport}>
                 <ListItemIcon style={{minWidth: 30}}>

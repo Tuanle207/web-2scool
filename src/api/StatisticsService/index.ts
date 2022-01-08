@@ -61,6 +61,17 @@ const getStudentsWithMostFaults = async (input: Util.DateFilterDto) => {
   }
 };
 
+const getStatForLineChart = async (input: Util.DateFilterDto) => {
+  try {
+    const apiService = await getApiService();
+    const query = `?StartTime=${formatQueryDate(input.startTime)}&EndTime=${formatQueryDate(input.endTime)}`;
+    const result = await apiService.get<Stats.LineChartStatDto>(Endpoint.GetStatForLineChart(query));
+    return result;
+  } catch (error) {
+    throw error;
+  }
+};
+
 const getOverallRankingExcel = async (input: Util.DateFilterDto) => {
   try {
     await getApiService();
@@ -117,6 +128,7 @@ const StatisticsService = {
   getClassesFaults,
   getCommonFaults,
   getStudentsWithMostFaults,
+  getStatForLineChart,
   getOverallRankingExcel,
   getDcpRankingExcel,
   getClassesFaultsExcel,

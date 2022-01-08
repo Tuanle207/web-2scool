@@ -20,8 +20,8 @@ export namespace Identity {
     emailConfirmed: boolean;
     phoneNumber: string;
     phoneNumberConfirmed: boolean;
-    role: RoleForSimpleListDto;
-    roleId: string | null;
+    roles: RoleForSimpleListDto[];
+    listRoleId: string[];
   }
 
   export interface CreateUpdateUserDto extends Util.IHaveExtraProperties {

@@ -1,3 +1,5 @@
+import { Util } from './Util';
+
 export namespace Stats {
 
   export interface OverallClassRanking {
@@ -42,5 +44,15 @@ export namespace Stats {
     studentName: string;
     className: string;
     faults: number;
+  }
+
+  export interface LineChartStat {
+    classId: string;
+    penaltyPoint: number;
+    faults: number;
+  }
+
+  export interface LineChartStatDto {
+    items: Util.IObject<LineChartStat[]>;
   }
 }

@@ -9,6 +9,8 @@ const Endpoint = {
     `/api/app/statistics/common-faults${query}`,
   GetStudentsWithMostFaults: (query: string) =>
     `/api/app/statistics/students-with-most-faults${query}`,
+  GetStatForLineChart: (query: string) =>
+    `/api/app/statistics/stat-for-line-chart${query}`,
   GetOverallRankingExcel: (query: string) =>
     `/downloads/overall-ranking-excel${query}`,
   GetDcpRankingExcel: (query: string) =>

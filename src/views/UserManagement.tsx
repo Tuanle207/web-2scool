@@ -97,14 +97,14 @@ const cols: GridColDef[] =  [
     width: 150,
   },
   {
-    field: 'role',
+    field: 'roles',
     headerName: 'Vai trò',
     width: 200,
     valueFormatter: (params: GridValueFormatterParams) => {
       console.log({params});
       if (params.value) {
-        const value = params.value as Identity.RoleForSimpleListDto;
-        return value.name;
+        const value = params.value as Identity.RoleForSimpleListDto[];
+        return value.map(x => x.name).join(', ');
       }
       
       return '';
