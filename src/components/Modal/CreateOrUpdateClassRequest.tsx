@@ -16,7 +16,7 @@ const CreateOrUpdateClassRequest = ({id}: {id?: string}) => {
   const [courses, setCourses] = useState<Course.CourseDto[]>([]);
   const [grades, setGrades] = useState<Grade.GradeDto[]>([]);
   const [teachers, setTeachers] = useState<Teacher.TeacherForSimpleListDto[]>([]);
-  const {errors, validate, getError} = useDataValidator();
+  const {errors} = useDataValidator();
 
   useEffect(() => {
 
@@ -54,6 +54,7 @@ const CreateOrUpdateClassRequest = ({id}: {id?: string}) => {
         msg: errors[0].msg
       } : undefined
     });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data]);
 
 

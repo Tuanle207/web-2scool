@@ -136,7 +136,7 @@ const RegulationsPage = () => {
     data,
     loading,
     error,
-    resetCache,
+    resetFilter,
   } = useFetchV2({ fetchFn: fetchAPIDebounced });
 
   useEffect(() => {
@@ -208,13 +208,13 @@ const RegulationsPage = () => {
       onAccept: async () => {
         await RegulationsService.deleteRegulation(id);
         toast.success(`Xóa quy định thành công thành công`);
-        resetCache();
+        resetFilter();
       }
     });
   };
 
   const onDataChange = (newItem: Regulation.RegulationDto) => {
-    resetCache();
+    resetFilter();
   };
 
   return (

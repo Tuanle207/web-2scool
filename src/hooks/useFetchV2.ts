@@ -57,7 +57,7 @@ export const useFetchV2 = <T = any> ({ fetchFn, filter, pageIndex, pageSize }: I
       newFilter.push(filter);
     });
     
-    setPagingInfo(prev => ({...prev, filter: newFilter}));
+    setPagingInfo(prev => ({...prev, pageIndex: 1, filter: newFilter}));
   };
 
   const setPageIndex = (pageIndex: number) => {
@@ -72,7 +72,7 @@ export const useFetchV2 = <T = any> ({ fetchFn, filter, pageIndex, pageSize }: I
     return [...new Set(pagingInfo.filter?.filter((x) => !!x).map((x) => x.key))].length || 0;
   };
 
-  const resetCache = () => {
+  const resetFilter = () => {
     setPagingInfo({
       pageIndex: pageIndex || 1, 
       pageSize: pageSize || 15,
@@ -88,7 +88,7 @@ export const useFetchV2 = <T = any> ({ fetchFn, filter, pageIndex, pageSize }: I
     getFilterCount,
     updateData: setRes,
     data: res,
-    resetCache,
+    resetFilter,
     error,
     loading,
   };

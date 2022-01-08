@@ -37,6 +37,7 @@ const CreateOrUpdateCourseRequest = ({id}: {id?: string}) => {
         msg: errors[0].msg
       } : undefined
     });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data]);
 
 

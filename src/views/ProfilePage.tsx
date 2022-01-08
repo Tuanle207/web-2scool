@@ -109,7 +109,7 @@ interface IChangePasswordFormInputs {
 
 const ChangePasswordTab: FC<IChangePasswordTabProps> = () => {
 
-  const { control, handleSubmit, getValues, reset, setValue } = useForm<IChangePasswordFormInputs>({
+  const { control, handleSubmit, getValues, setValue } = useForm<IChangePasswordFormInputs>({
     defaultValues: {
       currentPassword: '',
       newPassword: '',

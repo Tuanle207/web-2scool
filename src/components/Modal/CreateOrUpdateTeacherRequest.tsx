@@ -4,7 +4,6 @@ import DateFnsUtils from '@date-io/date-fns';
 import { MuiPickersUtilsProvider, KeyboardDatePicker } from '@material-ui/pickers';
 import { Teacher } from '../../interfaces';
 import ActionModal from '.';
-import { Validator } from '../../utils/DataValidation';
 import { useDataValidator } from '../../hooks';
 import { TeachersService } from '../../api';
 
@@ -16,7 +15,7 @@ const CreateOrUpdateTeacherRequest = ({id}: {id?: string}) => {
     email: '',
     phoneNumber: ''
   });
-  const {errors, validate, getError} = useDataValidator();
+  const {errors, getError} = useDataValidator();
 
   useEffect(() => {
     if (id) {
@@ -37,17 +36,18 @@ const CreateOrUpdateTeacherRequest = ({id}: {id?: string}) => {
         msg: errors[0].msg
       } : undefined
     });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data]);
 
 
-  const nameChange = (value: string) => {
-    setData(prev => ({...prev, name: value}))
-    validate('tên', value, Validator.isNotEmpty);
-  };
-  const descriptionChange = (value: string) => {
-    setData(prev => ({...prev, description: value}))
-    validate('mô tả', value, Validator.isNotEmpty);
-  };
+  // const nameChange = (value: string) => {
+  //   setData(prev => ({...prev, name: value}))
+  //   validate('tên', value, Validator.isNotEmpty);
+  // };
+  // const descriptionChange = (value: string) => {
+  //   setData(prev => ({...prev, description: value}))
+  //   validate('mô tả', value, Validator.isNotEmpty);
+  // };
 
   return (
     <form style={{padding: '20px 0'}}>

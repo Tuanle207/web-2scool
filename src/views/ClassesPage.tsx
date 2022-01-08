@@ -133,7 +133,7 @@ const ClassesPage = () => {
     data,
     loading,
     error,
-    resetCache
+    resetFilter
   } = useFetchV2({ fetchFn: fetchAPIDebounced });
   
   useEffect(() => {
@@ -175,7 +175,7 @@ const ClassesPage = () => {
     toast('Thêm lớp học thành công', {
       type: toast.TYPE.SUCCESS
     });
-    resetCache();
+    resetFilter();
   };
 
   return (

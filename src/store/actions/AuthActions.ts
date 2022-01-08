@@ -1,6 +1,5 @@
 import { createAction } from '@reduxjs/toolkit';
 import { User } from '../../interfaces';
-import { IAuthState } from '../reducers/AuthReducer';
 
 const postLoginAsync = createAction( 
   'app/AuthAction/postLoginAsync', 

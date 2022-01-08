@@ -19,7 +19,7 @@ const CreateOrUpdateUserRequest = ({id}: {id?: string}) => {
   });
   const [selectedRoles, setSelectedRoles] = useState<Identity.UserRoleDto[]>([]);
   const [roles, setRoles] = useState<Identity.UserRoleDto[]>([]);
-  const {errors, validate, getError} = useDataValidator();
+  const {errors} = useDataValidator();
 
   useEffect(() => {
 
@@ -60,6 +60,7 @@ const CreateOrUpdateUserRequest = ({id}: {id?: string}) => {
         msg: errors[0].msg
       } : undefined
     });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data]);
 
   return (

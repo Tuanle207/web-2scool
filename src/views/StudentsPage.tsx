@@ -157,7 +157,7 @@ const StudentsPage = () => {
     data,
     loading,
     error,
-    resetCache
+    resetFilter
   } = useFetchV2({ fetchFn: fetchAPIDebounced });
 
   useEffect(() => {
@@ -216,7 +216,7 @@ const StudentsPage = () => {
     toast('Thêm học sinh thành công', {
       type: toast.TYPE.SUCCESS
     });
-    resetCache();
+    resetFilter();
   };
 
   return (

@@ -16,9 +16,8 @@ const CreateStudentAccountRequest = ({id}: {id?: string}) => {
     password: '',
     extraProperties: {}
   });
-  const [selectedRoles, setSelectedRoles] = useState<Identity.UserRoleDto[]>([]);
-  const [roles, setRoles] = useState<Identity.UserRoleDto[]>([]);
-  const {errors, validate, getError} = useDataValidator();
+  const [ selectedRoles ] = useState<Identity.UserRoleDto[]>([]);
+  const { errors } = useDataValidator();
 
   useEffect(() => {
 

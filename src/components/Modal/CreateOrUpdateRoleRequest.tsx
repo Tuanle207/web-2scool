@@ -9,7 +9,7 @@ const CreateOrUpdateRoleRequest = ({id}: {id?: string}) => {
   const [data, setData] = useState<Identity.CreateUpdateRoleDto>({
     name: ''
   });
-  const {errors, validate, getError} = useDataValidator();
+  const {errors} = useDataValidator();
 
   useEffect(() => {
     if (id) {

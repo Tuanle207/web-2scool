@@ -14,7 +14,6 @@ import { formatDate } from '../utils/TimeHelper';
 import { useFetchV2 } from '../hooks';
 import CreateOrUpdateCourseRequest from '../components/Modal/CreateOrUpdateCourseRequest';
 import ActionModal from '../components/Modal';
-import { comparers } from '../appConsts';
 import { routes } from '../routers/routesDictionary';
 import useStyles from '../assets/jss/views/CoursesPage';
 
@@ -122,15 +121,13 @@ const CoursesPage = () => {
 
   const { 
     pagingInfo,
-    setFilter,
     setPageIndex,
     setPageSize,
     data,
     loading,
     error,
-    resetCache
+    resetFilter
   } = useFetchV2({ fetchFn: fetchAPIDebounced });
-
   
   useEffect(() => {
     document.title = "2Scool | Quản lý khóa học";
@@ -149,7 +146,7 @@ const CoursesPage = () => {
     toast('Thêm khóa học thành công', {
       type: toast.TYPE.SUCCESS
     });
-    resetCache();
+    resetFilter();
   };
 
   return (

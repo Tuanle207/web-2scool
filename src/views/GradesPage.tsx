@@ -12,7 +12,6 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@material-ui/icons/Edit';
 import ActionModal from '../components/Modal';
 import CreateOrUpdateGradeRequest from '../components/Modal/CreateOrUpdateGradeRequest';
-import { comparers } from '../appConsts';
 import { toast } from 'react-toastify';
 import { routes } from '../routers/routesDictionary';
 import useStyles from '../assets/jss/views/GradesPage';
@@ -111,13 +110,12 @@ const GradesPage = () => {
 
   const { 
     pagingInfo,
-    setFilter,
     setPageIndex,
     setPageSize,
     data,
     loading,
     error,
-    resetCache
+    resetFilter
   } = useFetchV2({ fetchFn: fetchAPIDebounced });
 
   useEffect(() => {
@@ -137,7 +135,7 @@ const GradesPage = () => {
     toast('Thêm khối thành công', {
       type: toast.TYPE.SUCCESS
     });
-    resetCache();
+    resetFilter();
   };
 
   return (

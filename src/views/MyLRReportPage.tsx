@@ -14,7 +14,7 @@ import Sidebar from '../components/Sidebar';
 import { LrReportsService } from '../api';
 import { useFetchV2 } from '../hooks';
 import { LrReport, Class } from '../interfaces';
-import { formatDate, formatFullDateTime } from '../utils/TimeHelper';
+import { formatFullDateTime } from '../utils/TimeHelper';
 import { comparers, dcpReportStatus, dcpReportStatusDic } from '../appConsts';
 import { routes, routeWithParams } from '../routers/routesDictionary';
 import FilterButton, { IFilterOption } from '../components/FilterButton';
@@ -29,6 +29,7 @@ import EditIcon from '@material-ui/icons/Edit';
 import AddIcon from '@material-ui/icons/Add';
 import { getFullUrl } from '../utils/ImageHelper';
 import useStyles from '../assets/jss/views/DCPReportHistoryPage';
+import moment from 'moment';
 
 
 const DetailCell = (params: GridCellParams) => {
@@ -278,21 +279,20 @@ const LRReportApprovalPage = () => {
     setPageSize,
     data,
     loading,
-    error,
-    resetCache
+    error
   } = useFetchV2({ 
     fetchFn: fetchAPIDebounced, 
     filter: [
-    {
-      key: 'CreationTime',
-      comparison: comparers.Gte,
-      value: formatDate(new Date(2020, 1, 1).toLocaleString(), 'MM/DD/YYYY')
-    },
-    {
-      key: 'CreationTime',
-      comparison: comparers.Lte,
-      value: formatDate(new Date(new Date().setDate(new Date().getDate() + 1)).toLocaleString(), 'MM/DD/YYYY')
-    }
+      {
+        key: 'CreationTime',
+        comparison: comparers.Gte,
+        value: moment().format('MM/DD/YYYY')
+      },
+      {
+        key: 'CreationTime',
+        comparison: comparers.Lte,
+        value: moment().add(1, 'd').format('MM/DD/YYYY')
+      }
   ] });
  
   useEffect(() => {
@@ -309,71 +309,54 @@ const LRReportApprovalPage = () => {
   const handleOnDateChange = (date: Date | null) => {
     setDateFilter(date);
     if (date !== null) {
-      const start = new Date(date);
-      const end = start.getDate() + 1;
-      const startDate = new Date(start);
-      const endDate = new Date(start.setDate(end));
+      const startDate = moment(date).format('MM/DD/YYYY')
+      const endDate = moment(date).add(1, 'd').format('MM/DD/YYYY');
       setFilter({
         key: 'CreationTime',
         comparison: comparers.Gte,
-        value: formatDate(startDate.toLocaleString(), 'MM/DD/YYYY')
+        value: startDate
       });
       setFilter({
         key: 'CreationTime',
         comparison: comparers.Lte,
-        value: formatDate(endDate.toLocaleString(), 'MM/DD/YYYY')
+        value: endDate
       });
-      setItems([]);
-      setPageIndex(0);
-      resetCache();
     }
   };
 
   const handleWeekFilterClick = () => {
     setDateFilterType('week');
-    const now = new Date();
-    const dayOfWeek = now.getDay() === 0 ? 7 : now.getDay(); 
-    let start = now.getDate() - dayOfWeek + 1;
-    const end = start + 6;
-    const startDate = new Date(now.setDate(start));
-    const endDate = new Date(now.setDate(end));
+    const startDate = moment().startOf('isoWeek').format('MM/DD/YYYY');
+    const endDate = moment().endOf('isoWeek').format('MM/DD/YYYY');
 
     setFilter({
       key: 'CreationTime',
       comparison: comparers.Gte,
-      value: formatDate(startDate.toLocaleString(), 'MM/DD/YYYY')
+      value: startDate
     });
     setFilter({
       key: 'CreationTime',
       comparison: comparers.Lte,
-      value: formatDate(endDate.toLocaleString(), 'MM/DD/YYYY')
+      value: endDate
     });
-    setItems([]);
-    setPageIndex(0);
-    resetCache();
   };
 
 
   const handleTodayFilterClick = () => {
     setDateFilterType('today');
-    const now = new Date();
-    const end = now.getDate() + 1;
-    const startDate = new Date(now);
-    const endDate = new Date(now.setDate(end));
+    const startDate = moment().format('MM/DD/YYYY');
+    const endDate = moment().add(1, 'd').format('MM/DD/YYYY');
 
     setFilter({
       key: 'CreationTime',
       comparison: comparers.Gte,
-      value: formatDate(startDate.toLocaleString(), 'MM/DD/YYYY')
+      value: startDate
     });
     setFilter({
       key: 'CreationTime',
       comparison: comparers.Lte,
-      value: formatDate(endDate.toLocaleString(), 'MM/DD/YYYY')
+      value: endDate
     });
-    setItems([]);
-    setPageIndex(0);
-    resetCache();
   };
 
   const onStatusFilterChange = (options: IFilterOption[]) => {

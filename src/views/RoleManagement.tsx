@@ -140,7 +140,7 @@ const RoleManagement = () => {
     data,
     loading,
     error,
-    resetCache
+    resetFilter
   } = useFetchV2({ fetchFn: fetchAPIDebounced });
 
   useEffect(() => {
@@ -160,7 +160,7 @@ const RoleManagement = () => {
     toast('Thêm vai trò thành công', {
       type: toast.TYPE.SUCCESS
     });
-    resetCache();
+    resetFilter();
   };
 
   return (

@@ -141,7 +141,7 @@ const UserManagement = () => {
     data,
     loading,
     error,
-    resetCache
+    resetFilter
   } = useFetchV2({ fetchFn: fetchAPIDebounced });
 
   useEffect(() => {
@@ -161,7 +161,7 @@ const UserManagement = () => {
     toast('Thêm người dùng thành công', {
       type: toast.TYPE.SUCCESS
     });
-    resetCache();
+    resetFilter();
   };
 
   return (

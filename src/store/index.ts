@@ -3,7 +3,6 @@ import { persistReducer, persistStore } from 'redux-persist';
 import createSagaMiddleware from 'redux-saga';
 import Storage from 'redux-persist/lib/storage';
 import { Persistor } from 'redux-persist/es/types';
-import { createLogger } from 'redux-logger';
 import reduders from './reducers';
 import rootSaga from './saga';
 import ENV from '../config/env';
@@ -29,7 +28,6 @@ export class ReduxStore {
       reducer: this.persistedReducer,
       middleware: ENV.enableLogger ? [
         this.sagaMiddleware,
-        // createLogger()
       ] : [this.sagaMiddleware]
     });
     this.persistor = persistStore(this.store);

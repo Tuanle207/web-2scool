@@ -11,7 +11,7 @@ const CreateOrUpdateGradeRequest = ({id}: {id?: string}) => {
     displayName: '',
     description: ''
   });
-  const {errors, validate, getError} = useDataValidator();
+  const {errors} = useDataValidator();
 
   useEffect(() => {
     if (id) {
@@ -20,7 +20,7 @@ const CreateOrUpdateGradeRequest = ({id}: {id?: string}) => {
         description: res.description || '',
       }))
     }
-  }, []);
+  }, [id]);
 
   useEffect(() => {
     ActionModal.setData({

@@ -129,7 +129,7 @@ const TeachersPage = () => {
     data,
     loading,
     error,
-    resetCache
+    resetFilter
   } = useFetchV2({ fetchFn: fetchAPIDebounced });
 
   useEffect(() => {
@@ -149,7 +149,7 @@ const TeachersPage = () => {
     toast('Thêm giáo viên thành công', {
       type: toast.TYPE.SUCCESS
     });
-    resetCache();
+    resetFilter();
   };
 
   return (
