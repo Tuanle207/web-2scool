@@ -315,8 +315,8 @@ const LRReportApprovalPage = () => {
         key: 'CreationTime',
         comparison: comparers.Gte,
         value: startDate
-      });
-      setFilter({
+      },
+      {
         key: 'CreationTime',
         comparison: comparers.Lte,
         value: endDate
@@ -333,8 +333,8 @@ const LRReportApprovalPage = () => {
       key: 'CreationTime',
       comparison: comparers.Gte,
       value: startDate
-    });
-    setFilter({
+    },
+    {
       key: 'CreationTime',
       comparison: comparers.Lte,
       value: endDate
@@ -351,8 +351,8 @@ const LRReportApprovalPage = () => {
       key: 'CreationTime',
       comparison: comparers.Gte,
       value: startDate
-    });
-    setFilter({
+    },
+    {
       key: 'CreationTime',
       comparison: comparers.Lte,
       value: endDate

@@ -303,8 +303,8 @@ const DCPReportsApprovalPage = () => {
         key: 'CreationTime',
         comparison: comparers.Gte,
         value: startDate
-      });
-      setFilter({
+      },
+      {
         key: 'CreationTime',
         comparison: comparers.Lte,
         value: endDate
@@ -321,8 +321,8 @@ const DCPReportsApprovalPage = () => {
       key: 'CreationTime',
       comparison: comparers.Gte,
       value: startDate
-    });
-    setFilter({
+    },
+    {
       key: 'CreationTime',
       comparison: comparers.Lte,
       value: endDate
@@ -339,8 +339,8 @@ const DCPReportsApprovalPage = () => {
       key: 'CreationTime',
       comparison: comparers.Gte,
       value: startDate
-    });
-    setFilter({
+    },
+    {
       key: 'CreationTime',
       comparison: comparers.Lte,
       value: endDate
