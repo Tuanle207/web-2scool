@@ -55,8 +55,8 @@ jobs:
           name: Remove old distribution folder
           command: |
             /usr/bin/ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no $DROPLET_USER@$DROPLET_IP "
-              var /var/www/2scool-web
-              rm -r dist
+              cd /var/www/2scool-web
+              rm -r -f dist
             "
       - run:
           working_directory: ~/project
