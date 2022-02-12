@@ -39,7 +39,7 @@ const useSidebarStyles = makeStyles(theme => ({
     }
   },
   listItem: {
-    padding: '1rem 2rem',
+    padding: '.8rem 2rem',
     transition: 'background 500ms', 
     '&:hover': {
       background: 'rgba(0,0,0,0.25)',
@@ -69,6 +69,11 @@ const useSidebarStyles = makeStyles(theme => ({
     '& > *': {
       fontSize: 14
     }
+  },
+  divider: {
+    height: 1,
+    margin: theme.spacing(1, 2),
+    backgroundColor: theme.palette.grey[400]
   }
 
 }));

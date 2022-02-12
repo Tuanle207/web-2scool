@@ -1,7 +1,8 @@
 import React from 'react';
-import { Box, Button, Grid, IconButton, Modal, Typography, WithStyles, withStyles } from '@material-ui/core';
+import { Box, Button, Grid, IconButton, Modal, Typography } from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';
 import modalStyles from '../../assets/jss/components/Modal';
+import { toast } from 'react-toastify';
 
 /**
  * used as paramater passes into SHOW modal method
@@ -43,7 +44,7 @@ interface ModalState extends ModalOptions {
 }
 
 // initial state
-const initialState = {
+const initialState: ModalState = {
   title: 'Xác nhận tiếp tục?',
   acceptText: 'Xác nhận',
   cancelText: 'Hủy',
@@ -51,8 +52,11 @@ const initialState = {
   noAcceptButton: false,
   component: undefined,
   data: {},
-  visible: false
-}
+  visible: false,
+  onAccept: () => {},
+  onCancel: () => {},
+  onClose: () => {}
+};
 
 
 class ActionModal extends React.Component<{}, ModalState> {
@@ -95,6 +99,7 @@ class ActionModal extends React.Component<{}, ModalState> {
         })
         .catch(err => { // failed -> reject, handler error
           console.log('Đã có lỗi xảy ra', {err});
+          toast.error(`Đã có lỗi xảy ra: ${err?.message || ''}`)
         })
         .finally(() => { // finally
           // 5. Close modal

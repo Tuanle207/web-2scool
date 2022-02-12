@@ -1,0 +1,93 @@
+version: 2.1
+
+jobs:
+  build:
+    docker:
+      - image: cimg/node:14.16.0
+    steps:
+      - checkout
+      - run:
+          working_directory: ~/project
+          name: Run build
+          command: |
+            yarn install
+            yarn build
+  deployment:
+    docker:
+      - image: cimg/node:14.16.0
+    steps:
+      - checkout
+      - add_ssh_keys:
+          fingerprints:
+            - $SSH_FINGERPRINT
+      - run: yarn install
+      # Get ENV Variables from CircleCI and fill them into configuration files
+      # Then copy them to distribution directory
+      - run:
+          working_directory: ~/project
+          name: Fill Enviroment Variables in configuration files
+          command: |
+
+            sed -i "s%<HOST_URL>%$HOST_URLL%g" 2scool-web.nginx
+
+            #Fill deployment.ts and replace in env config file
+            sed -i "s%<API_URL>%$API_URL%g" src/config/env/deployment.ts
+            sed -i "s%<APP_URL>%$AUTH_URL%g" src/config/env/deployment.ts
+            sed -i "s%<AUTH_URL>%$AUTH_URL%g" src/config/env/deployment.ts
+            sed -i "s%<CLIENT_ID>%$CLIENT_ID%g" src/config/env/deployment.ts
+            sed -i "s%<CLIENT_SECRET>%$CLIENT_SECRET%g" src/config/env/deployment.ts
+            cat src/config/env/deployment.ts > src/config/env/index.ts
+
+            #Copy nginx config to output folder
+            mkdir dist
+            cp 2scool-web.nginx dist/
+            
+            echo "Fill Enviroment Variables in configuration files Successfully"
+      - run:
+          working_directory: ~/project
+          name: Run build
+          command: |
+            yarn build
+            mv -v build/* dist
+            echo "Build Successfully"
+      - run:
+          working_directory: ~/project
+          name: Remove old distribution folder
+          command: |
+            /usr/bin/ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no $DROPLET_USER@$DROPLET_IP "
+              var /var/www/2scool-web
+              rm -r dist
+            "
+      - run:
+          working_directory: ~/project
+          name: Copy distribution folder to hosting VPS
+          command: |
+            scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -r ~/project/dist $DROPLET_USER@$DROPLET_IP:/var/www/2scool-web/
+            echo "Copy distribution folder to hosting VPS Successfully"
+      - run:
+          name: Update Nginx configs
+          command: |
+            /usr/bin/ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no $DROPLET_USER@$DROPLET_IP "
+              cd /var/www/2scool-web/dist
+              cp 2scool-web.nginx /etc/nginx/sites-available/2scool-web
+              ln -sf /etc/nginx/sites-available/2scool-web /etc/nginx/sites-enabled/
+              nginx -t
+              systemctl restart nginx
+            "
+            echo "Update Nginx configs Successfully"
+workflows:
+  version: 2
+  check_build:
+    jobs:
+      - build:
+          filters:
+            branches:
+              only: dev
+  deploy:
+    when:
+      equal: [ master, << pipeline.git.branch >> ]
+    jobs:
+      - build
+      - deployment:
+          requires:
+            - build

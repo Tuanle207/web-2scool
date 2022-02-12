@@ -1,82 +1,22 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Container, Grid, Box, Button, makeStyles, InputLabel, Select, Typography, Tabs, Tab, IconButton, Chip, Tooltip, FormControl, MenuItem } from '@material-ui/core';
+import { Container, Grid, Box, Select,
+  IconButton, Chip, Tooltip, FormControl, MenuItem, Paper, Badge } from '@material-ui/core';
 import { MuiPickersUtilsProvider, KeyboardDatePicker } from '@material-ui/pickers';
 import DateFnsUtils from '@date-io/date-fns';
 import React, { ChangeEvent } from 'react';
-import { useHistory } from 'react-router-dom';
 import Header from '../components/Header';
 import Sidebar from '../components/Sidebar';
-import { DcpReport, Regulation, Stats } from '../common/interfaces';
-import { DataGrid, GridColDef, GridRowData, GridValueFormatterParams } from '@material-ui/data-grid';
-import { DcpReportsService, StatisticsService } from '../common/api';
-import { usePagingInfo, useFetch } from '../hooks';
-import { formatDate, getDayOfWeek, addDays, getPreviousMonday } from '../common/utils/TimeHelper';
-import SettingsIcon from '@material-ui/icons/Settings';
-import ActionModal from '../components/Modal';
-import { toast } from 'react-toastify';
-import { comparers } from '../common/appConsts';
+import { DataGrid, GridColDef, GridRowData } from '@material-ui/data-grid';
+import { StatisticsService } from '../api';
+import { getPreviousMonday } from '../utils/TimeHelper';
 import { FindInPage } from '@material-ui/icons';
 import GetAppIcon from '@material-ui/icons/GetApp';
-import { sleep } from '../common/utils/SetTimeOut';
+import { ReactComponent as FilterIcon } from '../assets/img/filter.svg';
+import { sleep } from '../utils/SetTimeOut';
+import { Stats } from '../interfaces';
+import { routes } from '../routers/routesDictionary';
+import useStyles from '../assets/jss/views/DCPStatisticsPage';
 
-
-const useStyles = makeStyles(theme => ({
-  container: {
-    height: '100%',
-
-    '& .MuiGrid-container': {
-      flexWrap: 'nowrap'
-    }
-  },
-  actionGroup: {
-    padding: theme.spacing(1, 4),
-    borderBottom: `1px solid ${theme.palette.divider}`
-  },
-  list: {
-    // overflowY: 'scroll'
-    // padding: '20px 100px' 
-  },
-  datagridContainer: {
-    // height: '100%', 
-    width: '100%',
-    '& .MuiDataGrid-columnSeparator': {
-      display: 'none'
-    },
-    '& .MuiDataGrid-colCellTitle': {
-      fontWeight: 700,
-    },
-    '& .MuiDataGrid-root': {
-      border: 'none',
-      '& .MuiDataGrid-withBorder': {
-        borderRight: 'none',
-      }
-    },
-    '& .MuiDataGrid-root.MuiDataGrid-colCellMoving': {
-      backgroundColor: 'inherit'
-    }
-  },
-
-  dateCardContainer: {
-    padding: theme.spacing(1, 2), 
-    border: '1px solid #000',
-    boxShadow: '2px 2px 6px #000',
-    cursor: 'pointer',
-    '&:hover': {
-      backgroundColor: theme.palette.primary.light,
-      color: theme.palette.common.white
-    }
-  },
-  dateCardContainerActive: {
-    backgroundColor: theme.palette.primary.main,
-    color: theme.palette.common.white
-  },
-  statisticsTypeSelector: {
-    width: 150,
-    '& .MuiSelect-select:focus': {
-      backgroundColor: 'unset'
-    }
-  }
-}));
 
 const classFaultsStatsCols: GridColDef[] = [
   {
@@ -211,7 +151,6 @@ type ViewType = 'ByWeek' | 'ByMonth' | 'BySemester';
 const DCPStatisticsPage = () => {
 
   const classes = useStyles();
-  const history = useHistory();
 
   const [dateFilter, setDateFilter] = React.useState<{
     startTime: Date | null,
@@ -376,94 +315,112 @@ const DCPStatisticsPage = () => {
     <div style={{ height: '100%' }}>
       <Grid container className={classes.container}>
         <Grid item xs={4} sm={3} md={2}>
-          <Sidebar activeKey={'dcp-statistics'} />
+          <Sidebar activeKey={routes.DCPStatistics} />
         </Grid>
-        <Grid style={{ height: '100%' }} item container xs={8} sm={9} md={10} direction={'column'}>
-          <Header />
-          <Grid item container direction='column' style={{ flex: 1, minHeight: 0, flexWrap: 'nowrap' }}>
-            <Grid item container justify='space-between' alignItems='center' className={classes.actionGroup}>
-              <Grid item container direction='row' alignItems='center' >
-                <FormControl className={classes.statisticsTypeSelector}>
-                  <InputLabel id="statistics-type-select">Loại thống kê</InputLabel>
-                  <Select
-                    labelId="statistics-type-select"
-                    id="demo-simple-select"
-                    value={statsType}
-                    onChange={handleStatsTypeChange}
-                  >
-                    <MenuItem value={'ClassFaults'}>Lớp vi phạm</MenuItem>
-                    <MenuItem value={'CommonFaults'}>Lỗi vi phạm</MenuItem>
-                    <MenuItem value={'StudentWithMostFaults'}>Học sinh vi phạm</MenuItem>
-                  </Select>
-                </FormControl>
-                <Chip 
-                  clickable label='Thống kê tuần' 
-                  onClick={() => handleViewTypeChange('ByWeek')}
-                  variant={viewType === 'ByWeek' ? 'default' : 'outlined'} 
-                  color={viewType === 'ByWeek' ? 'primary' : 'default'} style={{marginLeft: 16}}
-                  />
-                <Chip clickable label='Thống kê tháng' 
-                  onClick={() => handleViewTypeChange('ByMonth')}
-                  variant={viewType === 'ByMonth' ? 'default' : 'outlined'} 
-                  color={viewType === 'ByMonth' ? 'primary' : 'default'}
-                  style={{marginLeft: 8}}
-                />
-                <Chip clickable label='Thống kê học kỳ' 
-                  onClick={() => handleViewTypeChange('BySemester')}
-                  variant={viewType === 'BySemester' ? 'default' : 'outlined'} 
-                  color={viewType === 'BySemester' ? 'primary' : 'default'}
-                  style={{marginLeft: 8, marginRight: 16}}
-                />
-                <MuiPickersUtilsProvider utils={DateFnsUtils}>
-                  <Box>
-                    <KeyboardDatePicker
-                      style={{width: 150}}
-                      disableToolbar
-                      fullWidth
-                      size='small'
-                      variant='inline'
-                      format='dd/MM/yyyy'
-                      margin='dense'
-                      id='get-stats-report-start'
-                      label='Bắt đầu từ'
-                      value={dateFilter.startTime}
-                      onChange={() => {}}
-                      KeyboardButtonProps={{
-                        'aria-label': 'dcp - rankings - start end date',
-                      }}
-                    />
-                  </Box>
-                  <Box>
-                    <KeyboardDatePicker
-                      style={{width: 150}}
-                      disableToolbar
-                      fullWidth
-                      size='small'
-                      variant='inline'
-                      format='dd/MM/yyyy'
-                      margin='dense'
-                      id='get-stats-report-end'
-                      label='Đến ngày'
-                      value={dateFilter.endTime}
-                      onChange={() => {}}
-                      KeyboardButtonProps={{
-                        'aria-label': 'dcp - rankings - change end date',
-                      }}
-                    />
-                  </Box>
-                </MuiPickersUtilsProvider>
+        <Grid style={{ background: '#fff', flexGrow: 1 }} item container xs={8} sm={9} md={10} direction="column" >
+          <Grid item >
+            <Header
+              pageName="Thống kê nề nếp"
+            />
+          </Grid>
 
-                <Tooltip title='Lưu thành báo cáo' style={{marginLeft: 'auto'}} onClick={handleDownloadFile}>
-                  <IconButton color='primary' aria-label='Tải báo cáo'>
-                    <GetAppIcon />
-                  </IconButton>
-                </Tooltip>
-              </Grid>
-      
+          <Grid item container direction="column" style={{ flex: 1, minHeight: 0, flexWrap: 'nowrap', background: "#e8e8e8" }}>
+            <Grid item container
+              style={{
+                paddingTop: 16, 
+                paddingRight: 24, 
+                paddingLeft: 24,
+                background: "#e8e8e8"
+              }}
+            >
+              <Paper variant="outlined" elevation={1} style={{ width: "100%" }}>
+                <Grid item container direction='row' alignItems='center' style={{ padding: "5px 32px", height: 54 }}>
+                  <Tooltip title="Bộ lọc" style={{ marginRight: 16 }}>
+                      <Badge color="primary" >
+                        <FilterIcon fontSize="small" />
+                      </Badge>
+                  </Tooltip>
+                  <FormControl className={classes.statisticsTypeSelector}>
+                    <Select
+                      labelId="statistics-type-select"
+                      id="demo-simple-select"
+                      value={statsType}
+                      onChange={handleStatsTypeChange}
+                      placeholder="Loại vi phạm"
+                    >
+                      <MenuItem value={'ClassFaults'}>Lớp vi phạm</MenuItem>
+                      <MenuItem value={'CommonFaults'}>Lỗi vi phạm</MenuItem>
+                      <MenuItem value={'StudentWithMostFaults'}>Học sinh vi phạm</MenuItem>
+                    </Select>
+                  </FormControl>
+                  <Chip 
+                    clickable label='Thống kê tuần' 
+                    onClick={() => handleViewTypeChange('ByWeek')}
+                    variant={viewType === 'ByWeek' ? 'default' : 'outlined'} 
+                    color={viewType === 'ByWeek' ? 'primary' : 'default'} style={{marginLeft: 16}}
+                    />
+                  <Chip clickable label='Thống kê tháng' 
+                    onClick={() => handleViewTypeChange('ByMonth')}
+                    variant={viewType === 'ByMonth' ? 'default' : 'outlined'} 
+                    color={viewType === 'ByMonth' ? 'primary' : 'default'}
+                    style={{marginLeft: 8}}
+                  />
+                  <Chip clickable label='Thống kê học kỳ' 
+                    onClick={() => handleViewTypeChange('BySemester')}
+                    variant={viewType === 'BySemester' ? 'default' : 'outlined'} 
+                    color={viewType === 'BySemester' ? 'primary' : 'default'}
+                    style={{marginLeft: 8, marginRight: 16}}
+                  />
+                  <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                    <Box>
+                      <KeyboardDatePicker
+                        style={{width: 150}}
+                        disableToolbar
+                        fullWidth
+                        size='small'
+                        variant='inline'
+                        format='dd/MM/yyyy'
+                        margin='dense'
+                        id='get-stats-report-start'
+                        placeholder='Bắt đầu từ'
+                        value={dateFilter.startTime}
+                        onChange={() => {}}
+                        KeyboardButtonProps={{
+                          'aria-label': 'dcp - rankings - start end date',
+                        }}
+                      />
+                    </Box>
+                    <Box>
+                      <KeyboardDatePicker
+                        style={{width: 150}}
+                        disableToolbar
+                        fullWidth
+                        size='small'
+                        variant='inline'
+                        format='dd/MM/yyyy'
+                        margin='dense'
+                        id='get-stats-report-end'
+                        placeholder='Đến ngày'
+                        value={dateFilter.endTime}
+                        onChange={() => {}}
+                        KeyboardButtonProps={{
+                          'aria-label': 'dcp - rankings - change end date',
+                        }}
+                      />
+                    </Box>
+                  </MuiPickersUtilsProvider>
+
+                  <Tooltip title='Lưu thành báo cáo' style={{marginLeft: 'auto'}} onClick={handleDownloadFile}>
+                    <IconButton color='primary' aria-label='Tải báo cáo'>
+                      <GetAppIcon />
+                    </IconButton>
+                  </Tooltip>
+                </Grid>
+              </Paper>
             </Grid>              
-            <Grid item container direction={'row'} style={{ flex: 1, minHeight: 0, flexWrap: 'nowrap', padding: 16, paddingBottom: 0 }}>
+            <Grid item style={{ flexGrow: 1, paddingTop: 16, paddingBottom: 16, backgroundColor: '#e8e8e8'}}>
               <Container className={classes.datagridContainer}>
-                {
+              {
                   statsType === 'ClassFaults' && (
                     <DataGrid
                       columns={classFaultsStatsCols}

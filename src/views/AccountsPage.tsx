@@ -3,7 +3,7 @@
 // import Sidebar from '@components/Sidebar';
 // import Header from '@components/Header';
 // import PageTitleBar from '@components/PageTitleBar';
-// import { DataGrid, GridColDef, GridPageChangeParams, GridValueFormatterParams } from '@material-ui/data-grid';
+// import { DataGrid, GridColDef, GridSelectionModel, GridValueFormatterParams } from '@material-ui/data-grid';
 // import { Course } from '@common/interfaces';
 // import { CoursesService } from '@common/api';
 // import { useFetch, usePagingInfo } from '@common/hooks';
@@ -73,8 +73,8 @@
 //   );
 //   const {selectedItems, changeSelection} = useSelectedItems<Course.Course>();
   
-//   const onPageChange = (param: GridPageChangeParams) => {
-//     setPageIndex(param.page);
+//   const onPageChange = (param: GridSelectionModel) => {
+//     setPageIndex(1);
 //   };
 
 //   const onRequestDelete = async (courseId: string) => {

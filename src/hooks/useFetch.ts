@@ -1,7 +1,7 @@
-import { Util } from '../common/interfaces';
 import { useEffect, useMemo, useReducer, useRef } from 'react';
-import HttpQueue from '../common/@helper/network/HttpQuere';
-import { cleanObject } from '../common/utils/ObjectHelper';
+import HttpQueue from '../config/axios/HttpQuere';
+import { Util } from '../interfaces';
+import { cleanObject } from '../utils/ObjectHelper';
 
 enum FetchState {
   Fetching = 'fetching',
@@ -44,7 +44,7 @@ const initialState: FetchDataState = {
  * @param fetchFunction a function used for calling API
  * @param input an object used as request input: params, body, ...
  */
-export default function useFetch<T = any>(fetchFunction: Function, input: Util.IObject): ReturnType<T> {
+export function useFetch<T = any>(fetchFunction: Function, input: Util.IObject): ReturnType<T> {
   // TODO: Sort input key-value following alphabet order for fully utilize cache
   const cacheKey = JSON.stringify(input);
   const cache = useRef<Util.IObject>({});
@@ -83,7 +83,7 @@ export default function useFetch<T = any>(fetchFunction: Function, input: Util.I
           if (cancelRequest) return;
           dispatch({ type: FetchState.Fetched, payload: response });
             
-        } catch (error) {
+        } catch (error: any) {
           console.log('error fetching', {error});
           if (cancelRequest) return;
           dispatch({ type: FetchState.Error, payload: error.message });

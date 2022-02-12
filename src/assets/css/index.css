@@ -41,6 +41,29 @@ body {
 	background-color: #555;
 }
 
+.MuiDataGrid-footer {
+  border-top: 1px solid rgba(224, 224, 224, 1)
+}
+
 .MuiDataGrid-row:hover {
   background-color:#81c2f7 !important;
+}
+
+.hiddenDataGridHeader {
+  visibility: hidden;
+}
+
+.ReactModal__Overlay {
+  z-index: 1000;
+  background-color: rgba(0, 0, 0, 0.5) !important;
+  opacity: 0;
+  transition: opacity 200ms ease-in-out;
+}
+
+.ReactModal__Overlay--after-open {
+  opacity: 1;
+}
+
+.ReactModal__Overlay--before-close {
+  opacity: 0;
 }

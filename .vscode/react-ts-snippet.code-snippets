@@ -1,0 +1,19 @@
+{
+  "Create jsx component": {
+    	"prefix": "cmp",
+    	"body": [
+    		"import { FC } from 'react';",
+    		"import styles from './index.module.scss';",
+    		"",
+    		"interface I${1:NAME}Props { }",
+    		"",
+    		"export const ${1:NAME}: FC<I${1:NAME}Props> = () => {",
+    		"",
+    		"\treturn (",
+    		"",
+    		"\t);",
+    		"};"
+    	],
+    	"description": "Snippet code for react functional component in typescript style"
+    }
+}

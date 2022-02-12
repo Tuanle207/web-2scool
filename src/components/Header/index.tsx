@@ -1,64 +1,77 @@
-import React from 'react';
-import { AppBar, IconButton, Badge, Toolbar, InputBase, Menu, MenuItem, ListItemIcon, ListItemText } from '@material-ui/core';
-import useHeaderStyles from '../../assets/jss/components/Header/headerStyles';
-import { withRedux } from '../../common/utils/ReduxConnect';
-import { AuthActions } from '../../common/store/actions';
-import { StyledMenu, StyledMenuItem } from './HeaderMenu';
-
-import ExitToAppIcon from '@material-ui/icons/ExitToApp';
-import AccountCircle from '@material-ui/icons/AccountCircle';
-import SettingsIcon from '@material-ui/icons/Settings';
-import SearchIcon from '@material-ui/icons/Search';
-import NotificationsIcon from '@material-ui/icons/Notifications';
-import MoreIcon from '@material-ui/icons/MoreVert';
-import { useHistory } from 'react-router';
+import { FC, memo, useState } from 'react';
+import { AppBar, IconButton, Badge, Toolbar,
+  InputBase, Menu, MenuItem, ListItemIcon, ListItemText, Typography } from '@material-ui/core';
+  import { StyledMenu, StyledMenuItem } from './HeaderMenu';
+  import ExitToAppIcon from '@material-ui/icons/ExitToApp';
+  import AccountCircle from '@material-ui/icons/AccountCircle';
+  import SettingsIcon from '@material-ui/icons/Settings';
+  import SearchIcon from '@material-ui/icons/Search';
+  import NotificationsIcon from '@material-ui/icons/Notifications';
+  import MoreIcon from '@material-ui/icons/MoreVert';
+  import { useHistory } from 'react-router';
+  import { withRedux } from '../../utils/ReduxConnect';
+  import { AuthActions } from '../../store/actions';
+  import { routes } from '../../routers/routesDictionary';
+  import { useDebouncedCallback } from 'use-debounce/lib';
+  import useHeaderStyles from '../../assets/jss/components/Header/headerStyles';
 
 interface Props {
   hiddenSearchBar?: boolean;
   onTextChange?: (text: string) => void;
   postlogoutAsync: () => void;
-  
+  searchBarPlaceholder?: string;
+  pageName?: string;
 }
 
-const Header: React.FC<Props> = ({ postlogoutAsync, onTextChange, hiddenSearchBar = false }) => {
+const Header: FC<Props> = ({ 
+  postlogoutAsync, 
+  onTextChange, 
+  hiddenSearchBar = false,
+  searchBarPlaceholder = "Tìm kiếm...",
+  pageName = "",
+ }) => {
 
   const classes = useHeaderStyles();
   const history = useHistory();
 
-  const [anchorEl, setAnchorEl] = React.useState(null);
-  const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = useState(null);
+
+  const onSearchChangeDebounced = useDebouncedCallback(
+    (value: string) => onTextChange && onTextChange(value),
+    500
+  );
 
   const isMenuOpen = Boolean(anchorEl);
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
+
+
+  const handleMobileMenuClose = () => {
+    setMobileMoreAnchorEl(null);
+  };
+
+  const handleMobileMenuOpen = (event: any) => {
+    setMobileMoreAnchorEl(event.currentTarget);
+  };
 
   const handleProfileMenuOpen = (event: any) => {
     setAnchorEl(event.currentTarget);
   };
 
-  const handleMobileMenuClose = () => {
-    setMobileMoreAnchorEl(null);
+  const handleProfileClick = () => {
+    setAnchorEl(null);
+    history.push(routes.Profile);
+  };
+
+  const handleAdminClick = () => {
+    setAnchorEl(null);
+    history.push(routes.CoursesManager);
   };
 
   const handleLogoutClick = () => {
     setAnchorEl(null);
     postlogoutAsync();
     handleMobileMenuClose();
-  };
-
-  const handleAdminClick = () => {
-    setAnchorEl(null);
-    history.push('/admin/courses');
-    setAnchorEl(null);
-  }
-
-  const handleMobileMenuOpen = (event: any) => {
-    setMobileMoreAnchorEl(event.currentTarget);
-  };
-
-  const textChange = (e: any) => {
-    const value = e.target!.value || '';
-    // setSearchText(value);
-    onTextChange && onTextChange(value);
   };
 
   const menuId = 'primary-search-account-menu';
@@ -70,7 +83,7 @@ const Header: React.FC<Props> = ({ postlogoutAsync, onTextChange, hiddenSearchBa
       open={isMenuOpen}
       onBackdropClick={() => setAnchorEl(null)}
       >
-      <StyledMenuItem>
+      <StyledMenuItem onClick={handleProfileClick}>
         <ListItemIcon className={classes.resetMenuIconWidth}>
           <AccountCircle fontSize="small" />
         </ListItemIcon>
@@ -128,22 +141,27 @@ const Header: React.FC<Props> = ({ postlogoutAsync, onTextChange, hiddenSearchBa
     <div className={classes.grow}>
       <AppBar color='transparent' position="static">
         <Toolbar className={classes.toolbar}>
-          <div className={classes.search} style={hiddenSearchBar ? { visibility: 'hidden' } : {}} >
-            <div className={classes.searchIcon}>
-              <SearchIcon />
+          <Typography variant='h5' display='inline'>{ pageName }</Typography>
+            <div className={classes.search} style={hiddenSearchBar ? { visibility: 'hidden' } : {}} >
+              <div className={classes.searchIcon}>
+                <SearchIcon />
+              </div>
+              <InputBase
+                name="fcking-name"
+                disabled={hiddenSearchBar ? true : false}
+                placeholder={searchBarPlaceholder}
+                fullWidth
+                autoComplete="new-search"
+                defaultValue=""
+                type="search"
+                classes={{
+                  root: classes.inputRoot,
+                  input: classes.inputInput,
+                }}
+                inputProps={{ 'aria-label': 'search' }}
+                onChange={(e) => onSearchChangeDebounced(e.target.value)}
+              />
             </div>
-            <InputBase
-              disabled={hiddenSearchBar ? true : false}
-              placeholder="Tìm kiếm…"
-              fullWidth
-              classes={{
-                root: classes.inputRoot,
-                input: classes.inputInput,
-              }}
-              inputProps={{ 'aria-label': 'search' }}
-              onChange={textChange}
-            />
-          </div>
           <div className={classes.sectionDesktop}>
             <IconButton aria-label="show 17 new notifications" color="inherit">
               <Badge badgeContent={17} color="secondary">
@@ -181,7 +199,7 @@ const Header: React.FC<Props> = ({ postlogoutAsync, onTextChange, hiddenSearchBa
 };
 
 export default withRedux<Props>({
-  component: React.memo(Header),
+  component: memo(Header),
   dispatchProps: ({
     postlogoutAsync: AuthActions.postLogoutAsync
   })

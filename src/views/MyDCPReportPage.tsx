@@ -1,540 +1,448 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Container, Grid, Box, Button, makeStyles, List, ListItem, Typography, Tabs, Tab, IconButton, Menu, MenuItem, Chip, Tooltip } from '@material-ui/core';
+import { Grid, Box, Badge, Paper, Container, Chip, Tooltip, IconButton, Menu, MenuItem,
+  ListItemIcon, ListItemText, Button } from '@material-ui/core';
 import { MuiPickersUtilsProvider, KeyboardDatePicker } from '@material-ui/pickers';
+import { DataGrid, GridColDef, GridPageChangeParams, GridValueFormatterParams,
+  GridCellParams } from '@material-ui/data-grid';
 import DateFnsUtils from '@date-io/date-fns';
-import React from 'react';
-import { useHistory } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import AwesomeDebouncePromise from 'awesome-debounce-promise';
 import Header from '../components/Header';
 import Sidebar from '../components/Sidebar';
-import { DcpReport, Regulation } from '../common/interfaces';
-import { DataGrid, GridColDef, GridValueFormatterParams } from '@material-ui/data-grid';
-import { DcpReportsService } from '../common/api';
-import { usePagingInfo, useFetch } from '../hooks';
-import { formatDate, getDayOfWeek, formatTime } from '../common/utils/TimeHelper';
-import SettingsIcon from '@material-ui/icons/Settings';
+import { DcpReportsService } from '../api';
+import { useFetchV2 } from '../hooks';
+import { DcpReport } from '../interfaces';
+import { formatFullDateTime } from '../utils/TimeHelper';
+import { comparers, dcpReportStatus, dcpReportStatusDic } from '../appConsts';
+import { routes, routeWithParams } from '../routers/routesDictionary';
+import FilterButton, { IFilterOption } from '../components/FilterButton';
+import { useHistory } from 'react-router-dom';
+import { ReactComponent as FilterIcon } from '../assets/img/filter.svg';
+import ErrorIcon from '@material-ui/icons/Error';
+import DoneIcon from '@material-ui/icons/Done';
+import WarningIcon from '@material-ui/icons/Warning';
+import PageviewIcon from '@material-ui/icons/Pageview';
+import MoreHorizIcon from '@material-ui/icons/MoreHoriz';
+import DeleteIcon from '@material-ui/icons/Delete';
+import EditIcon from '@material-ui/icons/Edit';
+import AddIcon from '@material-ui/icons/Add';
+import useStyles from '../assets/jss/views/DCPReportHistoryPage';
 import ActionModal from '../components/Modal';
 import { toast } from 'react-toastify';
-import { comparers } from '../common/appConsts';
-import { FindInPage } from '@material-ui/icons';
-import StudentList from '../components/Modal/StudentList';
+import moment from 'moment';
 
 
-const useStyles = makeStyles(theme => ({
-  container: {
-    height: '100%',
+const DetailCell = (props: GridCellParams) => {
+  
+  const history = useHistory();
+  const { id } = props;
 
-    '& .MuiGrid-container': {
-      flexWrap: 'nowrap'
+  const navigateToDcpReportApprovalDetail = () => {
+    history.push(routeWithParams(routes.DCPReportDetail, id.toString()));
+  };
+
+  return (
+    <IconButton size="small" color="primary" onClick={navigateToDcpReportApprovalDetail}
+    >
+      <PageviewIcon />
+    </IconButton>
+
+  );
+};
+
+const MenuCell = (props: GridCellParams) => {
+
+  const history = useHistory();
+  const { api, id } = props;
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const reloadCurrentPageData = () => {
+    api.setPage(api.getState().pagination.page);
+  };
+
+  const navigateToDcpReportDetail = () => {
+    handleClose();
+    history.push(routeWithParams(routes.DCPReportDetail, id.toString()));
+  };
+
+  const updateDcpReport = async () => {
+    handleClose();
+    history.push(routeWithParams(routes.UpdateDCPReport, id.toString()));
+  };
+
+  const deleteDcpReport = async () => {
+    try {
+      handleClose();
+
+      ActionModal.show({
+        title: 'Xóa phiếu chấm này?',
+        onAccept: async () => {
+          await DcpReportsService.deleteDcpReportById(id.toString());
+          reloadCurrentPageData();
+        } 
+      });
+
+    } catch (err) {
+      console.log(err);
+      toast('Đã có lỗi xảy ra!', {
+        type: 'error'
+      });
     }
-  },
-  actionGroup: {
-    padding: theme.spacing(1, 4),
-    borderBottom: `1px solid ${theme.palette.divider}`
-  },
-  list: {
-    // overflowY: 'scroll'
-    // padding: '20px 100px' 
-  },
-  datagridContainer: {
-    // height: '100%', 
-    width: '100%',
-    '& .MuiDataGrid-columnSeparator': {
-      display: 'none'
-    },
-    '& .MuiDataGrid-colCellTitle': {
-      fontWeight: 700,
-    },
-    '& .MuiDataGrid-root': {
-      border: 'none',
-      '& .MuiDataGrid-withBorder': {
-        borderRight: 'none',
-      }
-    },
-  },
-  dcpReportClassFilter: {
-    minHeight: 0,
-    // padding: theme.spacing(2), 
-    borderTop: `1px solid ${theme.palette.divider}`,
-    borderBottom: `1px solid ${theme.palette.divider}`,
-    overflowX: 'auto',
-    scrollbarWidth: 'none',
-    minWidth: 0,
-    overflow: 'hidden',
-    '&::-webkit-scrollbar': {
-      display: 'none',
-    }
-  },
-  classFilter: {
-    margin: theme.spacing(1, 1, 1, 0),
-  },
+  };
 
-  dateCardContainer: {
-    padding: theme.spacing(1, 2), 
-    border: '1px solid #000',
-    boxShadow: '2px 2px 6px #000',
-    cursor: 'pointer',
-    '&:hover': {
-      backgroundColor: theme.palette.primary.light,
-      color: theme.palette.common.white
-    }
-  },
-  dateCardContainerActive: {
-    backgroundColor: theme.palette.primary.main,
-    color: theme.palette.common.white
-  },
-  classTabContainer: {
+  const status = api.getCellValue(id, 'status');
 
-    '& .MuiTabs-scroller.MuiTabs-scrollable': {
-      maxWidth: 750
-    }
-  },
-  emptyText: {
-    color: theme.palette.grey[500],
-    textAlign: 'center'
-  }
-}));
+  return (
+    <div>
+      <Paper>
+        <Menu id="simple-menu"
+            anchorEl={anchorEl}
+            keepMounted
+            open={Boolean(anchorEl)}
+            onClose={handleClose}
+        >
+          <MenuItem onClick={navigateToDcpReportDetail}>
+            <ListItemIcon style={{minWidth: 30}}>
+              <PageviewIcon fontSize="small" />
+            </ListItemIcon>
+            <ListItemText primary="Xem chi tiết" />
+          </MenuItem>
+          {
+            status === dcpReportStatus.Created && (
+              <>
+                <MenuItem onClick={updateDcpReport}>
+                  <ListItemIcon style={{minWidth: 30}}>
+                    <EditIcon fontSize="small" />
+                  </ListItemIcon>
+                  <ListItemText primary="Cập nhật" />
+                </MenuItem>
+                <MenuItem onClick={deleteDcpReport}>
+                  <ListItemIcon style={{minWidth: 30}}>
+                    <DeleteIcon fontSize="small" />
+                  </ListItemIcon>
+                  <ListItemText primary="Xóa" />
+                </MenuItem>
+              </>
+            )
+          }
+        </Menu>
+      </Paper>
+      <IconButton size="small"
+          aria-controls={"simple-menu"}
+          aria-haspopup="true"
+          onClick={handleClick}
+      >
+        <MoreHorizIcon />
+      </IconButton>
+    </div>
+  );
+};
 
+const StatusCell = (params: GridCellParams) => {
+  const classes = useStyles();
 
-const cols: GridColDef[] = [
+  const status = params.value;
+  const statusText = dcpReportStatusDic[params.value as string];
+  return (
+    <Chip
+      icon={status === dcpReportStatus.Created ? <ErrorIcon /> 
+        : status === dcpReportStatus.Approved ? <DoneIcon /> : <WarningIcon />}
+      label={statusText}
+      variant="outlined"
+      className={status === dcpReportStatus.Created ? classes.pendingStatus 
+        : status === dcpReportStatus.Approved ? classes.approvedStatus : classes.rejectedStatus}
+    />
+  );
+};
+
+const cols: GridColDef[] =  [
   {
     field: 'id',
     headerName: 'Mã',
     hide: true
   },
   {
-    field: 'regulation',
-    headerName: 'Vi phạm',
-    flex: 1,
-    valueFormatter: (params: GridValueFormatterParams) => ((params.value) as Regulation.RegulationForSimpleListDto).name
-  },
-  {
-    field: 'relatedStudents',
-    headerName: 'Học sinh vi phạm',
+    field: 'dcpClassReports',
+    headerName: 'Lớp được chấm',
     flex: 1,
     valueFormatter: (params: GridValueFormatterParams) => {
-      const students = (params.value) as DcpReport.DcpStudentReportDto[];
-      if (!students || students.length === 0) {
-        return 'Trống';
-      }
-      return students.map(el => el.student.name).join(', ');
+      const value = params.value as DcpReport.DcpClassReportDto[];
+      return value ? value.map(x => x.class.name).join(', ') : '';
     }
   },
   {
-    field: '',
-    disableClickEventBubbling: true,
-    renderCell: (params) => {
-      // const onClick = () => {
-      //   const id = params.getValue('id');
-      // };
-
-      return (
-        <Tooltip title='Xem chi tiết'>
-          <IconButton color='primary'
-          // onClick={onClick}
-          // onClick={() => ActionModal.show({
-          //   component: <StudentList students={[]} />,
-          //   title: 'Danh sách học sinh vi phạm'
-          // })}
-          >
-            <FindInPage />
-          </IconButton>
-        </Tooltip>
-      )
+    field: 'status',
+    headerName: 'Trạng thái',
+    headerAlign: 'center',
+    width: 180,
+    renderCell: StatusCell
+  },
+  {
+    field: 'creationTime',
+    headerName: 'Thời gian tạo',
+    width: 200,
+    align: 'center',
+    headerAlign: 'center',
+    valueFormatter: (params: GridValueFormatterParams) => {
+      const creationTime = (params.value as Date).toLocaleString();
+      return formatFullDateTime(creationTime);
     }
-  }
+  },
+  {
+    field: 'detail',
+    headerName: 'Chi tiết',
+    renderCell: DetailCell,
+    sortable: false,
+    headerAlign: 'center',
+    width: 80,
+    filterable: false,
+    align: 'center',
+    disableColumnMenu: true,
+  },
+  {
+    field: 'Menu',
+    headerName: '',
+    renderCell: MenuCell,
+    sortable: false,
+    headerAlign: 'center',
+    headerClassName: 'hiddenDataGridHeader',
+    width: 80,
+    filterable: false,
+    align: 'center',
+    disableColumnMenu: true,
+  },
 ];
 
-const DateCard = ({
-  date, 
-  id, 
-  onClick=(() => {}), 
-  resetCache, 
-  active = false 
-}: {
-    date: Date | string;
-    id: string;
-    resetCache: Function;
-    onClick: () => void;
-    active?: boolean;
-  }) => {
-  const classes = useStyles();
-  const history = useHistory();
-
-  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-
-  const deleteReport = async () => {
-    try {
-      await DcpReportsService.deleteDcpReportById(id);
-      toast('Xóa phiếu chấm điểm thành công', {
-        type: 'success'
-      });
-      resetCache();
-    } catch (err) {
-      console.log({err});
-      toast('Xóa thất bại! Đã có lỗi xảy ra.', {
-        type: 'error'
-      });
-    }
-    
-  }
-
-  const handleUpdate = () => {
-    setAnchorEl(null);
-    history.push(`dcp-report-update/${id}`)
-  };
-
-  const handleDelete = () =>  {
-    ActionModal.show({
-      title: `Xác nhận xóa phiếu chấm điểm lúc ${formatTime(date.toLocaleString())} ?`,
-      onAccept: deleteReport
-    })
-    setAnchorEl(null);
-  }
-  
-
-  return (
-    <Grid key={id} container alignItems={'center'} 
-      className={`${classes.dateCardContainer} ${active ? classes.dateCardContainerActive : ''}`}
-      onClick={onClick}
-    >
-      <Typography variant={'body2'}>{`${getDayOfWeek(date.toLocaleString())} - ${formatTime(date.toLocaleString())}`}</Typography>
-      <IconButton size='small'
-        style={{ marginLeft: 'auto' }}
-        aria-controls={`dcp-report-menu-${id}`} 
-        aria-haspopup='true'
-        onClick={e => setAnchorEl(e.currentTarget)}
-      >
-        <SettingsIcon />
-      </IconButton> 
-      <Menu
-        id={`dcp-report-menu-${id}`}
-        anchorEl={anchorEl}
-        keepMounted
-        open={Boolean(anchorEl)}
-        onBackdropClick={() => setAnchorEl(null)}
-      >
-        <MenuItem onClick={handleUpdate}>Cập nhật</MenuItem>
-        <MenuItem onClick={handleDelete}>Xóa</MenuItem>
-      </Menu>
-    </Grid>
-  );
-};
-
-function a11yProps(index: any) {
-  return {
-    id: `scrollable-auto-tab-${index}`,
-    'aria-controls': `scrollable-auto-tabpanel-${index}`,
-  };
-}
-
-interface TabPanelProps {
-  children?: React.ReactNode;
-  index: number;
-  activeIndex: number;
-  data: DcpReport.DcpClassReportItemDto[]
-}
-
-function TabPanel(props: TabPanelProps) {
-  const { children, index, activeIndex, data, ...other } = props;
-  const classes = useStyles();
-
-  return (
-    <div
-      role='tabpanel'
-      hidden={index !== activeIndex}
-      aria-labelledby={`scrollable-auto-tab-${activeIndex}`}
-      id={`scrollable-auto-tabpanel-${activeIndex}`}
-      {...other}
-
-      >
-        {index === activeIndex && (
-          <Container className={classes.datagridContainer}>
-            <DataGrid
-              columns={cols}
-              rows={data}
-              autoHeight
-              disableExtendRowFullWidth
-              hideFooterPagination
-              disableColumnFilter
-              disableColumnMenu
-              hideFooterSelectedRowCount
-              onCellClick={(params) => {
-                if (params.colIndex === 2) {
-                  const id = params.getValue('id');
-                  const rowData = data.find(x => x.id === id);
-                  const students = rowData ? rowData.relatedStudents : []
-                  ActionModal.show({
-                    title: 'Danh sách học sinh vi phạm',
-                    component: <StudentList students={students} />
-                  });
-                }
-              }}
-            />
-          </Container>
-        )}
-      </div>
-  );
-}
+const fetchAPIDebounced = AwesomeDebouncePromise(DcpReportsService.getMyDcpReports, 500);
 
 const MyDCPReportPage = () => {
-
-  const classes = useStyles();
+  
   const history = useHistory();
+  const classes = useStyles();
 
-  const {pagingInfo, setPageIndex, setFilter} = usePagingInfo();
-  const {loading, data, error, resetCache} = useFetch<DcpReport.DcpReportDto>(
-    DcpReportsService.getMyDcpReports, 
-    { ...pagingInfo, pageIndex: pagingInfo.pageIndex! + 1 }
-  );
-  const [selectedReport, setSelectedReport] = React.useState<DcpReport.DcpReportDto | null>(null);
-  const [classTabIndex, setClassTabIndex] = React.useState(0); 
-  const [dateFilter, setDateFilter] = React.useState<Date | null>(new Date());
-  const [dateFilterType, setDateFilterType] = React.useState<string>('today');
+  const [ statusOptions ] = useState<IFilterOption[]>([
+    { id: dcpReportStatus.Created, label: dcpReportStatusDic[dcpReportStatus.Created], value: dcpReportStatus.Created, },
+    { id: dcpReportStatus.Approved, label: dcpReportStatusDic[dcpReportStatus.Approved], value: dcpReportStatus.Approved, },
+    { id: dcpReportStatus.Rejected, label: dcpReportStatusDic[dcpReportStatus.Rejected], value: dcpReportStatus.Rejected, },
+  ]);
 
-  React.useEffect(() => {
-    
-    document.title = '2Cool | Lịch sử chấm phiếu chấm điểm của tôi';
-    
-    if (dateFilter) {
-      setFilter({
-        key: 'StartDate',
-        comparison: comparers.Eq,
-        value: formatDate(dateFilter.toLocaleString(), 'MM/DD/YYYY')
-      });
-      setFilter({
-        key: 'EndDate',
-        comparison: comparers.Eq,
-        value: formatDate(dateFilter.toLocaleString(), 'MM/DD/YYYY')
-      });
+  const [ items, setItems ] = useState<DcpReport.DcpReportDto[]>([]);
+  const [ dateFilter, setDateFilter ] = useState<Date | null>(new Date());
+  const [ dateFilterType, setDateFilterType ] = useState<string>('today');
+
+  const { 
+    pagingInfo,
+    setFilter,
+    getFilterCount,
+    setPageIndex,
+    setPageSize,
+    data,
+    loading,
+    error
+  } = useFetchV2({ 
+    fetchFn: fetchAPIDebounced, 
+    filter: [
+    {
+      key: 'CreationTime',
+      comparison: comparers.Gte,
+      value: moment().format('MM/DD/YYYY')
+    },
+    {
+      key: 'CreationTime',
+      comparison: comparers.Lte,
+      value: moment().add(1, 'd').format('MM/DD/YYYY')
     }
-    
+  ] });
+ 
+  useEffect(() => {
+    document.title = '2Cool | Phiếu chấm nề nếp của tôi';
   }, []);
 
-  React.useEffect(() => {
-    if (selectedReport === null && data.items.length > 0) {
-      setSelectedReport(data.items[0]);
-    }
-    if (data.items.length === 0) {
-      setSelectedReport(null);
+  useEffect(() => {
+    const firstItem = data.items.length > 0 ? data.items[0] : null;
+    if (firstItem && items.findIndex(x => x.id === firstItem.id) === -1) {
+      setItems(prev => [...prev, ...data.items]);
     }
   }, [data]);
-
-  React.useEffect(() => {
-    if (selectedReport && selectedReport.dcpClassReports.length > 0) {
-      setClassTabIndex(0);
-    }
-  }, [selectedReport]);
-
-  const handleTabIndexChange = (event: React.ChangeEvent<{}>, newValue: number) => {
-    setClassTabIndex(newValue);
-  };
 
   const handleOnDateChange = (date: Date | null) => {
     setDateFilter(date);
     if (date !== null) {
+      const startDate = moment(date).format('MM/DD/YYYY')
+      const endDate = moment(date).add(1, 'd').format('MM/DD/YYYY');
       setFilter({
-        key: 'StartDate',
-        comparison: comparers.Eq,
-        value: formatDate(date.toLocaleString(), 'MM/DD/YYYY')
+        key: 'CreationTime',
+        comparison: comparers.Gte,
+        value: startDate
+      },
+      {
+        key: 'CreationTime',
+        comparison: comparers.Lte,
+        value: endDate
       });
-      setFilter({
-        key: 'EndDate',
-        comparison: comparers.Eq,
-        value: formatDate(date.toLocaleString(), 'MM/DD/YYYY')
-      });
-
-      resetCache();
     }
-    
   };
 
   const handleWeekFilterClick = () => {
     setDateFilterType('week');
-    const now = new Date();
-    const dayOfWeek = now.getDay() === 0 ? 7 : now.getDay(); 
-    let start = now.getDate() - dayOfWeek + 1;
-    const end = start + 6;
-    const startDate = new Date(now.setDate(start));
-    const endDate = new Date(now.setDate(end));
+    const startDate = moment().startOf('isoWeek').format('MM/DD/YYYY');
+    const endDate = moment().endOf('isoWeek').format('MM/DD/YYYY');
 
     setFilter({
-      key: 'StartDate',
-      comparison: comparers.Eq,
-      value: formatDate(startDate.toLocaleString(), 'MM/DD/YYYY')
+      key: 'CreationTime',
+      comparison: comparers.Gte,
+      value: startDate
+    },
+    {
+      key: 'CreationTime',
+      comparison: comparers.Lte,
+      value: endDate
     });
-    setFilter({
-      key: 'EndDate',
-      comparison: comparers.Eq,
-      value: formatDate(endDate.toLocaleString(), 'MM/DD/YYYY')
-    });
-    resetCache();
   };
 
 
   const handleTodayFilterClick = () => {
     setDateFilterType('today');
-    const now = new Date();
-    const end = now.getDate() + 1;
-    const startDate = new Date(now);
-    const endDate = new Date(now.setDate(end));
+    const startDate = moment().format('MM/DD/YYYY');
+    const endDate = moment().add(1, 'd').format('MM/DD/YYYY');
 
     setFilter({
-      key: 'StartDate',
-      comparison: comparers.Eq,
-      value: formatDate(startDate.toLocaleString(), 'MM/DD/YYYY')
+      key: 'CreationTime',
+      comparison: comparers.Gte,
+      value: startDate
+    },
+    {
+      key: 'CreationTime',
+      comparison: comparers.Lte,
+      value: endDate
     });
+  };
+
+  const onStatusFilterChange = (options: IFilterOption[]) => {
+    const listStatus = options.map((x) => x.id);
     setFilter({
-      key: 'EndDate',
-      comparison: comparers.Eq,
-      value: formatDate(endDate.toLocaleString(), 'MM/DD/YYYY')
+      key: 'Status',
+      comparison: comparers.In,
+      value: listStatus.join(',')
     });
-    resetCache();
+  };
+
+  const onPageChange = (param: GridPageChangeParams) => {
+    setPageIndex(param.page + 1);
+  };
+
+  const onPageSizeChange = (param: GridPageChangeParams) => {
+    setPageSize(param.pageSize);
   };
 
   return (
     <div style={{ height: '100%' }}>
-      <Grid container className={classes.container}>
+      <Grid container style={{ height: '100%' }}>
         <Grid item xs={4} sm={3} md={2}>
-          <Sidebar activeKey={'my-dcp-report'} />
+          <Sidebar activeKey={routes.MyDCPReport} />
         </Grid>
-        <Grid style={{ height: '100%' }} item container xs={8} sm={9} md={10} direction={'column'}>
-          <Header />
-          <Grid item container direction='column' style={{ flex: 1, minHeight: 0, flexWrap: 'nowrap' }}>
-            <Grid item container justify='space-between' alignItems='center' className={classes.actionGroup}>
-              <Grid item container direction='row' alignItems='center'>
-                <MuiPickersUtilsProvider utils={DateFnsUtils}>
-                  <Box>
-                    <KeyboardDatePicker
-                      disableToolbar
-                      fullWidth
-                      variant='dialog'
-                      format='dd/MM/yyyy'
-                      margin='dense'
-                      id='get-discipline-report-filter'
-                      label='Chọn ngày chấm'
-                      value={dateFilter}
-                      onChange={handleOnDateChange}
-                      KeyboardButtonProps={{
-                        'aria-label': 'my dcp report - change date',
-                      }}
-                    />
-                  </Box>
-                </MuiPickersUtilsProvider>
-                <Chip 
-                  clickable label='Hôm nay' 
-                  onClick={handleTodayFilterClick}
-                  variant={dateFilterType === 'today' ? 'default' : 'outlined'} 
-                  color={dateFilterType === 'today' ? 'primary' : 'default'} style={{marginLeft: 16}}
+        <Grid style={{ background: '#fff', flexGrow: 1 }} item container xs={8} sm={9} md={10} direction='column'>
+          <Grid item >
+            <Header
+              pageName="Phiếu chấm nề nếp của tôi"
+            />
+          </Grid>
+          <Grid item container direction='column' style={{ flex: 1, minHeight: 0, flexWrap: 'nowrap', background: "#e8e8e8" }}>
+            <Grid item container
+              style={{
+                paddingTop: 16, 
+                paddingRight: 24, 
+                paddingLeft: 24,
+                background: "#e8e8e8"
+              }}
+            >
+              <Paper variant="outlined" elevation={1} style={{ width: "100%" }}>
+                <Grid item container direction='row' alignItems='center' style={{ padding: "5px 32px", height: 54 }}>
+                  <Tooltip title="Bộ lọc" style={{ marginRight: 16 }}>
+                      <Badge badgeContent={getFilterCount()} color="primary" >
+                        <FilterIcon fontSize="small" />
+                      </Badge>
+                  </Tooltip>
+                  <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                    <Box>
+                      <KeyboardDatePicker
+                        disableToolbar
+                        size="small"
+                        variant="inline"
+                        format="dd/MM/yyyy"
+                        margin="dense"
+                        id="get-discipline-report-filter"
+                        value={dateFilter}
+                        onChange={handleOnDateChange}
+                        KeyboardButtonProps={{
+                          'aria-label': 'change date',
+                        }}
+                        style={{ width: 160 }}
+                      />
+                    </Box>
+                  </MuiPickersUtilsProvider>
+                  <Chip 
+                      clickable label='Hôm nay' 
+                      onClick={handleTodayFilterClick}
+                      variant={dateFilterType === 'today' ? 'default' : 'outlined'} 
+                      color={dateFilterType === 'today' ? 'primary' : 'default'} style={{marginLeft: 16}}
+                      />
+                  <Chip clickable label='Tuần này' 
+                    onClick={handleWeekFilterClick}
+                    variant={dateFilterType === 'week' ? 'default' : 'outlined'} 
+                    color={dateFilterType === 'week' ? 'primary' : 'default'}
+                    style={{marginLeft: 8, marginRight: 16}}
                   />
-                <Chip clickable label='Tuần này' 
-                  onClick={handleWeekFilterClick}
-                  variant={dateFilterType === 'week' ? 'default' : 'outlined'} 
-                  color={dateFilterType === 'week' ? 'primary' : 'default'}
-                  style={{marginLeft: 8}}
-                />
-              </Grid>
-
-              <Grid item container alignItems='flex-end' justify='flex-end'>
-                <Button 
-                  variant={'contained'} 
-                  color={'primary'}
-                  onClick={() => history.push('dcp-report-creation')}>
-                  Tạo phiếu chấm nề nếp
-                </Button>
-              </Grid>
+                  <FilterButton
+                    title="Trạng thái"
+                    options={statusOptions}
+                    onSelectedOptionsChange={onStatusFilterChange}
+                  />
+                  <Button
+                    startIcon={<AddIcon/>}
+                    variant={'contained'} 
+                    color={'primary'}
+                    style={{ marginLeft: "auto" }}
+                    onClick={() => history.push(routes.CreateDCPReport)}
+                    >
+                    Tạo phiếu chấm nề nếp
+                  </Button>
+                </Grid>
+              </Paper>
             </Grid>              
-            <Grid item container direction={'row'} style={{ flex: 1, minHeight: 0, flexWrap: 'nowrap', padding: 16, paddingBottom: 0 }}>
-              {
-                loading && (
-                  <Grid container justify='center' alignItems='center'>
-                    <p className={classes.emptyText}>Đang tải ...</p>
-                  </Grid>
-                )
-              }
-              {
-                !loading && data.items.length === 0 && (
-                  <Grid container justify='center' alignItems='center'>
-                    <p className={classes.emptyText}>Chưa có phiếu chấm nào!</p>
-                  </Grid>
-
-                )
-              }
-              {
-                !loading && data.items.length > 0 && (
-                  <Grid item style={{ flex: 1, minHeight: 0, overflowY: 'auto' }}>
-                    <List className={classes.list}>
-                      {
-                        data.items.map((el, i) => (
-                        <ListItem key={el.id}>
-                          <DateCard 
-                            id={el.id}
-                            resetCache={resetCache}
-                            date={el.creationTime} 
-                            active={selectedReport?.id === el.id}
-                            onClick={() => setSelectedReport(el)}
-                          />
-                        </ListItem>))
-                      }
-                    </List>
-                  </Grid>
-                )
-              }
-              {
-                !loading && data.items.length > 0 && (
-                  <Grid item container direction={'column'} alignItems={'stretch'} style={{ flex: 3 }}>
-                    <Grid item container className={classes.dcpReportClassFilter} style={{flexWrap: 'wrap', width: '100%'}}>
-                      {
-                        selectedReport === null && (
-                          <Grid item container justify='center' alignItems='center' style={{height: 50}}>
-                            <p className={classes.emptyText}>Không có dữ liệu.</p>
-                          </Grid>
-                        )
-                      }
-                      {
-                        selectedReport !== null && (
-                          <Tabs
-                            value={classTabIndex}
-                            onChange={handleTabIndexChange}
-                            indicatorColor='primary'
-                            textColor='primary'
-                            variant='scrollable'
-                            scrollButtons='auto'
-                            aria-label='scrollable class list tab'
-                            className={classes.classTabContainer}
-                          >
-                            {
-                              selectedReport.dcpClassReports.map((el, i) => (
-                                <Tab label={el.class.name} {...a11yProps(0)} />
-                              ))
-                            }
-                          </Tabs>
-                        )
-                      }
-                      
-                    </Grid>
-                    <Grid item style={{ flex: 1, minHeight: 0, minWidth: 0, overflowY: 'auto', overflowX: 'hidden' }}>
-                      {
-                        selectedReport === null && (
-                          <Grid item container justify='center' alignItems='center' style={{ height: '100%' }}>
-                            <p className={classes.emptyText}>Không có dữ liệu.</p>
-                          </Grid>
-                        )
-                      }
-                      {
-                        selectedReport && selectedReport.dcpClassReports.map((el, i) => (
-                          <TabPanel index={i} activeIndex={classTabIndex} data={el.faults}/>
-                        ))
-                      }
-                    </Grid>
-                  </Grid>
-                )
-              }
+            <Grid item style={{ flexGrow: 1, paddingTop: 16, paddingBottom: 16, backgroundColor: '#e8e8e8'}}>
+              <Container className={classes.root}>
+                <DataGrid
+                  columns={cols}
+                  rows={data.items}
+                  pageSize={pagingInfo.pageSize} 
+                  rowCount={data.totalCount}
+                  onPageChange={onPageChange}
+                  loading={loading}
+                  page={pagingInfo.pageIndex && pagingInfo.pageIndex - 1}
+                  error={error}
+                  paginationMode='server'
+                  hideFooterSelectedRowCount
+                  rowsPerPageOptions={[5, 15, 30, 50]}
+                  onPageSizeChange={onPageSizeChange}
+                  pagination
+                />
+              </Container>
             </Grid>
           </Grid>
         </Grid>
       </Grid>
     </div>
   );
+
 };
 
 export default MyDCPReportPage;

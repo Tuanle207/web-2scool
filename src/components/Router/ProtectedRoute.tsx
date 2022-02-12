@@ -1,29 +1,26 @@
-import React from 'react';
-import { Route, Redirect, RouteComponentProps, useHistory } from 'react-router-dom';
-import { Util } from '../../common/interfaces';
-import { withRedux } from '../../common/utils/ReduxConnect';
+import { FC } from 'react';
+import { useSelector } from 'react-redux';
+import { Route, Redirect, RouteComponentProps,  } from 'react-router-dom';
+import { AppConfigSelector } from '../../store/selectors';
 
-interface OwnProps {
+interface IProtectedRouteProps {
   component: React.FC<RouteComponentProps>;
   policyName?: string;
   path: string; 
   exact?: boolean;
 }
 
-type Props = OwnProps & {
-  policies: Util.IObject<boolean>
-};
 
-const ProtectedRoute: React.FC<Props> = ({
+const ProtectedRoute: FC<IProtectedRouteProps> = ({
   component: Component,
   policyName = '',
   path,
-  policies,
   exact = false, 
   ...rest
 }) => {
 
-  console.log({policies});
+  const policies = useSelector(AppConfigSelector.grantedPolicies);
+
   return (
     <Route 
       {...{ path, exact, ...rest }}
@@ -37,9 +34,4 @@ const ProtectedRoute: React.FC<Props> = ({
   );
 };
 
-export default withRedux<OwnProps>({
-  component: ProtectedRoute,
-  stateProps: (state: any) => ({
-    policies: state.appConfig?.appConfig?.auth?.grantedPolicies
-  })
-});
+export default ProtectedRoute;

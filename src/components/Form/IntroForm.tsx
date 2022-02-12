@@ -1,12 +1,12 @@
+import { FC } from 'react';
 import { Button, Grid, Container, Box, Typography } from '@material-ui/core';
-import React from 'react';
 import useIntroFormStyles from '../../assets/jss/components/Form/useIntroFormStyles';
 
 interface Props {
   history: any;
 }
 
-const IntroForm: React.FC<Props> = ({ history }) => {
+const IntroForm: FC<Props> = ({ history }) => {
 
   const styles = useIntroFormStyles();
 

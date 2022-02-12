@@ -1,14 +1,13 @@
-import React from 'react';
-import { Box, Container, TextField, MenuItem } from '@material-ui/core';
-import { Identity } from '../../common/interfaces';
+import { useState, useEffect } from 'react';
+import { Box, Container, TextField } from '@material-ui/core';
+import { Identity } from '../../interfaces';
 import ActionModal from '.';
 import { useDataValidator } from '../../hooks';
-import { IdentityService, StudentsService } from '../../common/api';
-import { Autocomplete, AutocompleteChangeReason } from '@material-ui/lab';
+import { StudentsService } from '../../api';
 
 const CreateStudentAccountRequest = ({id}: {id?: string}) => {
 
-  const [data, setData] = React.useState<Identity.CreateUpdateUserDto>({
+  const [data, setData] = useState<Identity.CreateUpdateUserDto>({
     userName: '',
     name: '',
     email: '',
@@ -17,11 +16,10 @@ const CreateStudentAccountRequest = ({id}: {id?: string}) => {
     password: '',
     extraProperties: {}
   });
-  const [selectedRoles, setSelectedRoles] = React.useState<Identity.UserRoleDto[]>([]);
-  const [roles, setRoles] = React.useState<Identity.UserRoleDto[]>([]);
-  const {errors, validate, getError} = useDataValidator();
+  const [ selectedRoles ] = useState<Identity.UserRoleDto[]>([]);
+  const { errors } = useDataValidator();
 
-  React.useEffect(() => {
+  useEffect(() => {
 
     const initData = async () => {
 
@@ -45,10 +43,10 @@ const CreateStudentAccountRequest = ({id}: {id?: string}) => {
     initData();
   }, [id]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     const dto = {...data};
     dto.roleNames = selectedRoles.map(x => x.name);
-    console.log({dto});
+
     ActionModal.setData({
       data: dto,
       error: errors.length > 0 ? {
@@ -56,6 +54,7 @@ const CreateStudentAccountRequest = ({id}: {id?: string}) => {
         msg: errors[0].msg
       } : undefined
     });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data]);
 
   return (
@@ -63,7 +62,7 @@ const CreateStudentAccountRequest = ({id}: {id?: string}) => {
       <Container>
         <Box style={{marginBottom: '10px'}}>
           <TextField
-            id='create-user-name' 
+            // id='create-user-name' 
             label='Tên người dùng' 
             required
             autoComplete='off'
@@ -75,10 +74,10 @@ const CreateStudentAccountRequest = ({id}: {id?: string}) => {
         </Box>
         <Box style={{marginBottom: '10px'}}>
           <TextField
-            id='create-user-username' 
+            // id='create-user-username' 
             label='Tên đăng nhập' 
             required
-            autoComplete='off'
+            autoComplete='new-username'
             autoFocus={true}
             style={{width: '40ch'}}
             value={data.userName}
@@ -87,10 +86,10 @@ const CreateStudentAccountRequest = ({id}: {id?: string}) => {
         </Box>
         <Box style={{marginBottom: '10px'}}>
           <TextField
-            id='create-user-email' 
+            // id='create-user-email' 
             label='Email' 
             required
-            autoComplete='off'
+            autoComplete='new-email'
             autoFocus={true}
             style={{width: '40ch'}}
             value={data.email}
@@ -99,10 +98,10 @@ const CreateStudentAccountRequest = ({id}: {id?: string}) => {
         </Box>
         <Box style={{marginBottom: '10px'}}>
           <TextField
-            id='create-user-phonenumber' 
+            // id='create-user-phonenumber' 
             label='Số điện thoại' 
             required
-            autoComplete='off'
+            autoComplete='new-phone-no'
             autoFocus={true}
             style={{width: '40ch'}}
             value={data.phoneNumber}
@@ -111,10 +110,10 @@ const CreateStudentAccountRequest = ({id}: {id?: string}) => {
         </Box>
         <Box style={{marginBottom: '10px'}}>
           <TextField
-            id='create-user-password' 
+            // id='create-user-password' 
             label='Mật khẩu'
             type={'password'}
-            autoComplete='off'
+            autoComplete='new-password'
             style={{width: '40ch'}}
             value={data.password}
             onChange={e => setData(prev => ({...prev, password: e.target.value}))}

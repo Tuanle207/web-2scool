@@ -1,4 +1,3 @@
-import React from 'react';
 import { Route, BrowserRouter as Router, Switch, Redirect } from 'react-router-dom';
 import Dashboard from '../views/Dashboard';
 import ProtectedRoute from '../components/Router/ProtectedRoute';
@@ -13,144 +12,158 @@ import MyDCPReportPage from '../views/MyDCPReportPage';
 import UserManagement from '../views/UserManagement';
 import RoleManagement from '../views/RoleManagement';
 import DCPReportCreatePage from '../views/DCPReportCreatePage';
-import DCPReportHistoryPage from '../views/DCPReportHistoryPage';
+import DCPReportHistoryPage from '../views/LRReportApprovalPage';
 import DCPRankingPage from '../views/DCPRankingPage';
 import DCPStatisticsPage from '../views/DCPStatisticsPage';
 import ErrorPage from '../views/ErrorPage';
-import { policies } from '../common/appConsts';
 import DCPReportUpdatePage from '../views/DCPReportUpdatePage';
 import DCPReportSchedule from '../views/DCPReportSchedule';
 import DCPReportScheduleAssignment from '../views/DCPReportScheduleAssignment';
 import LessonRegisterReportSchedule from '../views/LessonRegisterReportSchedule';
-import LessonRegisterReport from '../views/LessonRegisterReport';
+import MyLRReportPage from '../views/MyLRReportPage';
 import LessonRegisterReportCreate from '../views/LessonRegisterReportCreate';
+import LessonRegisterReportUpdate from '../views/LessonRegisterReportUpdate';
+import ProfilePage from '../views/ProfilePage';
+import { policies } from '../appConsts';
+import { routes } from './routesDictionary';
+import RegulationsPage from '../views/RegulationsPage';
 
 const DashboardRouter = () => {
   return (
     <Router>
       <Switch>
         <Route 
-          path='/dashboard' 
+          path={routes.Dashboard} 
           exact
           component={Dashboard}
         />
         <ProtectedRoute 
-          path='/dcp-report-approval'
+          path={routes.DCPReportApproval}
           exact
           policyName={policies.DcpReportApproval}
           component={DCPReportsApprovalPage}
         />
         <ProtectedRoute 
-          path='/dcp-report-approval/:dcpReportId'
+          path={routes.DCPReportDetail}
           exact
           policyName={policies.GetDcpReportDetail}
           component={DCPReportPage}
         />
-         <ProtectedRoute 
-          path='/dcp-report-history'
+        <ProtectedRoute 
+          path={routes.LRReportApproval}
           exact
-          policyName={policies.GetDcpReportApprovalHistory}
+          policyName={policies.LRReportApproval}
           component={DCPReportHistoryPage}
         />
         <ProtectedRoute 
-          path='/my-dcp-report'
+          path={routes.MyDCPReport}
           exact
           policyName={policies.GetMyDcpReport}
           component={MyDCPReportPage}
         />
          <ProtectedRoute 
-          path='/my-lr-report'
+          path={routes.MyLRReport}
           exact
           policyName={policies.GetMyLRReport}
-          component={LessonRegisterReport}
+          component={MyLRReportPage}
         />
         <ProtectedRoute 
-          path='/dcp-report-creation'
+          path={routes.CreateDCPReport}
           exact
           policyName={policies.CreateNewDcpReport}
           component={DCPReportCreatePage}
         />
         <ProtectedRoute 
-          path='/lr-report-creation'
+          path={routes.CreateLRReport}
           exact
           policyName={policies.CreateNewLRReport}
           component={LessonRegisterReportCreate}
         />
         <ProtectedRoute 
-          path='/dcp-report-update/:dcpReportId'
+          path={routes.UpdateLRReport}
+          exact
+          policyName={policies.UpdateLRReport}
+          component={LessonRegisterReportUpdate}
+        />
+        <ProtectedRoute 
+          path={routes.UpdateDCPReport}
           exact
           policyName={policies.UpdateDcpReport}
           component={DCPReportUpdatePage}
         />
         <ProtectedRoute 
-          path='/dcp-report-schedules'
+          path={routes.DCPReportSchedule}
           exact
           policyName={policies.GetScheduleList}
           component={DCPReportSchedule}
         />
         <ProtectedRoute
-          path='/dcp-report-schedules-assignment'
+          path={routes.DCPReportScheduleAssignment}
           exact
           policyName={policies.AssignDcpReport}
           component={DCPReportScheduleAssignment}
         />
         <ProtectedRoute 
-          path='/lesson-register-report-schedules'
+          path={routes.LRReportSchedule}
           exact
           policyName={policies.AssignLessonRegisterReport}
           component={LessonRegisterReportSchedule}
         />
         <ProtectedRoute 
-          path='/dcp-rankings'
+          path={routes.DCPRanking}
           exact
           policyName={policies.Rankings}
           component={DCPRankingPage}
         />
         <ProtectedRoute 
-          path='/dcp-statistics'
+          path={routes.DCPStatistics}
           exact
           policyName={policies.Statistics}
           component={DCPStatisticsPage}
         />
         <ProtectedRoute 
-          path='/my-dcp-report/:dcpReportId'
-          exact
-          policyName={policies.GetDcpReportDetail}
-          component={MyDCPReportPage}
+          path={routes.Profile}
+          // policyName={policies.Courses}
+          component={ProfilePage}
         />
         <ProtectedRoute
-          path='/admin/courses' 
+          path={routes.CoursesManager} 
           exact
           policyName={policies.Courses}
           component={CoursesPage}
         />
         <ProtectedRoute 
-          path='/admin/classes'
+          path={routes.ClassesManager}
           policyName={policies.Courses}
           component={ClassesPage}
         />
         <ProtectedRoute 
-          path='/admin/students'
+          path={routes.StudentsManager}
           policyName={policies.Courses}
           component={StudentsPage}
         />
         <ProtectedRoute 
-          path='/admin/teachers'
+          path={routes.TeachersManager}
           policyName={policies.Courses}
           component={TeachersPage}
         />
         <ProtectedRoute 
-          path='/admin/grades'
+          path={routes.GradesManager}
           policyName={policies.Courses}
           component={GradesPage}
         />
+         <ProtectedRoute 
+          path={routes.RegulationManager}
+          policyName={policies.Courses}
+          component={RegulationsPage}
+        />
         <ProtectedRoute 
-          path='/admin/users'
+          path={routes.UsersManager}
           policyName={policies.AbpIdentityUsers}
           component={UserManagement}
         />
         <ProtectedRoute 
-          path='/admin/roles'
+          path={routes.RolesManager}
           policyName={policies.AbpIdentityRoles}
           component={RoleManagement}
         />
@@ -158,7 +171,7 @@ const DashboardRouter = () => {
           path='/errors'
           component={ErrorPage}
         />
-        <Redirect to='/dashboard' />
+        <Redirect to={routes.Dashboard} />
       </Switch>
     </Router>
   );

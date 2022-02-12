@@ -1,12 +1,9 @@
-import React from 'react';
-import { Box, Collapse, Container, List, ListItem, ListItemIcon, ListItemText, SvgIconTypeMap, Typography } from '@material-ui/core';
+import { FC, useState } from 'react';
+import { Box, Collapse, Container, Divider, List, ListItem, ListItemText } from '@material-ui/core';
 import { Dashboard } from '@material-ui/icons';
 import { Link, useHistory, useLocation } from 'react-router-dom';
-import useSidebarStyles from '../../assets/jss/components/Sidebar/sidebarStyles';
-import { withRedux } from '../../common/utils/ReduxConnect';
-import { Util } from '../../common/interfaces';
-import { policies } from '../../common/appConsts';
-import HistoryIcon from '@material-ui/icons/History';
+import { Util } from '../../interfaces';
+import { policies } from '../../appConsts';
 import CheckCircleIcon from '@material-ui/icons/CheckCircle';
 import AssignmentIcon from '@material-ui/icons/Assignment';
 import CreateIcon from '@material-ui/icons/Create';
@@ -19,12 +16,17 @@ import AssignmentTurnedInIcon from '@material-ui/icons/AssignmentTurnedIn';
 import FlagIcon from '@material-ui/icons/Flag';
 import LocalLibraryIcon from '@material-ui/icons/LocalLibrary';
 import BookIcon from '@material-ui/icons/Book';
+import PostAddIcon from '@material-ui/icons/PostAdd';
 import { ReactComponent as TeacherIcon } from '../../assets/img/teacher.svg';
 import { ReactComponent as StudentIcon } from '../../assets/img/student.svg';
 import { ReactComponent as RoleIcon } from '../../assets/img/permission.svg';
 import { ReactComponent as UserIcon } from '../../assets/img/user.svg';
-
-// import { OverridableComponent } from '@material-ui/core/OverridableComponent';
+import { ReactComponent as RegulationIcon } from '../../assets/img/regulation.svg';
+import { ReactComponent as LrBookIcon } from '../../assets/img/lesson-register.svg';
+import { routes } from '../../routers/routesDictionary';
+import { AppConfigSelector } from '../../store/selectors';
+import { useSelector } from 'react-redux';
+import useSidebarStyles from '../../assets/jss/components/Sidebar/sidebarStyles';
 
 interface ISidebarInfo {
   key: string;
@@ -38,103 +40,110 @@ interface ISidebarInfo {
 const sidebarItems: Util.IObject<ISidebarInfo[]> = {
   admin: [
     {
-      key: 'courses',
+      key: routes.CoursesManager,
       title: 'Khóa học',
       Icon: FlagIcon,
-      route: '/admin/courses',
+      route: routes.CoursesManager,
       policyName: policies.Courses
     },
     {
-      key: 'teachers',
+      key: routes.TeachersManager,
       Icon: TeacherIcon,
       title: 'Giáo viên',
-      route: '/admin/teachers',
+      route: routes.TeachersManager,
       policyName: policies.Courses
     },
     {
-      key: 'classes',
+      key: routes.ClassesManager,
       Icon: LocalLibraryIcon,
       title: 'Lớp học',
-      route: '/admin/classes',
+      route: routes.ClassesManager,
       policyName: policies.Courses
     },
     {
-      key: 'students',
+      key: routes.StudentsManager,
       Icon: StudentIcon,
       title: 'Học sinh',
-      route: '/admin/students',
+      route: routes.StudentsManager,
       policyName: policies.Courses
     },
     {
-      key: 'grades',
+      key: routes.GradesManager,
       Icon: BookIcon,
       title: 'Khối',
-      route: '/admin/grades',
+      route: routes.GradesManager,
       policyName: policies.Courses
     },
     {
-      key: 'users',
+      key: routes.RegulationManager,
+      Icon: RegulationIcon,
+      title: 'Quy định nề nếp',
+      route: routes.RegulationManager,
+      policyName: policies.Courses
+    },
+    {
+      key: routes.UsersManager,
       Icon: UserIcon,
       title: 'Người dùng',
-      route: '/admin/users',
+      route: routes.UsersManager,
       policyName: policies.AbpIdentityUsers
     },
     {
-      key: 'roles',
+      key: routes.RolesManager,
       Icon: RoleIcon,
-      title: 'Quyền',
-      route: '/admin/roles',
+      title: 'Vai trò',
+      route: routes.RolesManager,
       policyName: policies.AbpIdentityRoles
     }
   ],
   dashboard: [
     {
-      key: 'dashboard',
+      key: routes.Dashboard,
       title: 'Trang chủ',
       Icon: Dashboard,
-      route: '/dashboard',
+      route: routes.Dashboard,
       policyName: ''
     },
     {
-      key: 'dcp-report-approval',
+      key: routes.DCPReportApproval,
       Icon: CheckCircleIcon,
-      title: 'Duyệt',
-      route: '/dcp-report-approval',
+      title: 'Duyệt nề nếp',
+      route: routes.DCPReportApproval,
       policyName: policies.DcpReportApproval
     },
     {
-      key: 'dcp-report-history',
-      Icon: HistoryIcon,
-      title: 'Lịch sử duyệt',
-      route: '/dcp-report-history',
-      policyName: policies.GetDcpReportApprovalHistory
+      key: routes.LRReportApproval,
+      Icon: LrBookIcon,
+      title: 'Duyệt sổ đầu bài',
+      route: routes.LRReportApproval,
+      policyName: policies.LRReportApproval
     },
     {
       key: 'my-report',
-      Icon: CreateIcon,
+      Icon: PostAddIcon,
       title: 'Chấm điểm',
-      route: '/my-dcp-report',
+      route: routes.MyDCPReport,
       policyName: policies.CreateNewDcpReport,
     },
     {
-      key: 'my-dcp-report-post',
+      key: 'my-report-post',
       Icon: CreateIcon,
       title: 'Chấm điểm',
       route: '/',
       policyName: policies.CreateNewDcpReport,
       subItems: [
         {
-          key: 'my-dcp-report',
+          key: routes.MyDCPReport,
           Icon: AssignmentTurnedInIcon,
           title: 'Chấm điểm nề nếp',
-          route: '/my-dcp-report',
+          route: routes.MyDCPReport,
           policyName: policies.CreateNewDcpReport,
         },
         {
-          key: 'my-lr-report',
+          key: routes.MyLRReport,
           Icon: ImportContactsIcon,
           title: 'Sổ đầu bài',
-          route: '/my-lr-report',
+          route: routes.MyLRReport,
           policyName: policies.CreateNewLRReport,
         }
       ]
@@ -154,89 +163,91 @@ const sidebarItems: Util.IObject<ISidebarInfo[]> = {
       policyName: policies.GetScheduleList,
       subItems: [
         {
-          key: 'report-schedule-assignment',
+          key: routes.DCPReportSchedule,
           Icon: AssignmentTurnedInIcon,
           title: 'Trực cờ đỏ',
-          route: '/dcp-report-schedules',
+          route: routes.DCPReportSchedule,
           policyName: policies.AssignDcpReport
         },
         {
-          key: 'lessons-register-report-schedule-assignment',
+          key: routes.LRReportSchedule,
           Icon: ImportContactsIcon,
           title: 'Nộp sổ đầu bài',
-          route: '/lesson-register-report-schedules',
+          route: routes.LRReportSchedule,
           policyName: policies.AssignLessonRegisterReport
         }
       ]
     },
     {
-      key: 'dcp-rankings',
+      key: routes.DCPRanking,
       Icon: EqualizerIcon,
       title: 'Xếp hạng',
-      route: '/dcp-rankings',
+      route: routes.DCPRanking,
       policyName: policies.Rankings
     },
     {
-      key: 'dcp-statistics',
+      key: routes.DCPStatistics,
       Icon: ShowChartIcon,
       title: 'Thống kê',
-      route: '/dcp-statistics',
+      route: routes.DCPStatistics,
       policyName: policies.Statistics
     }
   ]
 };
 
-interface OwnProps {
+interface ISidebarProps {
   activeKey?: string;
 }
 
-type Props = OwnProps & {
-  grantedPolicies: Util.IObject<boolean>
-}
-
-const Sidebar: React.FC<Props> = ({ activeKey, grantedPolicies }) => {
+const Sidebar: FC<ISidebarProps> = ({ activeKey }) => {
 
   const styles = useSidebarStyles();
   const history = useHistory();
   const location = useLocation();
 
-  const [expandTaskAssignment, setExpandTaskAssignment] = React.useState(
-    location.pathname.includes('/dcp-report-schedules') ||
-    location.pathname.includes('/lesson-register-report-schedules')
+  const [expandTaskAssignment, setExpandTaskAssignment] = useState(
+    location.pathname.includes(routes.DCPReportSchedule) ||
+    location.pathname.includes(routes.LRReportSchedule)
   );
 
-  const [expandCreateReport, setExpandCreateReport] = React.useState(
-    location.pathname.includes('/my-dcp-report') ||
-    location.pathname.includes('/my-lr-report')
+  const [expandCreateReport, setExpandCreateReport] = useState(
+    location.pathname.includes(routes.MyDCPReport) ||
+    location.pathname.includes(routes.MyLRReport)
   );
-  
-  React.useEffect(() => {
-    if (activeKey && [
-      'report-schedule-assignment', 
-      'lessons-register-report-schedule-assignment'
-    ].includes(activeKey)) {
-      setExpandTaskAssignment(true);
+
+  const toggleExpandTaskAssignment = () => {
+    if (expandCreateReport){
+      setExpandCreateReport(false);
     }
-  }, [activeKey]);
-  
+    setExpandTaskAssignment((prevOpen) => !prevOpen);
+  };
+
+  const toggleExpandCreateReport = () => {
+    if (expandTaskAssignment){
+      setExpandTaskAssignment(false);
+    }
+    setExpandCreateReport((prevOpen) => !prevOpen);
+  };
+
+  const grantedPolicies = useSelector(AppConfigSelector.grantedPolicies);
+
   return (
     <Container className={styles.container}>
       <Box className={styles.filterBackground}></Box>
       <Box className={styles.titleWrapper}>
-        <h1 onClick={() => history.push('dashboard')}>2Scool</h1>
+        <h1 onClick={() => history.push(routes.Dashboard)}>2Scool</h1>
       </Box>
       <List component='nav'>
         {
-          sidebarItems[location.pathname.startsWith('/admin') ? 'admin' : 'dashboard'].map(item => 
+          sidebarItems[location.pathname.startsWith('/quan-ly') ? 'admin' : 'dashboard'].map((item) => 
             ((grantedPolicies && grantedPolicies[item.policyName] === true) || item.policyName === '') && (
               item.key === 'task-assignments' ? (
                 <ListItem 
                   key={item.key}
                   button
-                  onClick={() =>  setExpandTaskAssignment((prevOpen) => !prevOpen)} 
-
+                  onClick={toggleExpandTaskAssignment} 
                 >
-                  <item.Icon style={{marginRight: 8, marginBottom: 4, color: '#fff', fill: '#fff'}} />
+                  <item.Icon style={{marginRight: 8, marginLeft: 4, marginBottom: 4, color: '#fff', fill: '#fff'}} />
                   <ListItemText primary={item.title} />
                   {
                     expandTaskAssignment ? 
@@ -244,14 +255,14 @@ const Sidebar: React.FC<Props> = ({ activeKey, grantedPolicies }) => {
                     <ExpandMoreIcon fontSize='small'/>
                   }
                 </ListItem>
-              ) : item.key === 'my-dcp-report' ? (
+              ) : item.key === 'my-report' ? (
                 <ListItem 
                   key={item.key}
                   button
-                  onClick={() => setExpandCreateReport((prevOpen) => !prevOpen)} 
+                  onClick={toggleExpandCreateReport} 
 
                 >
-                  <item.Icon style={{marginRight: 8, marginBottom: 4, color: '#fff', fill: '#fff'}} />
+                  <item.Icon style={{marginRight: 8, marginLeft: 4, marginBottom: 4, color: '#fff', fill: '#fff'}} />
                   <ListItemText primary={item.title} />
                   {
                     expandCreateReport ? 
@@ -261,11 +272,11 @@ const Sidebar: React.FC<Props> = ({ activeKey, grantedPolicies }) => {
                 </ListItem>
               ) :
               item.key === 'task-assignments-post' ? (
-                <Collapse component="li" in={expandTaskAssignment} timeout="auto" unmountOnExit>
+                <Collapse component="li" in={expandTaskAssignment} timeout="auto" unmountOnExit >
                   <List disablePadding>
                       {
                         item.subItems && item.subItems.map(el => (
-                          <ListItem 
+                          <ListItem
                             button
                             className={`${styles.listItem} ${el.key === activeKey ? styles.listItemActive : ''}`}
                             component={Link} 
@@ -279,9 +290,9 @@ const Sidebar: React.FC<Props> = ({ activeKey, grantedPolicies }) => {
                   </List>
                 </Collapse>
               ) : 
-              item.key === 'my-dcp-report-post' ? (
+              item.key === 'my-report-post' ? (
                 <Collapse component="li" in={expandCreateReport} timeout="auto" unmountOnExit>
-                  <List disablePadding>
+                  <List disablePadding >
                       {
                         item.subItems && item.subItems.map(el => (
                           <ListItem 
@@ -298,16 +309,21 @@ const Sidebar: React.FC<Props> = ({ activeKey, grantedPolicies }) => {
                   </List>
                 </Collapse>
               ) : (
-                <ListItem
-                  button 
-                  className={`${styles.listItem} ${item.key === activeKey ? styles.listItemActive : ''}`}
-                  component={Link}
-                  to={item.route}
-                  key={item.key}
-                >
-                  <item.Icon  style={{marginRight: 8, marginBottom: 4, width: 24, height: 24}} />
-                  <ListItemText primary={item.title} />
-                </ListItem>
+                <>
+                  {
+                    item.key === routes.UsersManager && <Divider light className={styles.divider} />
+                  }
+                  <ListItem
+                    button 
+                    className={`${styles.listItem} ${item.key === activeKey ? styles.listItemActive : ''}`}
+                    component={Link}
+                    to={item.route}
+                    key={item.key}
+                  >
+                    <item.Icon  style={{marginRight: 8, marginBottom: 4, width: 24, height: 24}} />
+                    <ListItemText primary={item.title} />
+                  </ListItem>
+                </>
               )
             )
           )
@@ -320,9 +336,4 @@ const Sidebar: React.FC<Props> = ({ activeKey, grantedPolicies }) => {
   )
 };
 
-export default withRedux<OwnProps>({
-  component: Sidebar,
-  stateProps: (state: any) => ({
-    grantedPolicies: state.appConfig?.appConfig?.auth?.grantedPolicies
-  })
-});
+export default Sidebar;

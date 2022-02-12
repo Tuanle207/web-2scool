@@ -2,17 +2,12 @@ import { fade, makeStyles, Theme } from '@material-ui/core';
 
 const useHeaderStyles = makeStyles((theme: Theme) => ({
   grow: {
-    // flexGrow: 1
     width: '100%'
   },
   toolbar: {
-    // padding: theme.spacing(2, 1)
-    boxShadow: '0px 1px 4px #888888',
+    boxShadow: '0px 1px 1px #888888',
     [theme.breakpoints.up('md')]: {
-      paddingTop: theme.spacing(2),
-      paddingBottom: theme.spacing(2),
-      paddingLeft: theme.spacing(4),
-      paddingRight: theme.spacing(4)
+      padding: theme.spacing(2, 4)
     }
   },
   title: {
@@ -28,7 +23,8 @@ const useHeaderStyles = makeStyles((theme: Theme) => ({
     '&:hover': {
       backgroundColor: fade(theme.palette.grey[700], 0.25),
     },
-    marginRight: 'auto',
+    marginRight: theme.spacing(2),
+    marginLeft: 'auto',
     width: '100%',
     [theme.breakpoints.up('md')]: {
       width: 'auto',

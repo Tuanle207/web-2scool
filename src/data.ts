@@ -1,4 +1,4 @@
-import { Course, Class, Grade, Teacher, Student } from './common/interfaces';
+import { Course, Class, Grade, Teacher, Student } from './interfaces';
 
 const courses: Course.CourseDto[] = [
   {

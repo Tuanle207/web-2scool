@@ -1,25 +1,24 @@
-import React from 'react';
+import { useState, useEffect } from 'react';
 import { Box, Container, TextField, Select, InputLabel, FormControl, MenuItem } from '@material-ui/core';
 import DateFnsUtils from '@date-io/date-fns';
 import { MuiPickersUtilsProvider, KeyboardDatePicker } from '@material-ui/pickers';
-import { Student, Class } from '../../common/interfaces';
+import { Student, Class } from '../../interfaces';
 import ActionModal from '.';
-import { Validator } from '../../common/utils/DataValidation';
 import { useDataValidator } from '../../hooks';
-import { StudentsService, ClassesService } from '../../common/api';
+import { StudentsService, ClassesService } from '../../api';
 
 const CreateOrUpdateStudentRequest = ({id}: {id?: string}) => {
 
-  const [data, setData] = React.useState<Student.CreateUpdateStudentDto>({
+  const [data, setData] = useState<Student.CreateUpdateStudentDto>({
     name: '',
     classId:  '',
     dob: new Date(),
     parentPhoneNumber: ''
   });
-  const [classes, setClasses] = React.useState<Class.ClassForListDto[]>([]);
-  const {errors, validate, getError} = useDataValidator();
+  const [classes, setClasses] = useState<Class.ClassForListDto[]>([]);
+  const {errors, getError} = useDataValidator();
 
-  React.useEffect(() => {
+  useEffect(() => {
     const initData = async () => {
       const classesRes = await ClassesService.getAllClasss({});
       setClasses(classesRes.items);
@@ -37,7 +36,7 @@ const CreateOrUpdateStudentRequest = ({id}: {id?: string}) => {
     initData();
   }, [id]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     ActionModal.setData({
       data,
       error: errors.length > 0 ? {
@@ -45,17 +44,18 @@ const CreateOrUpdateStudentRequest = ({id}: {id?: string}) => {
         msg: errors[0].msg
       } : undefined
     });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data]);
 
 
-  const nameChange = (value: string) => {
-    setData(prev => ({...prev, name: value}))
-    validate('tên', value, Validator.isNotEmpty);
-  };
-  const descriptionChange = (value: string) => {
-    setData(prev => ({...prev, description: value}))
-    validate('mô tả', value, Validator.isNotEmpty);
-  };
+  // const nameChange = (value: string) => {
+  //   setData(prev => ({...prev, name: value}))
+  //   validate('tên', value, Validator.isNotEmpty);
+  // };
+  // const descriptionChange = (value: string) => {
+  //   setData(prev => ({...prev, description: value}))
+  //   validate('mô tả', value, Validator.isNotEmpty);
+  // };
 
   return (
     <form style={{padding: '20px 0'}}>

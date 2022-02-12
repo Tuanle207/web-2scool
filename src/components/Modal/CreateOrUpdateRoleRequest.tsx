@@ -1,23 +1,23 @@
-import React from 'react';
+import { useState, useEffect } from 'react';
 import { Box, Container, TextField } from '@material-ui/core';
-import { Identity } from '../../common/interfaces';
+import { Identity } from '../../interfaces';
 import ActionModal from '.';
 import { useDataValidator } from '../../hooks';
 
 const CreateOrUpdateRoleRequest = ({id}: {id?: string}) => {
 
-  const [data, setData] = React.useState<Identity.CreateUpdateRoleDto>({
+  const [data, setData] = useState<Identity.CreateUpdateRoleDto>({
     name: ''
   });
-  const {errors, validate, getError} = useDataValidator();
+  const {errors} = useDataValidator();
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (id) {
       
     }
   }, [id]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     ActionModal.setData({
       data,
       error: errors.length > 0 ? {

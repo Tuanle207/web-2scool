@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { Util } from '../common/interfaces';
-import { withoutVNSign }from '../common/utils/StringHelper'
-import { hasError } from '../common/utils/DataValidation';
+import { Util } from '../interfaces';
+import { hasError } from '../utils/DataValidation';
+import { withoutVNSign } from '../utils/StringHelper';
 
-export default function useDataValidator()
+export function useDataValidator()
 : {
   errors: Array<Util.DataError>;
   validate: (propertyName: string, value: any, validators: Array<string> | string) => string | undefined;

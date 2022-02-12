@@ -1,85 +1,21 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Container, Grid, Box, Button, makeStyles, List, ListItem, Typography, Tabs, Tab, IconButton, Chip, Tooltip } from '@material-ui/core';
+import { useState, useEffect } from 'react';
+import { Container, Grid, Box, IconButton, Chip, Tooltip, Paper,
+  Badge } from '@material-ui/core';
 import { MuiPickersUtilsProvider, KeyboardDatePicker } from '@material-ui/pickers';
 import DateFnsUtils from '@date-io/date-fns';
-import React from 'react';
-import { useHistory } from 'react-router-dom';
 import Header from '../components/Header';
 import Sidebar from '../components/Sidebar';
-import { DcpReport, Regulation, Stats } from '../common/interfaces';
-import { DataGrid, GridColDef, GridRowData, GridValueFormatterParams } from '@material-ui/data-grid';
-import { DcpReportsService, StatisticsService } from '../common/api';
-import { usePagingInfo, useFetch } from '../hooks';
-import { formatDate, getDayOfWeek, addDays, getPreviousMonday } from '../common/utils/TimeHelper';
-import SettingsIcon from '@material-ui/icons/Settings';
-import ActionModal from '../components/Modal';
-import { toast } from 'react-toastify';
-import { comparers } from '../common/appConsts';
+import { Stats } from '../interfaces';
+import { DataGrid, GridColDef, GridRowParams } from '@material-ui/data-grid';
+import { StatisticsService } from '../api';
+import { getPreviousMonday } from '../utils/TimeHelper';
 import { FindInPage } from '@material-ui/icons';
 import GetAppIcon from '@material-ui/icons/GetApp';
-import { sleep } from '../common/utils/SetTimeOut';
+import { ReactComponent as FilterIcon } from '../assets/img/filter.svg';
+import { routes } from '../routers/routesDictionary';
+import useStyles from '../assets/jss/views/DCPRankingPage';
 
-
-const useStyles = makeStyles(theme => ({
-  container: {
-    height: '100%',
-
-    '& .MuiGrid-container': {
-      flexWrap: 'nowrap'
-    }
-  },
-  actionGroup: {
-    padding: theme.spacing(1, 4),
-    borderBottom: `1px solid ${theme.palette.divider}`
-  },
-  list: {
-    // overflowY: 'scroll'
-    // padding: '20px 100px' 
-  },
-  datagridContainer: {
-    // height: '100%', 
-    width: '100%',
-    '& .MuiDataGrid-columnSeparator': {
-      display: 'none'
-    },
-    '& .MuiDataGrid-colCellTitle': {
-      fontWeight: 700,
-    },
-    '& .MuiDataGrid-root': {
-      border: 'none',
-      '& .MuiDataGrid-withBorder': {
-        borderRight: 'none',
-      }
-    },
-    '& .MuiDataGrid-root.MuiDataGrid-colCellMoving': {
-      backgroundColor: 'unset'
-    },
-    '& .MuiDataGrid-row:first-child': {
-      backgroundColor: '#18a61a'
-    },
-    '& .MuiDataGrid-row:nth-child(2)': {
-      backgroundColor: '#81c2f7'
-    },
-    '& .MuiDataGrid-row:nth-child(3)': {
-      backgroundColor: '#e6e5fe'
-    }
-  },
-
-  dateCardContainer: {
-    padding: theme.spacing(1, 2), 
-    border: '1px solid #000',
-    boxShadow: '2px 2px 6px #000',
-    cursor: 'pointer',
-    '&:hover': {
-      backgroundColor: theme.palette.primary.light,
-      color: theme.palette.common.white
-    }
-  },
-  dateCardContainerActive: {
-    backgroundColor: theme.palette.primary.main,
-    color: theme.palette.common.white
-  },
-}));
 
 const cols: GridColDef[] = [
   {
@@ -102,7 +38,12 @@ const cols: GridColDef[] = [
   {
     field: 'formTeacherName',
     headerName: 'Giáo viên chủ nhiệm',
-    flex: 1
+    width: 120
+  },
+  {
+    field: 'totalAbsence',
+    headerName: 'Lượt vắng',
+    width: 120
   },
   {
     field: 'faults',
@@ -113,14 +54,24 @@ const cols: GridColDef[] = [
   },
   {
     field: 'penaltyPoints',
-    headerName: 'Tổng điểm trừ',
+    headerName: 'Điểm trừ',
     width: 150,
     align: 'center',
     headerAlign: 'right'
   },
   {
-    field: 'totalPoints',
-    headerName: 'Tổng điểm',
+    field: 'lrPoints',
+    headerName: 'Điểm sổ đầu bài',
+    width: 120
+  },
+  {
+    field: 'dcpPoints',
+    headerName: 'Điểm nề nếp',
+    width: 120
+  },
+  {
+    field: 'rankingPoints',
+    headerName: 'Điểm thi đua',
     width: 150,
     align: 'center',
     headerAlign: 'right'
@@ -128,7 +79,7 @@ const cols: GridColDef[] = [
   {
     field: '',
     headerName: 'Chi tiết',
-    disableClickEventBubbling: true,
+    // disableClickEventBubbling: true,
     hideSortIcons: true,
     align: 'center',
     renderCell: (params) => {
@@ -149,21 +100,21 @@ const DCPRankingPage = () => {
 
   const classes = useStyles();
 
-  const [dateFilter, setDateFilter] = React.useState<{
+  const [dateFilter, setDateFilter] = useState<{
     startTime: Date | null,
     endTime: Date | null
   }>({startTime: getPreviousMonday(new Date()), endTime: new Date()})
 
-  const [data, setData] = React.useState<Stats.DcpClassRanking[]>([]);
-  const [loading, setLoading] = React.useState(false);
+  const [data, setData] = useState<Stats.OverallClassRanking[]>([]);
+  const [loading, setLoading] = useState(false);
   
-  const [viewType, setViewType] = React.useState<ViewType>('ByWeek');
+  const [viewType, setViewType] = useState<ViewType>('ByWeek');
 
-  React.useEffect(() => {
+  useEffect(() => {
     document.title = '2Cool | Xếp hạng thi đua nề nếp';
   }, []);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (dateFilter && dateFilter.startTime && dateFilter.endTime)  {
       fetchData();
     }
@@ -209,11 +160,11 @@ const DCPRankingPage = () => {
   };
 
   const fetchData = async () => {
-    try {
-      setLoading(true);
-      await sleep(200);
+    setLoading(true);
 
-      const res = await StatisticsService.getDcpRanking({
+    try {
+
+      const res = await StatisticsService.getOverallRanking({
         startTime: dateFilter.startTime!,
         endTime: dateFilter.endTime!
       });
@@ -227,12 +178,24 @@ const DCPRankingPage = () => {
   };
 
   const handleDownloadFile = () => {
-    StatisticsService.getDcpRankingExcel({
+    StatisticsService.getOverallRankingExcel({
       startTime: dateFilter.startTime!,
       endTime: dateFilter.endTime!
     });
-  }
+  };
 
+
+  const getRowClass = (param: GridRowParams): string => {
+    const ranking = param.getValue('ranking') as number;
+    if (ranking === 1) {
+      return classes.top1Item;
+    } else if (ranking === 2){
+      return classes.top2Item;
+    } else if  (ranking === 3){
+      return classes.top3Item;
+    }
+    return "";
+  };
 
   const handleViewTypeChange = (mode: ViewType) => {
     if (mode !== viewType) {
@@ -258,79 +221,97 @@ const DCPRankingPage = () => {
     <div style={{ height: '100%' }}>
       <Grid container className={classes.container}>
         <Grid item xs={4} sm={3} md={2}>
-          <Sidebar activeKey={'dcp-rankings'} />
+          <Sidebar activeKey={routes.DCPRanking} />
         </Grid>
-        <Grid style={{ height: '100%' }} item container xs={8} sm={9} md={10} direction={'column'}>
-          <Header />
-          <Grid item container direction='column' style={{ flex: 1, minHeight: 0, flexWrap: 'nowrap' }}>
-            <Grid item container justify='space-between' alignItems='center' className={classes.actionGroup}>
-              <Grid item container direction='row' alignItems='center' >
-                <Chip
-                  clickable label='Xếp hạng tuần' 
-                  onClick={() => handleViewTypeChange('ByWeek')}
-                  variant={viewType === 'ByWeek' ? 'default' : 'outlined'} 
-                  color={viewType === 'ByWeek' ? 'primary' : 'default'} style={{marginLeft: 16}}
-                  />
-                <Chip clickable label='Xếp hạng tháng' 
-                  onClick={() => handleViewTypeChange('ByMonth')}
-                  variant={viewType === 'ByMonth' ? 'default' : 'outlined'} 
-                  color={viewType === 'ByMonth' ? 'primary' : 'default'}
-                  style={{marginLeft: 8}}
-                />
-                <Chip clickable label='Xếp hạng học kỳ' 
-                  onClick={() => handleViewTypeChange('BySemester')}
-                  variant={viewType === 'BySemester' ? 'default' : 'outlined'} 
-                  color={viewType === 'BySemester' ? 'primary' : 'default'}
-                  style={{marginLeft: 8, marginRight: 16}}
-                />
-                <MuiPickersUtilsProvider utils={DateFnsUtils}>
-                  <Box>
-                    <KeyboardDatePicker
-                      style={{width: 150}}
-                      disableToolbar
-                      fullWidth
-                      size='small'
-                      variant='inline'
-                      format='dd/MM/yyyy'
-                      margin='dense'
-                      id='get-rankings-report-start'
-                      label='Bắt đầu từ'
-                      value={dateFilter.startTime}
-                      onChange={() => {}}
-                      KeyboardButtonProps={{
-                        'aria-label': 'dcp - rankings - change start date',
-                      }}
-                    />
-                  </Box>
-                  <Box>
-                    <KeyboardDatePicker
-                      style={{width: 150}}
-                      disableToolbar
-                      fullWidth
-                      size='small'
-                      variant='inline'
-                      format='dd/MM/yyyy'
-                      margin='dense'
-                      id='get-rankings-report-end'
-                      label='Đến ngày'
-                      value={dateFilter.endTime}
-                      onChange={() => {}}
-                      KeyboardButtonProps={{
-                        'aria-label': 'dcp - rankings - change end date',
-                      }}
-                    />
-                  </Box>
-                </MuiPickersUtilsProvider>
+        <Grid style={{ background: '#fff', flexGrow: 1 }} item container xs={8} sm={9} md={10} direction="column" >
+          <Grid item >
+            <Header
+              pageName="Xếp hạng thi đua nề nếp"
+            />
+          </Grid>
 
-                <Tooltip title='Tải báo cáo' style={{marginLeft: 'auto'}}>
-                  <IconButton color='primary' aria-label='Tải báo cáo' onClick={handleDownloadFile}>
-                    <GetAppIcon />
-                  </IconButton>
-                </Tooltip>
-              </Grid>
-      
+          <Grid item container direction="column" style={{ flex: 1, minHeight: 0, flexWrap: 'nowrap', background: "#e8e8e8" }}>
+            <Grid item container
+              style={{
+                paddingTop: 16, 
+                paddingRight: 24, 
+                paddingLeft: 24,
+                background: "#e8e8e8"
+              }}
+            >
+              <Paper variant="outlined" elevation={1} style={{ width: "100%" }}>
+                <Grid item container direction='row' alignItems='center' style={{ padding: "5px 32px", height: 54 }}>
+                  <Tooltip title="Bộ lọc" style={{ marginRight: 16 }}>
+                      <Badge color="primary" >
+                        <FilterIcon fontSize="small" />
+                      </Badge>
+                  </Tooltip>
+                  <Chip
+                    clickable label='Xếp hạng tuần' 
+                    onClick={() => handleViewTypeChange('ByWeek')}
+                    variant={viewType === 'ByWeek' ? 'default' : 'outlined'} 
+                    color={viewType === 'ByWeek' ? 'primary' : 'default'} style={{marginLeft: 16}}
+                    />
+                  <Chip clickable label='Xếp hạng tháng' 
+                    onClick={() => handleViewTypeChange('ByMonth')}
+                    variant={viewType === 'ByMonth' ? 'default' : 'outlined'} 
+                    color={viewType === 'ByMonth' ? 'primary' : 'default'}
+                    style={{marginLeft: 8}}
+                  />
+                  <Chip clickable label='Xếp hạng học kỳ' 
+                    onClick={() => handleViewTypeChange('BySemester')}
+                    variant={viewType === 'BySemester' ? 'default' : 'outlined'} 
+                    color={viewType === 'BySemester' ? 'primary' : 'default'}
+                    style={{marginLeft: 8, marginRight: 16}}
+                  />
+                  <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                    <Box>
+                      <KeyboardDatePicker
+                        style={{width: 150}}
+                        disableToolbar
+                        fullWidth
+                        size='small'
+                        variant='inline'
+                        format='dd/MM/yyyy'
+                        margin='dense'
+                        id='get-rankings-report-start'
+                        placeholder="Bắt đầu từ"
+                        value={dateFilter.startTime}
+                        onChange={() => {}}
+                        KeyboardButtonProps={{
+                          'aria-label': 'dcp - rankings - change start date',
+                        }}
+                      />
+                    </Box>
+                    <Box>
+                      <KeyboardDatePicker
+                        style={{width: 150}}
+                        disableToolbar
+                        fullWidth
+                        size='small'
+                        variant='inline'
+                        format='dd/MM/yyyy'
+                        margin='dense'
+                        id='get-rankings-report-end'
+                        placeholder="Đến ngày"
+                        value={dateFilter.endTime}
+                        onChange={() => {}}
+                        KeyboardButtonProps={{
+                          'aria-label': 'dcp - rankings - change end date',
+                        }}
+                      />
+                    </Box>
+                  </MuiPickersUtilsProvider>
+
+                  <Tooltip title='Tải báo cáo' style={{marginLeft: 'auto'}}>
+                    <IconButton color='primary' aria-label='Tải báo cáo' onClick={handleDownloadFile}>
+                      <GetAppIcon />
+                    </IconButton>
+                  </Tooltip>
+                </Grid>
+              </Paper>
             </Grid>              
-            <Grid item container direction={'row'} style={{ flex: 1, minHeight: 0, flexWrap: 'nowrap', padding: 16, paddingBottom: 0 }}>
+            <Grid item style={{ flexGrow: 1, paddingTop: 16, paddingBottom: 16, backgroundColor: '#e8e8e8'}}>
               <Container className={classes.datagridContainer}>
                 <DataGrid
                   columns={cols}
@@ -340,6 +321,7 @@ const DCPRankingPage = () => {
                   loading={loading}
                   hideFooter
                   getRowId={data => data.classId}
+                  getRowClassName={getRowClass}
                 />
               </Container>
             </Grid>

@@ -1,75 +1,21 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Container, Grid, Button, makeStyles, List, ListItem, Typography, IconButton, Menu, MenuItem, Tooltip, TextField } from '@material-ui/core';
-import React from 'react';
-import { useHistory } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { Container, Grid, Typography, IconButton, Paper } from '@material-ui/core';
 import Header from '../components/Header';
 import Sidebar from '../components/Sidebar';
-import { Class, Identity, Student, TaskAssignment, Util } from '../common/interfaces';
-import { DataGrid, GridColDef, GridValueFormatterParams } from '@material-ui/data-grid';
-import { ClassesService, IdentityService, TaskAssignmentService } from '../common/api';
-import { getDayOfWeek, formatTime, formatDate } from '../common/utils/TimeHelper';
-import { taskType } from '../common/appConsts';
-import { FindInPage } from '@material-ui/icons';
+import { Class, Identity, TaskAssignment, User, Util } from '../interfaces';
+import { ClassesService, IdentityService, TaskAssignmentService } from '../api';
+import { getDayOfWeek, formatTime, formatDate } from '../utils/TimeHelper';
+import { taskType } from '../appConsts';
 import AlarmIcon from '@material-ui/icons/Alarm';
 import PermContactCalendarIcon from '@material-ui/icons/PermContactCalendar';
-import CheckIcon from '@material-ui/icons/Check';
-import { sleep } from '../common/utils/SetTimeOut';
-import { Autocomplete } from '@material-ui/lab';
-import { toast } from 'react-toastify';
+import EditIcon from '@material-ui/icons/Edit';
+import { routes } from '../routers/routesDictionary';
+import { DataGrid, GridApi, GridCellParams, GridColDef, GridRowId, GridValueFormatterParams } from '@material-ui/data-grid';
 import ActionModal from '../components/Modal';
-
-
-const useStyles = makeStyles(theme => ({
-  container: {
-    height: '100%',
-
-    '& .MuiGrid-container': {
-      flexWrap: 'nowrap'
-    }
-  },
-  actionGroup: {
-    padding: theme.spacing(1, 4),
-    borderBottom: `1px solid ${theme.palette.divider}`
-  },
-  list: {
-    // overflowY: 'scroll'
-    // padding: '20px 100px' 
-  },
-  datagridContainer: {
-    // height: '100%', 
-    width: '100%',
-    '& .MuiDataGrid-columnSeparator': {
-      display: 'none'
-    },
-    '& .MuiDataGrid-colCellTitle': {
-      fontWeight: 700,
-    },
-    '& .MuiDataGrid-root': {
-      border: 'none',
-      '& .MuiDataGrid-withBorder': {
-        borderRight: 'none',
-      }
-    },
-    '& .MuiDataGrid-root.MuiDataGrid-colCellMoving': {
-      backgroundColor: 'inherit'
-    }
-  },
-
-  dateCardContainer: {
-    padding: theme.spacing(1, 2), 
-    border: '1px solid #000',
-    boxShadow: '2px 2px 6px #000',
-    cursor: 'pointer',
-    '&:hover': {
-      backgroundColor: theme.palette.primary.light,
-      color: theme.palette.common.white
-    }
-  },
-  dateCardContainerActive: {
-    backgroundColor: theme.palette.primary.main,
-    color: theme.palette.common.white
-  },
-}));
+import UpdateLRKeeperRequest from '../components/Modal/UpdateLRKeeperRequest';
+import { toast } from 'react-toastify';
+import useStyles from '../assets/jss/views/LessonRegisterReportSchedule';
 
 
 interface IAssignClass {
@@ -78,89 +24,112 @@ interface IAssignClass {
   assigned: boolean;
 }
 
-const AssignCard = ({
-  index,
-  selectedUser,
-  onSelectedUserChange,
-  userOptions,
-  iclass,
-  editable = false
-}: {
-  index: number;
-  iclass: Class.ClassForSimpleListDto;
-  userOptions: Identity.UserForTaskAssignmentDto[];
-  selectedUser?: TaskAssignment.UserProfleForTaskAssignmentDto;
-  onSelectedUserChange: (selectedUser: Identity.UserForTaskAssignmentDto | null) => void;
-  editable: boolean;
-}) => {
+interface RowMenuProps {
+  api: GridApi;
+  id: GridRowId;
+}
 
-  const [ selected, setSelected ] = React.useState<Identity.UserForTaskAssignmentDto | null>(null);
-
-  React.useEffect(() => {
-    if (selectedUser) {
-      const user = userOptions.find(x => x.userProfileId === selectedUser?.id);
-      if (user) {
-        setSelected(user);
-      }
-    }
-  }, []);
-
-  const handleOnChange = (value: Identity.UserForTaskAssignmentDto | null) => {
-    setSelected(value);
-      onSelectedUserChange(value);
-  };
-  
+const RowMenuCell = (props: RowMenuProps) => {
 
   return (
-    <Grid container justify='center' alignItems='center' >
-      <p>{iclass.name}</p>
-      <Autocomplete
-        id={`lr-report-schedule-${index}`}
-        disabled={!editable}
-        style={{width: 300, marginLeft: 32}}
-        options={userOptions.sort((x, y) => x.name.localeCompare(y.name))}
-        getOptionLabel={(option) => option.name}
-        getOptionSelected={(option, value) => option.id === value.id}
-        value={selected}
-        onChange={(e, newValue) => handleOnChange(newValue)}
-        size='small'
-        renderInput={(params) => (
-          <TextField {...params} 
-            variant='outlined' 
-            label='Học sinh giữ sổ đầu bài' 
-            placeholder='Chọn học sinh' 
-          />
-        )}
-      />
+    <Grid container justify="center">
+      <IconButton
+        size="small"
+        style={{ marginLeft: -16 }}
+        >
+        <EditIcon />
+      </IconButton>
     </Grid>
   );
 };
 
+
+const cols: GridColDef[] = [
+  {
+    field: 'id',
+    headerName: 'Mã',
+    hide: true
+  },
+  {
+    field: 'classAssigned',
+    headerName: 'Lớp trực',
+    width: 120,
+    valueFormatter: (params: GridValueFormatterParams) => {
+      const value = params.value as Class.ClassForSimpleListDto;
+      return value.name;
+    }
+  },
+  {
+    field: 'assignee',
+    headerName: 'Cờ đỏ chấm ',
+    flex: 1,
+    valueFormatter: (params: GridValueFormatterParams) => {
+      const value = params.value as TaskAssignment.UserProfleForTaskAssignmentDto;
+      return value.name;
+    },
+  },
+  {
+    field: 'belongsToClass',
+    headerName: 'Thuộc lớp ',
+    width: 120,
+    valueFormatter: (params: GridValueFormatterParams) => {
+      const value = params.getValue('assignee') as TaskAssignment.UserProfleForTaskAssignmentDto;
+      return value.class.name;
+    },
+  },
+  {
+    field: 'startTime',
+    headerName: 'Bắt đầu từ',
+    width: 150,
+    valueFormatter: (params: GridValueFormatterParams) => {
+      const value = params.value as Date;
+      return formatDate(value.toLocaleString());
+    }
+  },
+  {
+    field: 'endTime',
+    headerName: 'Đến',
+    width: 150,
+    valueFormatter: (params: GridValueFormatterParams) => {
+      const value = params.value as Date;
+      return formatDate(value.toLocaleString());
+    }
+  },
+  {
+    field: 'edit',
+    headerName: 'Cập nhật',
+    align: 'center',
+    headerAlign: 'center',
+    width: 120,
+    renderCell: RowMenuCell,
+  }
+];
 
 
 const LessonRegisterReportSchedule = () => {
 
   const classes = useStyles();
 
-  const [updatedTime, setUpdatedTime] = React.useState(new Date());
-  const [creatorInfo, setCreatorInfo] = React.useState<Util.IObject>({});
+  const [ updatedTime, setUpdatedTime] = useState<Date>();
+  const [ creatorInfo, setCreatorInfo ] = useState<User.UserForSimpleListDto>();
 
-  const [userData, setUserData] = React.useState<Identity.UserForTaskAssignmentDto[]>([]);
-  const [classData, setClassData] = React.useState<Class.ClassForSimpleListDto[]>([]);
-  const [assignClasses, setAssignClasses] = React.useState<IAssignClass[]>([]);
-  const [date, setDate] = React.useState(new Date());
-  const [edit, setEdit] = React.useState(false);
+  const [ userData, setUserData ] = useState<Identity.UserForTaskAssignmentDto[]>([]);
+  const [ classData, setClassData ] = useState<Class.ClassForSimpleListDto[]>([]);
+  const [ assignClasses, setAssignClasses ] = useState<IAssignClass[]>([]);
+
+  const [ data, setData ] = useState<TaskAssignment.TaskAssignmentDto[]>([]);
+  const [ loading, setLoading ] = useState(true);
 
 
-  React.useEffect(() => {
+  useEffect(() => {
     
     document.title = '2Cool | Phân công nộp sổ đầu bài';
     getData();
 
   }, []);
 
-
   const getData = async () => {
+    setLoading(true);
     const promises: [
       Promise<Util.PagingModel<Class.ClassForSimpleListDto>>,
       Promise<Util.PagingModel<Identity.UserForTaskAssignmentDto>>,
@@ -172,150 +141,200 @@ const LessonRegisterReportSchedule = () => {
     ];
 
     const [classRes, userRes, taskAssignRes] = await Promise.all(promises);
+
+    // schedule
+    setData(taskAssignRes.items);
+    
     setClassData(classRes.items);
     setUserData(userRes.items);
+    parseAssignmentScheduleData(classRes.items, taskAssignRes.items);
+    setLoading(false);
+  };
+
+  const parseAssignmentScheduleData = (classItems: Class.ClassForSimpleListDto[],
+    taskAssignItems: TaskAssignment.TaskAssignmentDto[]) => {
+
+    if (taskAssignItems.length > 0) {
+      const firstItem = taskAssignItems[0];
+      setCreatorInfo(firstItem.creator);
+      setUpdatedTime(firstItem.creationTime);
+    }
 
     const assigns: IAssignClass[] = [];
 
-    classRes.items.forEach(el => {
-      const status = taskAssignRes.items.find(x => x.classAssigned.id === el.id);
+    classItems.forEach(el => {
+      const status = taskAssignItems.find((x) => x.classAssigned.id === el.id);
       assigns.push({
         classId: el.id,
         assigned: status ? true : false,
         user: status?.assignee
       });
     });
-   
-    if (taskAssignRes.items.length > 0) {
-      const firstItem = taskAssignRes.items[0];
-      setDate(firstItem.creationTime);
-    }
+    
     setAssignClasses(assigns);
   };
   
-  const getClass = (classId: string) => {
-    return classData.find(x => x.id === classId);
+  const handleSubmit = async (assigment: IAssignClass[]) => {
+    try {
+      const body: TaskAssignment.CreateUpdateTaskAssignmentDto = {
+        items: [],
+        taskType: taskType.LessonRegisterReport
+      };
+
+      body.items = assigment.map(x => ({
+        assigneeId: x.user!.id,
+        classId: x.classId,
+        startTime: new Date(),
+        endTime: new Date()
+      }));
+
+      await TaskAssignmentService.createUpdate(body);
+      
+      toast.success('Phân công thành công!');
+
+    } catch (err) {
+      console.log(err);
+      toast.error('Đã có lỗi xảy ra! Không thể lưu phân công!');
+    }
   };
 
-  const handleSubmit = () => {
-
-    if (!edit) {
-      setEdit(true);
-      return;
-    }
-
-    // no unassigned class
-    if (assignClasses.findIndex(x => x.assigned === false || !x.user) !== -1) {
-      return toast.info('Vui lòng phân công đầy đủ cho các lớp trước khi lưu!', {
-        autoClose: 5000
+  const onUpdateAssignment = async ({ classId, userId } : {
+    classId: string; userId: string;
+  }) =>  {
+    const newAssignment = [...assignClasses];
+    const assign = newAssignment.find(x => x.classId === classId);
+    const user = userData.find(x => x.userProfileId === userId);
+    const userProfile = {
+      id: user!.userProfileId,
+      name: user!.name,
+      phoneNumber: user!.phoneNumber,
+      class: user!.class
+    };
+    if (assign) {
+      assign.assigned = true;
+      assign.user = userProfile;
+    } else {
+      newAssignment.push({
+        assigned: true,
+        classId: classId,
+        user: userProfile,
       });
     }
-
-    // oke
-    ActionModal.show({
-      title: 'Xác nhận cập nhật phân công giữ sổ đầu bài?',
-      onAccept: async () => {
-        try {
-          const body: TaskAssignment.CreateUpdateTaskAssignmentDto = {
-            items: [],
-            taskType: taskType.LessonRegisterReport
-          };
-
-          body.items = assignClasses.map(x => ({
-            assigneeId: x.user!.id,
-            classId: x.classId,
-            startTime: new Date(),
-            endTime: new Date()
-          }));
-
-          await TaskAssignmentService.createUpdate(body);
-          
-          toast.success('Phân công lịch trực cờ đỏ thành công!');
-
-          setEdit(false);
-        } catch (err) {
-          console.log(err);
-          toast.error('Đã có lỗi xảy ra! Không thể lưu phân công!');
-        }
-      }
-    });
-  }
-  
-  const handleSelectedUserItemChange = (classId: string, selectedUser: Identity.UserForTaskAssignmentDto  | null) => {
-    const assign = [...assignClasses];
-    const item = assign.find(x => x.classId === classId);
-    console.log({item});
-    if (item && selectedUser) {
-      item.assigned = true;
-      item.user = {
-        id: selectedUser.userProfileId,
-        name: selectedUser.name,
-        class: selectedUser.class,
-        phoneNumber: selectedUser.phoneNumber
-      }
-    }
-    setAssignClasses(assign);
+    setAssignClasses(newAssignment);
+    await handleSubmit(newAssignment);
+    setLoading(true);
+    const newDataRes = await TaskAssignmentService.getAll({taskType: taskType.LessonRegisterReport});
+    setData(newDataRes.items);
+    parseAssignmentScheduleData(classData, newDataRes.items);
+    setLoading(false);
   };
 
-  React.useEffect(() => {
-    console.log({assignClasses});
-  }, [assignClasses]);
+  const handleEditAssignment = (classId: string) => {
+
+    const classItem = classData.find(x => x.id === classId);
+    if (classItem) {
+
+      const assign = assignClasses.find(x => x.classId === classId);
+
+      ActionModal.show({
+        title: `Chọn học sinh giữ sổ đầu bài cho ${classItem.name}`,
+        onAccept: onUpdateAssignment,
+        acceptText: "Lưu phân công",
+        component: <UpdateLRKeeperRequest 
+          classId={classId}
+          assignedStudentId={assign?.user?.id}
+          />
+      });
+    }
+  };
+
+  const timeText = 'Cập nhật lần cuối vào ' + (updatedTime ? `${getDayOfWeek(updatedTime.toLocaleString())} - ${formatTime(updatedTime.toLocaleString())}` : 'Không xác định');
+  const creatorText = creatorInfo ? `Phân công bởi ${creatorInfo.name}` : 'Chưa được ai phân công';
 
   return (
     <div style={{ height: '100%' }}>
       <Grid container className={classes.container}>
         <Grid item xs={4} sm={3} md={2}>
-          <Sidebar activeKey={'lessons-register-report-schedule-assignment'} />
+          <Sidebar activeKey={routes.LRReportSchedule} />
         </Grid>
         <Grid style={{ height: '100%' }} item container xs={8} sm={9} md={10} direction={'column'}>
-          <Header />
-          <Grid item container direction='column' style={{ flex: 1, minHeight: 0, flexWrap: 'nowrap' }}>
+          <Grid item >
+            <Header
+              pageName="Phân công giữ sổ đầu bài"
+            />
+          </Grid>
+
+          <Grid item container direction='column' style={{ flex: 1, minHeight: 0, flexWrap: 'nowrap', background: "#e8e8e8" }}>
+            <Grid item container
+              style={{
+                paddingTop: 16, 
+                paddingRight: 24, 
+                paddingLeft: 24,
+                background: "#e8e8e8"
+              }}
+            >
+              <Paper variant="outlined" elevation={1} style={{ width: "100%" }}>
+                <Grid item container direction='row' alignItems='center' style={{ padding: "5px 32px", height: 54 }}>
+                  <Grid item container direction={'row'} alignItems={'center'}>
+                    <AlarmIcon style={{ marginRight: 8 }}/>
+                    <Typography variant={'body2'}>{timeText}</Typography>
+                  </Grid>
+                  <Grid item container direction={'row'} alignItems={'center'}>
+                    <PermContactCalendarIcon style={{ marginRight: 8 }}/>
+                    <Typography variant={'body2'}>{creatorText}</Typography>
+                  </Grid>
+                </Grid>
+              </Paper>
+            </Grid>              
+            <Grid item style={{ flexGrow: 1, paddingTop: 16, paddingBottom: 16, backgroundColor: '#e8e8e8'}}>
+              <Container className={classes.datagridContainer}>
+                <DataGrid
+                  columns={cols}
+                  rows={data}
+                  hideFooter
+                  hideFooterPagination
+                  loading={loading}
+                  onCellClick={(params: GridCellParams) =>  {
+                    if (params.colIndex === 5) {
+                      const classItem = params.getValue('classAssigned') as Class.ClassForSimpleListDto
+                      handleEditAssignment(classItem.id);
+                    }
+                  }}
+                />
+              </Container>
+            </Grid>
+          </Grid>
+
+          {/* <Grid item container direction='column' style={{ flex: 1, minHeight: 0, flexWrap: 'nowrap' }}>
             <Grid item container alignItems='center' className={classes.actionGroup}>
               <Grid item container direction='row' alignItems='center' style={{paddingTop: 12, paddingBottom: 12, flex: 1}}>
                 <Grid item container direction={'row'} alignItems={'center'}>
                   <AlarmIcon style={{ marginRight: 8 }}/>
-                  <Typography variant={'body2'}>{`Cập nhật lần cuối vào ${getDayOfWeek(updatedTime.toLocaleString())} - ${formatTime(updatedTime.toLocaleString())}`}</Typography>
+                  <Typography variant={'body2'}>{`Cập nhật lần cuối vào ${timeText}`}</Typography>
                 </Grid>
                 <Grid item container direction={'row'} alignItems={'center'}>
                   <PermContactCalendarIcon style={{ marginRight: 8 }}/>
-                  <Typography variant={'body2'}>{`Phân công bởi Lê Anh Tuấn`}</Typography>
+                  <Typography variant={'body2'}>{creatorText}</Typography>
                 </Grid>
               </Grid>
-              <Button 
-                variant={'contained'} 
-                color={'primary'}
-                style={{marginLeft: 'auto'}}
-                onClick={handleSubmit}
-                endIcon={edit && <CheckIcon />}
-              >
-                {edit ?  'Lưu phân công' : 'Cập nhật phân công'}
-              </Button>
             </Grid>              
             <Grid item container direction={'row'} style={{ flex: '1 1 0', minHeight: 0, flexWrap: 'nowrap', padding: 16, paddingBottom: 0, overflowX: 'hidden', overflowY: 'auto' }}>
               <Container className={classes.datagridContainer}>
-                <List>
-                  {
-                    assignClasses
-                      .sort((x, y) => 
-                        getClass(x.classId)!.name.localeCompare(getClass(y.classId)!.name))
-                      .map((el, index) => (
-                      <ListItem key={el.classId}>
-                        <AssignCard 
-                          index={index}
-                          iclass={getClass(el.classId)!}
-                          userOptions={userData.filter(x => x.class.id === el.classId)}
-                          selectedUser={el.user} 
-                          onSelectedUserChange={(value) => handleSelectedUserItemChange(el.classId, value)}
-                          editable={edit}
-                          />
-                      </ListItem>
-                    ))
-                  }
-                 
-                </List>
+                <DataGrid
+                  columns={cols}
+                  rows={data}
+                  hideFooter
+                  hideFooterPagination
+                  onCellClick={(params: GridCellParams) =>  {
+                    if (params.colIndex === 5) {
+                      const classItem = params.getValue('classAssigned') as Class.ClassForSimpleListDto
+                      handleEditAssignment(classItem.id);
+                    }
+                  }}
+                />
               </Container>
             </Grid>
-          </Grid>
+          </Grid> */}
         </Grid>
       </Grid>
     </div>
