@@ -52,6 +52,14 @@ jobs:
             echo "Build Successfully"
       - run:
           working_directory: ~/project
+          name: Remove old distribution folder
+          command: |
+            /usr/bin/ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no $DROPLET_USER@$DROPLET_IP "
+              var /var/www/2scool-web
+              rm -r dist
+            "
+      - run:
+          working_directory: ~/project
           name: Copy distribution folder to hosting VPS
           command: |
             scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -r ~/project/dist $DROPLET_USER@$DROPLET_IP:/var/www/2scool-web/
