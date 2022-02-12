@@ -8,8 +8,14 @@ jobs:
       - checkout
       - run:
           working_directory: ~/project
+          name: Install yarn
+          command: |
+            curl -o- -L https://yarnpkg.com/install.sh | bash
+      - run:
+          working_directory: ~/project
           name: Run build
           command: |
+            npm ci
             npm run build
   deployment:
     docker:
@@ -48,6 +54,7 @@ jobs:
           working_directory: ~/project
           name: Build React Application for release
           command: |
+            yarn
             yarn build
             mv -v build/* dist
             echo "Build Successfully"
