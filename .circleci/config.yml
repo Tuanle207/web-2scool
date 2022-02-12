@@ -28,7 +28,7 @@ jobs:
           name: Fill Enviroment Variables in configuration files
           command: |
 
-            sed -i "s%<HOST_URL>%$HOST_URLL%g" 2scool-web.nginx
+            sed -i "s%<HOST_URL>%$DROPLET_IP%g" 2scool-web.nginx
 
             #Fill deployment.ts and replace in env config file
             sed -i "s%<API_URL>%$API_URL%g" src/config/env/deployment.ts
