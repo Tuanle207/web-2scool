@@ -10,7 +10,7 @@ jobs:
           working_directory: ~/project
           name: Run build
           command: |
-            yarn ci
+            yarn install --frozen-lockfile
             yarn build
   deployment:
     docker:
@@ -44,7 +44,7 @@ jobs:
           working_directory: ~/project
           name: Build React Application for release
           command: |
-            yarn ci
+            yarn install --frozen-lockfile
             yarn build
             mv -v build/* dist
             echo "Build Successfully"
