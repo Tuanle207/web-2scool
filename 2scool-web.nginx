@@ -3,7 +3,7 @@ server {
     listen [::]:80 default_server;
     root /var/www/2scool-web/dist/;
     index index.html index.htm;
-    server_name <HOST_IP> tuanle207.tech;
+    server_name <HOST_IP> quanlynenep.tech;
 
   location ~* \.(?:css|js)$ {
     try_files $uri =404;

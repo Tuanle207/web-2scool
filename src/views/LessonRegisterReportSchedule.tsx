@@ -15,8 +15,8 @@ import { DataGrid, GridApi, GridCellParams, GridColDef, GridRowId, GridValueForm
 import ActionModal from '../components/Modal';
 import UpdateLRKeeperRequest from '../components/Modal/UpdateLRKeeperRequest';
 import { toast } from 'react-toastify';
+import moment from 'moment';
 import useStyles from '../assets/jss/views/LessonRegisterReportSchedule';
-
 
 interface IAssignClass {
   classId: string;
@@ -65,7 +65,7 @@ const cols: GridColDef[] = [
     flex: 1,
     valueFormatter: (params: GridValueFormatterParams) => {
       const value = params.value as TaskAssignment.UserProfleForTaskAssignmentDto;
-      return value.name;
+      return value.name ?? 'Chưa phân công';
     },
   },
   {
@@ -74,7 +74,7 @@ const cols: GridColDef[] = [
     width: 120,
     valueFormatter: (params: GridValueFormatterParams) => {
       const value = params.getValue('assignee') as TaskAssignment.UserProfleForTaskAssignmentDto;
-      return value.class.name;
+      return value?.class?.name ?? 'Chưa phân công' ;
     },
   },
   {
@@ -154,6 +154,7 @@ const LessonRegisterReportSchedule = () => {
   const parseAssignmentScheduleData = (classItems: Class.ClassForSimpleListDto[],
     taskAssignItems: TaskAssignment.TaskAssignmentDto[]) => {
 
+    const data: TaskAssignment.TaskAssignmentDto[] = [];
     if (taskAssignItems.length > 0) {
       const firstItem = taskAssignItems[0];
       setCreatorInfo(firstItem.creator);
@@ -161,6 +162,8 @@ const LessonRegisterReportSchedule = () => {
     }
 
     const assigns: IAssignClass[] = [];
+    const startTime = taskAssignItems.length > 0 ? taskAssignItems[0].startTime : new Date();
+    const endTime = taskAssignItems.length > 0  ? taskAssignItems[0].endTime : moment().add(1, 'y').toDate();
 
     classItems.forEach(el => {
       const status = taskAssignItems.find((x) => x.classAssigned.id === el.id);
@@ -169,6 +172,19 @@ const LessonRegisterReportSchedule = () => {
         assigned: status ? true : false,
         user: status?.assignee
       });
+
+      const classSche = taskAssignItems.find(x => x.classAssigned.id === el.id);
+      if (classSche) {
+        data.push(classSche);
+      } else {
+        data.push({
+          id: el.id,
+          classAssigned: el,
+          assignee: {} as TaskAssignment.UserProfleForTaskAssignmentDto,
+          startTime,
+          endTime
+        } as TaskAssignment.TaskAssignmentDto);
+      }
     });
     
     setAssignClasses(assigns);
