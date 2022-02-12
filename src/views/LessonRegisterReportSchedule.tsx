@@ -142,9 +142,6 @@ const LessonRegisterReportSchedule = () => {
 
     const [classRes, userRes, taskAssignRes] = await Promise.all(promises);
 
-    // schedule
-    setData(taskAssignRes.items);
-    
     setClassData(classRes.items);
     setUserData(userRes.items);
     parseAssignmentScheduleData(classRes.items, taskAssignRes.items);
@@ -154,7 +151,7 @@ const LessonRegisterReportSchedule = () => {
   const parseAssignmentScheduleData = (classItems: Class.ClassForSimpleListDto[],
     taskAssignItems: TaskAssignment.TaskAssignmentDto[]) => {
 
-    const data: TaskAssignment.TaskAssignmentDto[] = [];
+    const scheData: TaskAssignment.TaskAssignmentDto[] = [];
     if (taskAssignItems.length > 0) {
       const firstItem = taskAssignItems[0];
       setCreatorInfo(firstItem.creator);
@@ -175,9 +172,9 @@ const LessonRegisterReportSchedule = () => {
 
       const classSche = taskAssignItems.find(x => x.classAssigned.id === el.id);
       if (classSche) {
-        data.push(classSche);
+        scheData.push(classSche);
       } else {
-        data.push({
+        scheData.push({
           id: el.id,
           classAssigned: el,
           assignee: {} as TaskAssignment.UserProfleForTaskAssignmentDto,
@@ -187,6 +184,7 @@ const LessonRegisterReportSchedule = () => {
       }
     });
     
+    setData(scheData);
     setAssignClasses(assigns);
   };
   
