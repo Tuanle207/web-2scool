@@ -6,11 +6,22 @@ jobs:
       - image: yarnpkg/dev:latest
     steps:
       - checkout
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "package.json" }}
+            # fallback to using the latest cache if no exact match is found
+            - v1-dependencies-
+      - run: yarn install
+      - save_cache:
+          paths:
+            - node_modules
+            - ~/.npm
+            - ~/.cache
+          key: v1-dependencies-{{ checksum "package.json" }}
       - run:
           working_directory: ~/project
           name: Run build
           command: |
-            yarn install --frozen-lockfile
             yarn build
   deployment:
     docker:
@@ -20,12 +31,26 @@ jobs:
       - add_ssh_keys:
           fingerprints:
             - $SSH_FINGERPRINT
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "package.json" }}
+            # fallback to using the latest cache if no exact match is found
+            - v1-dependencies-
+      - run: yarn install
+      - save_cache:
+          paths:
+            - node_modules
+            - ~/.npm
+            - ~/.cache
+          key: v1-dependencies-{{ checksum "package.json" }}
       # Get ENV Variables from CircleCI and fill them into configuration files
       # Then copy them to distribution directory
       - run:
           working_directory: ~/project
           name: Fill Enviroment Variables in configuration files
           command: |
+
+            sed -i "s%<HOST_URL>%$HOST_URLL%g" 2scool-web.nginx
 
             #Fill deployment.ts and replace in env config file
             sed -i "s%<API_URL>%$API_URL%g" src/config/env/deployment.ts
@@ -37,14 +62,13 @@ jobs:
 
             #Copy nginx config to output folder
             mkdir dist
-            cp 2scool-api.nginx dist/
+            cp 2scool-web.nginx dist/
             
             echo "Fill Enviroment Variables in configuration files Successfully"
       - run:
           working_directory: ~/project
-          name: Build React Application for release
+          name: Run build
           command: |
-            yarn install --frozen-lockfile
             yarn build
             mv -v build/* dist
             echo "Build Successfully"
@@ -54,7 +78,6 @@ jobs:
           command: |
             scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -r ~/project/dist $DROPLET_USER@$DROPLET_IP:/var/www/2scool-web/
             echo "Copy distribution folder to hosting VPS Successfully"
-      # Run database migrations
       - run:
           name: Update Nginx configs
           command: |
