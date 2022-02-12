@@ -3,23 +3,18 @@ version: 2.1
 jobs:
   build:
     docker:
-      - image: circleci/node:12.9.1-browsers
+      - image: yarnpkg/dev:latest
     steps:
       - checkout
       - run:
           working_directory: ~/project
-          name: Install yarn
-          command: |
-            curl -o- -L https://yarnpkg.com/install.sh | bash
-      - run:
-          working_directory: ~/project
           name: Run build
           command: |
-            npm ci
-            npm run build
+            yarn ci
+            yarn build
   deployment:
     docker:
-      - image: circleci/node:12.9.1-browsers
+      - image: yarnpkg/dev:latest
     steps:
       - checkout
       - add_ssh_keys:
@@ -27,11 +22,6 @@ jobs:
             - $SSH_FINGERPRINT
       # Get ENV Variables from CircleCI and fill them into configuration files
       # Then copy them to distribution directory
-      - run:
-          working_directory: ~/project
-          name: Install yarn
-          command: |
-            curl -o- -L https://yarnpkg.com/install.sh | bash
       - run:
           working_directory: ~/project
           name: Fill Enviroment Variables in configuration files
@@ -54,7 +44,7 @@ jobs:
           working_directory: ~/project
           name: Build React Application for release
           command: |
-            yarn
+            yarn ci
             yarn build
             mv -v build/* dist
             echo "Build Successfully"
