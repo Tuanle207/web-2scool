@@ -323,7 +323,7 @@ const LRReportApprovalPage = () => {
   ] });
  
   useEffect(() => {
-    document.title = '2Cool | Duyệt sổ đầu bài';
+    document.title = '2Scool | Duyệt sổ đầu bài';
   }, []);
 
   useEffect(() => {
