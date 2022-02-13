@@ -171,7 +171,7 @@ const DCPStatisticsPage = () => {
   const [viewType, setViewType] = React.useState<ViewType>('ByWeek');
 
   React.useEffect(() => {
-    document.title = '2Cool | Thống kê nề nếp';
+    document.title = '2Scool | Thống kê nề nếp';
   }, []);
 
   React.useEffect(() => {

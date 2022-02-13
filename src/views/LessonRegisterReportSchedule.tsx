@@ -123,7 +123,7 @@ const LessonRegisterReportSchedule = () => {
 
   useEffect(() => {
     
-    document.title = '2Cool | Phân công nộp sổ đầu bài';
+    document.title = '2Scool | Phân công nộp sổ đầu bài';
     getData();
 
   }, []);
