@@ -74,7 +74,7 @@ const DCPReportUpdatePage: FC<Props> = () => {
       setCriteriaOptions(criterias);
       dispatch(DcpReportActions.initDcpReport(dcpReportRes as DcpReport.CreateUpdateDcpReportDto));
     
-      document.title = '2Cool | Cập nhật phiếu chấm điểm nề nếp';
+      document.title = '2Scool | Cập nhật phiếu chấm điểm nề nếp';
     };
 
     initData();

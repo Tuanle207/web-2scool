@@ -263,7 +263,7 @@ const MyDCPReportPage = () => {
   ] });
  
   useEffect(() => {
-    document.title = '2Cool | Phiếu chấm nề nếp của tôi';
+    document.title = '2Scool | Phiếu chấm nề nếp của tôi';
   }, []);
 
   useEffect(() => {

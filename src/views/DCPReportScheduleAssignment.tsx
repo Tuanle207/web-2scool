@@ -59,7 +59,7 @@ const DCPReportScheduleAssignment = () => {
 
   React.useEffect(() => {
     
-    document.title = '2Cool | Phân công lịch trực cờ đỏ';
+    document.title = '2Scool | Phân công lịch trực cờ đỏ';
     
     initData();
 

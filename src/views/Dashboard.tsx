@@ -64,7 +64,7 @@ const Dashboard = () => {
 
     fetchData();
 
-    document.title = "Trang chủ";
+    document.title = "2Scool | Trang chủ";
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

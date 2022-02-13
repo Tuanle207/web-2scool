@@ -111,7 +111,7 @@ const DCPRankingPage = () => {
   const [viewType, setViewType] = useState<ViewType>('ByWeek');
 
   useEffect(() => {
-    document.title = '2Cool | Xếp hạng thi đua nề nếp';
+    document.title = '2Scool | Xếp hạng thi đua nề nếp';
   }, []);
 
   useEffect(() => {

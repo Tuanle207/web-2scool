@@ -284,7 +284,7 @@ const DCPReportsApprovalPage = () => {
   ] });
 
   useEffect(() => {
-    document.title = '2Cool | Duyệt chấm điểm nề nếp';
+    document.title = '2Scool | Duyệt chấm điểm nề nếp';
   }, []);
 
   useEffect(() => {

@@ -35,7 +35,7 @@ const LessonRegisterReportCreate = () => {
   const [reportClass, setReportClass] = React.useState<Class.ClassForSimpleListDto>();
 
   React.useEffect(() => {
-    document.title = '2Cool | Nộp sổ đầu bài';
+    document.title = '2Scool | Nộp sổ đầu bài';
   }, []);
 
   React.useEffect(() => {
