@@ -5,7 +5,7 @@ import redux from '../../store';
 import { IState } from '../../store/reducers';
 import { AuthService } from '../../api';
 import { AuthActions } from '../../store/actions';
-import { isTokenExpired } from './util';
+// import { isTokenExpired } from './util';
 
 export const configHttpRequest = (axios: AxiosInstance) => {
   axios.interceptors.request.use(async (config: AxiosRequestConfig) => {
@@ -17,7 +17,8 @@ export const configHttpRequest = (axios: AxiosInstance) => {
     }
 
     const state = redux.store.getState() as IState;
-    const { token, issuedAt, expiresIn, refreshToken } = state.auth;
+    const { token } = state.auth;
+    // const { token, issuedAt, expiresIn, refreshToken } = state.auth;
 
     config.headers['Authorization'] = `Bearer ${token}`;
 
