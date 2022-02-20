@@ -1,4 +1,5 @@
 import jwt_decode, { JwtPayload } from 'jwt-decode';
+import moment from 'moment';
 import { Util } from '../../interfaces';
 
 export const parseQueryString = (params: Util.IObject = {}) => {
@@ -20,6 +21,12 @@ export class HttpException<T = any> {
   }
 }
 
+/**
+ * Validate token with token itself
+ * @param token 
+ * @returns true if token is valid
+ * @deprecated Don't validate decode token in client side! User use isTokenExpired() insted
+ */
 export const isTokenValid = (token: string): boolean => {
   if (!token) {
     return false;
@@ -35,4 +42,11 @@ export const isTokenValid = (token: string): boolean => {
     console.log('invalid')
     return false;
   }
+};
+
+export const isTokenExpired = (issuedAt: Date, expiresIn: number) => {
+  const DELAY_FROM_REQUESTING_TOKEN_FROM_SERVER = 10; // second
+  const currentTime = moment();
+  const expiryTime = moment(issuedAt).add(expiresIn - DELAY_FROM_REQUESTING_TOKEN_FROM_SERVER, 'seconds');
+  return expiryTime.isAfter(currentTime);
 };

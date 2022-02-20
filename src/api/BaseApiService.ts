@@ -37,13 +37,12 @@ export const getAuthService = () => {
 
   const httpClient = new HttpClient({baseUrl: baseurl, options: {
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    // withCredentials: true
   }});
 
   return httpClient;
 };
 
-export const getDefaultOAuthOptions = () => {
+export const getLoginUrlEncodedOptions = () => {
   const { oAuthConfig } = ENV;
   return {
     'grant_type': 'password',
@@ -51,4 +50,14 @@ export const getDefaultOAuthOptions = () => {
     'client_id': oAuthConfig.clientId,
     'client_secret': oAuthConfig.clientSecret,
   };
+};
+
+export const getRefreshUrlEncodedOptions = () => {
+  const { oAuthConfig } = ENV;
+  return {
+    'grant_type': 'refresh_token',
+    'scope': oAuthConfig.scope,
+    'client_id': oAuthConfig.clientId,
+    'client_secret': oAuthConfig.clientSecret,
+  }
 };
