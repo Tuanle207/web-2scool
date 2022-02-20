@@ -31,6 +31,7 @@ export class HttpClient {
     this.interceptors = interceptors || {};
     this.instance = Axios.create({
       baseURL: this.baseUrl,
+      withCredentials: true,
       ...options
     })
   }

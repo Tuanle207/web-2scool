@@ -5,12 +5,13 @@ export interface IAuthState {
   token?: string;
   refreshToken?: string;
   expiresIn: number;
+  issuedAt?: Date;
 }
 
 const initial: IAuthState = {
   token: '',
   refreshToken: '',
-  expiresIn: 0
+  expiresIn: 0,
 };
 
 export default createReducer(initial, build => {
@@ -21,6 +22,7 @@ export default createReducer(initial, build => {
         state.token = action.payload.access_token;
         state.refreshToken = action.payload.refresh_token;
         state.expiresIn = action.payload.expires_in;
+        state.issuedAt = new Date();
         return state;
     });
 });
