@@ -36,7 +36,7 @@ jobs:
             sed -i "s%<AUTH_URL>%$AUTH_URL%g" src/config/env/deployment.ts
             sed -i "s%<CLIENT_ID>%$CLIENT_ID%g" src/config/env/deployment.ts
             sed -i "s%<CLIENT_SECRET>%$CLIENT_SECRET%g" src/config/env/deployment.ts
-            cat src/config/env/deployment.ts > src/config/env/index.ts
+            # cat src/config/env/deployment.ts > src/config/env/index.ts
 
             #Copy nginx config to output folder
             mkdir dist
