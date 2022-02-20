@@ -6,7 +6,7 @@ const ENV: IEnvConfig = {
   appUrl: 'http://147.182.219.63',
   oAuthConfig: {
     issuer: 'http://147.182.219.63:5001',
-    clientId: 'Scool_App',
+    clientId: 'Scool_App_Main',
     responseType: 'code',
     clientSecret: '1q2w3e*',
     scope: 'offline_access openid profile role email phone Scool',
