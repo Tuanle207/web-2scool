@@ -10,7 +10,6 @@ import { isTokenExpired } from './util';
 export const configHttpRequest = (axios: AxiosInstance) => {
   axios.interceptors.request.use(async (config: AxiosRequestConfig) => {
     const url = config.url || '';
-    console.log({url});
     if ([
       '/connect/token',
     ].includes(url)) {
