@@ -2,10 +2,10 @@ import { IEnvConfig, EnvType } from './type';
 
 const ENV: IEnvConfig = {
   env: EnvType.Development,
-  host: 'http://147.182.219.63:5001',
+  host: 'http://147.182.219.63:5000',
   appUrl: 'http://147.182.219.63',
   oAuthConfig: {
-    issuer: 'http://147.182.219.63:5001',
+    issuer: 'http://147.182.219.63:5000',
     clientId: 'Scool_App',
     responseType: 'code',
     clientSecret: '1q2w3e*',
