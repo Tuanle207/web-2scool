@@ -1,6 +1,6 @@
 server {
-    listen 80 default_server;
-    listen [::]:80 default_server;
+    listen 3000 default_server;
+    listen [::]:3000 default_server;
     root /var/www/2scool-web/dist/;
     index index.html index.htm;
     server_name <HOST_IP> quanlynenep.tech;

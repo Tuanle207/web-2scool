@@ -1,7 +1,7 @@
 import { IEnvConfig, EnvType } from './type';
 
 const ENV: IEnvConfig = {
-  env: EnvType.Development,
+  env: EnvType.Deployment,
   host: '<API_URL>',
   appUrl: '<APP_URL>',
   oAuthConfig: {
