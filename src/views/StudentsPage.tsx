@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { ChangeEvent, Fragment, useEffect, useRef, useState } from 'react';
 import AwesomeDebouncePromise from 'awesome-debounce-promise';
 import { Container, Grid, IconButton, Paper, Tooltip } from '@material-ui/core';
 import Sidebar from '../components/Sidebar';
@@ -8,11 +8,12 @@ import FilterButton, { IFilterOption } from '../components/FilterButton';
 import { DataGrid, GridColDef, GridPageChangeParams, GridValueFormatterParams,
   GridApi, GridRowId } from '@material-ui/data-grid';
 import { Student, Class, Identity } from '../interfaces';
-import { ClassesService, IdentityService, StudentsService, GradesService } from '../api';
+import { ClassesService, IdentityService, StudentsService, GradesService, DataImportService } from '../api';
 import { useFetchV2 } from '../hooks/useFetchV2';
 import PersonAddIcon from '@material-ui/icons/PersonAdd';
 import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@material-ui/icons/Edit';
+import PublishIcon from '@material-ui/icons/Publish';
 import { formatDate } from '../utils/TimeHelper';
 import ActionModal from '../components/Modal';
 import { comparers } from '../appConsts';
@@ -144,6 +145,7 @@ const fetchAPIDebounced = AwesomeDebouncePromise(StudentsService.getAllStudents,
 const StudentsPage = () => {
 
   const classes = useStyles();
+  const fileRef = useRef<HTMLInputElement>(null);
 
   const [ classOptions, setClassOptions ] = useState<IFilterOption[]>([]);
   const [ gradeOptions, setGradeOptions ] = useState<IFilterOption[]>([]);
@@ -212,11 +214,48 @@ const StudentsPage = () => {
   };
 
   const onRequestCreate = async (data: Student.CreateUpdateStudentDto) => {
-    await StudentsService.createStudent(data);
-    toast('Thêm học sinh thành công', {
-      type: toast.TYPE.SUCCESS
-    });
-    resetFilter();
+    try {
+      await StudentsService.createStudent(data);
+      toast('Thêm học sinh thành công', {
+        type: toast.TYPE.SUCCESS
+      });
+      resetFilter();
+    } catch (err) {
+      toast.error("Không thành công, đã có lỗi xảy ra");
+    }
+  };
+
+  const onImportFromExcel = async () => {
+    fileRef.current?.click();
+  };
+
+  const onFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files || [];
+    if (files.length > 0) {
+      const file = files[0];
+
+      ActionModal.show({
+        title: 'Xác nhận nhập dữ liệu từ excel',
+        onAccept: () => importFromExcel(file),
+        onClose: resetFileInput
+      });
+    }
+  };
+
+  const importFromExcel = async (file: File) => {
+    try {
+      await DataImportService.importStudentsData(file);
+      toast.success("Nhập từ excel thành công!");
+      resetFilter();
+    } catch (err) {
+      toast.error("Không thành công, đã có lỗi xảy ra");
+    }
+  };
+
+  const resetFileInput = () => {
+    if (fileRef.current) {
+      fileRef.current.value = '';
+    }
   };
 
   return (
@@ -256,7 +295,7 @@ const StudentsPage = () => {
                   })}
                   filterCount={getFilterCount()}
                   filterComponent={(
-                    <>
+                    <Fragment>
                       <FilterButton
                         title="Lớp"
                         options={classOptions}
@@ -267,13 +306,23 @@ const StudentsPage = () => {
                         options={gradeOptions}
                         onSelectedOptionsChange={onGradeFilterChange}
                       />
-                    </>
+                    </Fragment>
+                  )}
+                  actionComponent={(
+                    <Fragment>
+                      <Tooltip title="Nhập từ excel">
+                        <IconButton style={{ marginRight: 16 }} size="small" onClick={onImportFromExcel}>
+                          <PublishIcon color="primary" />
+                        </IconButton>
+                      </Tooltip>
+                    </Fragment>
                   )}
                 />
               </Paper>
             </Grid>
             <Grid item style={{ flexGrow: 1, paddingTop: 16, paddingBottom: 16, backgroundColor: '#e8e8e8' }}>
               <Container className={classes.root}>
+                <input ref={fileRef} hidden type="file" onChange={onFileChange} /> 
                 <DataGrid
                   columns={cols}
                   rows={data.items}

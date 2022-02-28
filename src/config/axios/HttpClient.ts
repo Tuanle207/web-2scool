@@ -17,21 +17,16 @@ export interface IHttpResponse<T> extends AxiosResponse {
 
 export class HttpClient {
   private baseUrl: string;
-  private options?: IHttpRequestOptions;
-  private interceptors?: any;
   private instance: AxiosInstance;
 
-  constructor({ baseUrl, options, interceptors = {} }: {
+  constructor({ baseUrl, options }: {
     baseUrl: string;
     options?: IHttpRequestOptions;
     interceptors?: any
   }) {
     this.baseUrl = baseUrl;
-    this.options = options;
-    this.interceptors = interceptors || {};
     this.instance = Axios.create({
       baseURL: this.baseUrl,
-      // withCredentials: true,
       ...options
     })
   }

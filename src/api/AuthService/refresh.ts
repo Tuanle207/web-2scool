@@ -8,7 +8,7 @@ export const refresh = async (refreshToken: string) => {
     const authService = getAuthService();
     const refreshOptions = getRefreshUrlEncodedOptions();
     const result = await authService.post<User.LoginResponse>(Endpoint.Login(), qs.stringify({
-      refreshToken, 
+      'refresh_token': refreshToken, 
       ...refreshOptions,
     }));
     return result;

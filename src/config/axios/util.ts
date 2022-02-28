@@ -48,5 +48,5 @@ export const isTokenExpired = (issuedAt: Date, expiresIn: number) => {
   const DELAY_FROM_REQUESTING_TOKEN_FROM_SERVER = 10; // second
   const currentTime = moment();
   const expiryTime = moment(issuedAt).add(expiresIn - DELAY_FROM_REQUESTING_TOKEN_FROM_SERVER, 'seconds');
-  return expiryTime.isAfter(currentTime);
+  return currentTime.isAfter(expiryTime);
 };

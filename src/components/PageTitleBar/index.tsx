@@ -8,6 +8,7 @@ interface Props {
   onMainButtonClick?: () => void;
   onOptionsButtonClick?: () => void;
   filterComponent?: ReactChild;
+  actionComponent?: ReactChild;
   filterCount?: number;
 }
 
@@ -16,7 +17,8 @@ const PageTitleBar: FC<Props> = ({
   onMainButtonClick,
   onOptionsButtonClick,
   filterComponent,
-  filterCount = 0
+  actionComponent,
+  filterCount = 0,
 }) => {
 
   const classes = usePageTitleBarStyles();
@@ -33,14 +35,17 @@ const PageTitleBar: FC<Props> = ({
         filterComponent
       }
       </Box>
-      <Box style={{ marginLeft: "auto" }}>
-        <Button variant="contained"
-          color={'primary'}
-          onClick={onMainButtonClick}
-        >
-          Thêm
-        </Button>
+      <Box style={{ marginLeft: "auto" }} className={classes.filter}>
+      {
+        actionComponent
+      }
       </Box>
+      <Button variant="contained"
+        color={'primary'}
+        onClick={onMainButtonClick}
+      >
+        Thêm
+      </Button>
     </Grid>
   );
 };

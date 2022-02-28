@@ -1,21 +1,24 @@
+import { AuthService } from '.';
 import { HttpClient } from '../config/axios/HttpClient';
 import { configHttpRequest, configHttpResponse } from '../config/axios/interceptors';
-import { isTokenValid } from '../config/axios/util';
+import { isTokenExpired } from '../config/axios/util';
 import ENV from '../config/env';
 import redux from '../store';
+import { AuthActions } from '../store/actions';
+import { IState } from '../store/reducers';
 
 export const getApiService = async () => {
   const baseurl = ENV.host;
 
   // get token from store
   const { 
-    auth: { token }
-  } = redux.store.getState();
+    auth: { refreshToken, issuedAt, expiresIn}
+  } = redux.store.getState() as IState;
 
-  // check token's valility
-  if (!isTokenValid(token)) {
-    // TODO: get new access token via refresh token
-    
+  // check token's valility and refresh token if possible
+  if ( refreshToken && issuedAt && isTokenExpired(issuedAt, expiresIn)) {
+    const refreshRes = await AuthService.refresh(refreshToken);
+    redux.store.dispatch(AuthActions.setLogin(refreshRes));
   }
   
   const httpClient = new HttpClient({
