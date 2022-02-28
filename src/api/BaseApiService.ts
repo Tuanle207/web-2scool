@@ -22,7 +22,7 @@ export const getApiService = async () => {
     baseUrl: baseurl,
     options: {
       headers: { 'Content-Type': 'application/json' },
-      withCredentials: true,
+      // withCredentials: true,
     }
   });
   // config axios interceptor;
