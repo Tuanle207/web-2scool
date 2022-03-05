@@ -17,11 +17,12 @@ import HighlightOffIcon from '@material-ui/icons/HighlightOff';
 import RestoreIcon from '@material-ui/icons/Restore';
 import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@material-ui/icons/Edit';
-import { dcpReportStatus, dcpReportStatusDic } from '../appConsts';
+import { dcpReportStatus, dcpReportStatusDic, policies } from '../appConsts';
 import { routes, routeWithParams } from '../routers/routesDictionary';
 import { useSelector } from 'react-redux';
 import { AppConfigSelector } from '../store/selectors';
 import useStyles from '../assets/jss/views/DCPReportPage';
+import { usePermissionChecker } from '../hooks';
 
 const classCols: GridColDef[] = [
   {
@@ -121,6 +122,9 @@ const DCPReportPage = () => {
   const [faultsPoint, setFaultsPoint] =  useState('...');
 
   const currentUser = useSelector(AppConfigSelector.currentUser);
+  const haveDcpApprovalPermission = usePermissionChecker(policies.DcpReportApproval);
+  const haveDcpUpdatePermission = usePermissionChecker(policies.UpdateDcpReport);
+  const haveDcpRemovePermission = usePermissionChecker(policies.RemoveDcpReport);
 
   useEffect(() => {
     document.title = '2Cool | Chi tiết phiếu chấm điểm nề nếp';
@@ -401,26 +405,28 @@ const DCPReportPage = () => {
                 </Grid>
                 <Grid item container justify="flex-end" className={classes.dcpReportAction} >
                   {
-                    (data.creatorId === currentUser.id &&  data.status === dcpReportStatus.Created) && (
-                      <>
-                        <Button 
-                          className={`${classes.rejectBtn} ${classes.acceptBtn}`} 
-                          style={{ marginRight: 16 }}
-                          variant={'contained'} 
-                          startIcon={<DeleteIcon />}
-                          onClick={handleDelete}
-                        >Xóa</Button>
-                        <Button
-                          style={{ marginRight: 16 }}
-                          variant={'contained'} 
-                          startIcon={<EditIcon />}
-                          onClick={handleEdit}
-                        >Cập nhật</Button>
-                      </>
+                    haveDcpRemovePermission &&(data.creatorId === currentUser.id &&  data.status === dcpReportStatus.Created) && (
+                      <Button 
+                        className={`${classes.rejectBtn} ${classes.acceptBtn}`} 
+                        style={{ marginRight: 16 }}
+                        variant={'contained'} 
+                        startIcon={<DeleteIcon />}
+                        onClick={handleDelete}
+                      >Xóa</Button>
                     )
                   }
                   {
-                    data.status === dcpReportStatus.Created && (
+                    haveDcpUpdatePermission &&(data.creatorId === currentUser.id &&  data.status === dcpReportStatus.Created) && (
+                      <Button
+                        style={{ marginRight: 16 }}
+                        variant={'contained'} 
+                        startIcon={<EditIcon />}
+                        onClick={handleEdit}
+                      >Cập nhật</Button>
+                    )
+                  }
+                  {
+                    haveDcpApprovalPermission && data.status === dcpReportStatus.Created && (
                       <Button 
                         className={classes.rejectBtn} 
                         startIcon={<Clear />}
@@ -429,7 +435,7 @@ const DCPReportPage = () => {
                     )                    
                   }
                   {
-                     data.status === dcpReportStatus.Created && (
+                     haveDcpApprovalPermission && data.status === dcpReportStatus.Created && (
                       <Button 
                         className={classes.acceptBtn} 
                         startIcon={<CheckSharp/>}
@@ -440,7 +446,7 @@ const DCPReportPage = () => {
                     )
                   }
                   {
-                     [dcpReportStatus.Approved, dcpReportStatus.Rejected].includes(data.status) && (
+                     haveDcpApprovalPermission && [dcpReportStatus.Approved, dcpReportStatus.Rejected].includes(data.status) && (
                       <Button 
                         className={classes.rejectBtn} 
                         startIcon={<RestoreIcon />}
