@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { ChangeEvent, Fragment, useEffect, useRef } from 'react';
 import AwesomeDebouncePromise from 'awesome-debounce-promise';
 import { Container, Grid, IconButton, Paper, Tooltip } from '@material-ui/core';
 import Sidebar from '../components/Sidebar';
@@ -6,10 +6,11 @@ import Header from '../components/Header';
 import PageTitleBar from '../components/PageTitleBar';
 import { DataGrid, GridApi, GridColDef, GridPageChangeParams, GridRowId, GridValueFormatterParams } from '@material-ui/data-grid';
 import { Teacher } from '../interfaces';
-import { TeachersService } from '../api';
+import { DataImportService, TeachersService } from '../api';
 import { useFetchV2 } from '../hooks';
 import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@material-ui/icons/Edit';
+import PublishIcon from '@material-ui/icons/Publish';
 import { formatDate } from '../utils/TimeHelper';
 import ActionModal from '../components/Modal';
 import CreateOrUpdateTeacherRequest from '../components/Modal/CreateOrUpdateTeacherRequest';
@@ -120,6 +121,7 @@ const fetchAPIDebounced = AwesomeDebouncePromise(TeachersService.getAllTeachers,
 const TeachersPage = () => {
 
   const classes = useStyles();
+  const fileRef = useRef<HTMLInputElement>(null);
 
   const { 
     pagingInfo,
@@ -150,6 +152,39 @@ const TeachersPage = () => {
       type: toast.TYPE.SUCCESS
     });
     resetFilter();
+  };
+
+  const onImportFromExcel = async () => {
+    fileRef.current?.click();
+  };
+
+  const onFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files || [];
+    if (files.length > 0) {
+      const file = files[0];
+
+      ActionModal.show({
+        title: 'Xác nhận nhập dữ liệu từ excel',
+        onAccept: () => importFromExcel(file),
+        onClose: resetFileInput
+      });
+    }
+  };
+
+  const importFromExcel = async (file: File) => {
+    try {
+      await DataImportService.importTeachersData(file);
+      toast.success("Nhập từ excel thành công!");
+      resetFilter();
+    } catch (err) {
+      toast.error("Không thành công, đã có lỗi xảy ra");
+    }
+  };
+
+  const resetFileInput = () => {
+    if (fileRef.current) {
+      fileRef.current.value = '';
+    }
   };
 
   return (
@@ -187,11 +222,21 @@ const TeachersPage = () => {
                   onOptionsButtonClick={() => toast('default toast', {
                     type: toast.TYPE.INFO,
                   })}
+                  actionComponent={(
+                    <Fragment>
+                      <Tooltip title="Nhập từ excel">
+                        <IconButton style={{ marginRight: 16 }} size="small" onClick={onImportFromExcel}>
+                          <PublishIcon color="primary" />
+                        </IconButton>
+                      </Tooltip>
+                    </Fragment>
+                  )}
                 />
               </Paper>
             </Grid>
             <Grid item style={{ flexGrow: 1, paddingTop: 16, paddingBottom: 16, backgroundColor: '#e8e8e8' }}>
               <Container className={classes.root}>
+                <input ref={fileRef} hidden type="file" onChange={onFileChange} /> 
                 <DataGrid
                   columns={cols}
                   rows={data.items}
