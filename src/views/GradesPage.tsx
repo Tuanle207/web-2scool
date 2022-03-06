@@ -14,6 +14,7 @@ import ActionModal from '../components/Modal';
 import CreateOrUpdateGradeRequest from '../components/Modal/CreateOrUpdateGradeRequest';
 import { toast } from 'react-toastify';
 import { routes } from '../routers/routesDictionary';
+import { dataGridLocale } from '../appConsts';
 import useStyles from '../assets/jss/views/GradesPage';
 
 interface RowMenuProps {
@@ -102,7 +103,7 @@ const cols: GridColDef[] =  [
   }
 ];
 
-const fetchAPIDebounced = AwesomeDebouncePromise(GradesService.getAllGrades, 500);
+const fetchAPIDebounced = AwesomeDebouncePromise(GradesService.getAllGrades, 100);
 
 const GradesPage = () => {
 
@@ -191,6 +192,7 @@ const GradesPage = () => {
                   rowsPerPageOptions={[5, 15, 30, 50]}
                   onPageSizeChange={onPageSizeChange}
                   pagination
+                  localeText={dataGridLocale}
                 />
               </Container>
             </Grid>

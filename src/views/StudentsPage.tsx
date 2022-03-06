@@ -16,7 +16,7 @@ import EditIcon from '@material-ui/icons/Edit';
 import PublishIcon from '@material-ui/icons/Publish';
 import { formatDate } from '../utils/TimeHelper';
 import ActionModal from '../components/Modal';
-import { comparers } from '../appConsts';
+import { comparers, dataGridLocale } from '../appConsts';
 import { toast } from 'react-toastify';
 import CreateOrUpdateStudentRequest from '../components/Modal/CreateOrUpdateStudentRequest';
 import CreateStudentAccountRequest from '../components/Modal/CreateStudentAccountRequest';
@@ -140,7 +140,7 @@ const cols: GridColDef[] =  [
   },
 ];
 
-const fetchAPIDebounced = AwesomeDebouncePromise(StudentsService.getAllStudents, 500);
+const fetchAPIDebounced = AwesomeDebouncePromise(StudentsService.getAllStudents, 100);
 
 const StudentsPage = () => {
 
@@ -337,6 +337,7 @@ const StudentsPage = () => {
                   rowsPerPageOptions={[5, 15, 30, 50]}
                   onPageSizeChange={onPageSizeChange}
                   pagination
+                  localeText={dataGridLocale}
                 />
               </Container>
             </Grid>

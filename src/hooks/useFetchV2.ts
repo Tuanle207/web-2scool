@@ -13,7 +13,7 @@ interface IUseFetchHookProps<T> {
 
 export const useFetchV2 = <T = any> ({ fetchFn, filter, pageIndex, pageSize }: IUseFetchHookProps<T>) => {
 
-  const fetchAPIDebounced = useRef<FetchFn<T>>(AwesomeDebouncePromise(fetchFn, 500));
+  const fetchAPIDebounced = useRef<FetchFn<T>>(AwesomeDebouncePromise(fetchFn, 100));
 
   const [ pagingInfo, setPagingInfo ] = useState<Util.PagingInfo>({ 
     pageIndex: pageIndex || 1, 

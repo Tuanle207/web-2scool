@@ -1,4 +1,4 @@
-const comparers = {
+export const comparers = {
   Eq: '==',
   Neq: '!=',
   Gt: '>',
@@ -10,5 +10,3 @@ const comparers = {
   StartsWith: 'StartsWith',
   EndsWith: 'EndsWith'
 };
-
-export default comparers;

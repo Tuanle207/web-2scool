@@ -15,7 +15,8 @@ const CreateOrUpdateUserRequest = ({id}: {id?: string}) => {
     phoneNumber: '',
     roleNames: [''],
     password: '',
-    extraProperties: {}
+    extraProperties: {},
+    concurrencyStamp: ''
   });
   const [selectedRoles, setSelectedRoles] = useState<Identity.UserRoleDto[]>([]);
   const [roles, setRoles] = useState<Identity.UserRoleDto[]>([]);
@@ -42,7 +43,8 @@ const CreateOrUpdateUserRequest = ({id}: {id?: string}) => {
         phoneNumber: userRes.phoneNumber || '',
         roleNames: userRes.roles?.map(x => x.name) || [],
         password: '',
-        extraProperties: {}
+        extraProperties: {},
+        concurrencyStamp: userRes.concurrencyStamp
       });
     };
 
@@ -52,7 +54,6 @@ const CreateOrUpdateUserRequest = ({id}: {id?: string}) => {
   useEffect(() => {
     const dto = {...data};
     dto.roleNames = selectedRoles.map(x => x.name);
-    console.log({dto});
     ActionModal.setData({
       data: dto,
       error: errors.length > 0 ? {

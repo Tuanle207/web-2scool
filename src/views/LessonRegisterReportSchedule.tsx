@@ -6,7 +6,7 @@ import Sidebar from '../components/Sidebar';
 import { Class, Identity, TaskAssignment, User, Util } from '../interfaces';
 import { ClassesService, IdentityService, TaskAssignmentService } from '../api';
 import { getDayOfWeek, formatTime, formatDate } from '../utils/TimeHelper';
-import { taskType } from '../appConsts';
+import { dataGridLocale, taskType } from '../appConsts';
 import AlarmIcon from '@material-ui/icons/Alarm';
 import PermContactCalendarIcon from '@material-ui/icons/PermContactCalendar';
 import EditIcon from '@material-ui/icons/Edit';
@@ -22,6 +22,8 @@ interface IAssignClass {
   classId: string;
   user?: TaskAssignment.UserProfleForTaskAssignmentDto;
   assigned: boolean;
+  startTime?: Date;
+  endTime?: Date;
 }
 
 interface RowMenuProps {
@@ -167,7 +169,9 @@ const LessonRegisterReportSchedule = () => {
       assigns.push({
         classId: el.id,
         assigned: status ? true : false,
-        user: status?.assignee
+        user: status?.assignee,
+        startTime: status?.startTime,
+        endTime: status?.endTime
       });
 
       const classSche = taskAssignItems.find(x => x.classAssigned.id === el.id);
@@ -189,58 +193,62 @@ const LessonRegisterReportSchedule = () => {
   };
   
   const handleSubmit = async (assigment: IAssignClass[]) => {
-    try {
-      const body: TaskAssignment.CreateUpdateTaskAssignmentDto = {
-        items: [],
-        taskType: taskType.LessonRegisterReport
-      };
+    const body: TaskAssignment.CreateUpdateTaskAssignmentDto = {
+      items: [],
+      taskType: taskType.LessonRegisterReport
+    };
 
-      body.items = assigment.map(x => ({
-        assigneeId: x.user!.id,
-        classId: x.classId,
-        startTime: new Date(),
-        endTime: new Date()
-      }));
+    body.items = assigment.filter(x => x.assigned).map(x => ({
+      assigneeId: x.user!.id,
+      classId: x.classId,
+      startTime: x.startTime!,
+      endTime: x.endTime!
+    }));
 
-      await TaskAssignmentService.createUpdate(body);
-      
-      toast.success('Phân công thành công!');
-
-    } catch (err) {
-      console.log(err);
-      toast.error('Đã có lỗi xảy ra! Không thể lưu phân công!');
-    }
+    await TaskAssignmentService.createUpdate(body);
   };
 
-  const onUpdateAssignment = async ({ classId, userId } : {
-    classId: string; userId: string;
+  const onUpdateAssignment = async ({ classId, userId, startTime, endTime } : {
+    classId: string; userId: string; startTime: Date; endTime: Date;
   }) =>  {
-    const newAssignment = [...assignClasses];
-    const assign = newAssignment.find(x => x.classId === classId);
-    const user = userData.find(x => x.userProfileId === userId);
-    const userProfile = {
-      id: user!.userProfileId,
-      name: user!.name,
-      phoneNumber: user!.phoneNumber,
-      class: user!.class
-    };
-    if (assign) {
-      assign.assigned = true;
-      assign.user = userProfile;
-    } else {
-      newAssignment.push({
-        assigned: true,
-        classId: classId,
-        user: userProfile,
-      });
+    try {
+      const newAssignment = [...assignClasses];
+      const assign = newAssignment.find(x => x.classId === classId);
+      const user = userData.find(x => x.userProfileId === userId);
+      const userProfile = {
+        id: user!.userProfileId,
+        name: user!.name,
+        phoneNumber: user!.phoneNumber,
+        class: user!.class
+      };
+      if (assign) {
+        assign.assigned = true;
+        assign.user = userProfile;
+        assign.startTime = startTime;
+        assign.endTime = endTime;
+      } else {
+        newAssignment.push({
+          assigned: true,
+          classId: classId,
+          user: userProfile,
+          startTime,
+          endTime
+        });
+      }
+      setAssignClasses(newAssignment);
+      await handleSubmit(newAssignment);
+      toast.success('Phân công thành công!');
+
+      setLoading(true);
+      const newDataRes = await TaskAssignmentService.getAll({taskType: taskType.LessonRegisterReport});
+      setData(newDataRes.items);
+      parseAssignmentScheduleData(classData, newDataRes.items);
+      setLoading(false);
+    } catch (err) {
+      console.log({err});
+      toast.error('Đã có lỗi xảy ra! Không thể lưu phân công!');
     }
-    setAssignClasses(newAssignment);
-    await handleSubmit(newAssignment);
-    setLoading(true);
-    const newDataRes = await TaskAssignmentService.getAll({taskType: taskType.LessonRegisterReport});
-    setData(newDataRes.items);
-    parseAssignmentScheduleData(classData, newDataRes.items);
-    setLoading(false);
+    
   };
 
   const handleEditAssignment = (classId: string) => {
@@ -257,6 +265,8 @@ const LessonRegisterReportSchedule = () => {
         component: <UpdateLRKeeperRequest 
           classId={classId}
           assignedStudentId={assign?.user?.id}
+          initStartTime={assign?.startTime}
+          initEndTime={assign?.endTime}
           />
       });
     }
@@ -314,41 +324,11 @@ const LessonRegisterReportSchedule = () => {
                       handleEditAssignment(classItem.id);
                     }
                   }}
+                  localeText={dataGridLocale}
                 />
               </Container>
             </Grid>
           </Grid>
-
-          {/* <Grid item container direction='column' style={{ flex: 1, minHeight: 0, flexWrap: 'nowrap' }}>
-            <Grid item container alignItems='center' className={classes.actionGroup}>
-              <Grid item container direction='row' alignItems='center' style={{paddingTop: 12, paddingBottom: 12, flex: 1}}>
-                <Grid item container direction={'row'} alignItems={'center'}>
-                  <AlarmIcon style={{ marginRight: 8 }}/>
-                  <Typography variant={'body2'}>{`Cập nhật lần cuối vào ${timeText}`}</Typography>
-                </Grid>
-                <Grid item container direction={'row'} alignItems={'center'}>
-                  <PermContactCalendarIcon style={{ marginRight: 8 }}/>
-                  <Typography variant={'body2'}>{creatorText}</Typography>
-                </Grid>
-              </Grid>
-            </Grid>              
-            <Grid item container direction={'row'} style={{ flex: '1 1 0', minHeight: 0, flexWrap: 'nowrap', padding: 16, paddingBottom: 0, overflowX: 'hidden', overflowY: 'auto' }}>
-              <Container className={classes.datagridContainer}>
-                <DataGrid
-                  columns={cols}
-                  rows={data}
-                  hideFooter
-                  hideFooterPagination
-                  onCellClick={(params: GridCellParams) =>  {
-                    if (params.colIndex === 5) {
-                      const classItem = params.getValue('classAssigned') as Class.ClassForSimpleListDto
-                      handleEditAssignment(classItem.id);
-                    }
-                  }}
-                />
-              </Container>
-            </Grid>
-          </Grid> */}
         </Grid>
       </Grid>
     </div>

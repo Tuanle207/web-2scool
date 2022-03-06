@@ -15,6 +15,7 @@ import GetAppIcon from '@material-ui/icons/GetApp';
 import { ReactComponent as FilterIcon } from '../assets/img/filter.svg';
 import { routes } from '../routers/routesDictionary';
 import useStyles from '../assets/jss/views/DCPRankingPage';
+import { dataGridLocale } from '../appConsts';
 
 
 const cols: GridColDef[] = [
@@ -322,6 +323,7 @@ const DCPRankingPage = () => {
                   hideFooter
                   getRowId={data => data.classId}
                   getRowClassName={getRowClass}
+                  localeText={dataGridLocale}
                 />
               </Container>
             </Grid>

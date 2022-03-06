@@ -16,6 +16,7 @@ import CreateOrUpdateCourseRequest from '../components/Modal/CreateOrUpdateCours
 import ActionModal from '../components/Modal';
 import { routes } from '../routers/routesDictionary';
 import useStyles from '../assets/jss/views/CoursesPage';
+import { dataGridLocale } from '../appConsts';
 
 interface RowMenuProps {
   api: GridApi;
@@ -112,7 +113,7 @@ const cols: GridColDef[] =  [
   }
 ];
 
-const fetchAPIDebounced = AwesomeDebouncePromise(CoursesService.getAllCourses, 500);
+const fetchAPIDebounced = AwesomeDebouncePromise(CoursesService.getAllCourses, 100);
 
 
 const CoursesPage = () => {
@@ -202,6 +203,7 @@ const CoursesPage = () => {
                   rowsPerPageOptions={[5, 15, 30, 50]}
                   onPageSizeChange={onPageSizeChange}
                   pagination
+                  localeText={dataGridLocale}
                 />
               </Container>
             </Grid>

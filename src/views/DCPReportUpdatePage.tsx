@@ -72,6 +72,7 @@ const DCPReportUpdatePage: FC<Props> = () => {
       setClassOptions(classes);
       setRegulationsOptions(regulations);
       setCriteriaOptions(criterias);
+      console.log({dcpReportRes});
       dispatch(DcpReportActions.initDcpReport(dcpReportRes as DcpReport.CreateUpdateDcpReportDto));
     
       document.title = '2Scool | Cập nhật phiếu chấm điểm nề nếp';

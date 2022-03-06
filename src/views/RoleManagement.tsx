@@ -15,7 +15,7 @@ import { useFetchV2 } from '../hooks';
 import CreateOrUpdateRoleRequest from '../components/Modal/CreateOrUpdateRoleRequest';
 import UpdateRolePermissionsRequest from '../components/Modal/UpdateRolePermissionsRequest';
 import ActionModal from '../components/Modal';
-import { comparers } from '../appConsts';
+import { comparers, dataGridLocale } from '../appConsts';
 import { routes } from '../routers/routesDictionary';
 import useStyles from '../assets/jss/views/RoleManagement';
 
@@ -126,7 +126,7 @@ const cols: GridColDef[] =  [
   },
 ];
 
-const fetchAPIDebounced = AwesomeDebouncePromise(IdentityService.getAllRoles, 500);
+const fetchAPIDebounced = AwesomeDebouncePromise(IdentityService.getAllRoles, 100);
 
 const RoleManagement = () => {
 
@@ -216,6 +216,7 @@ const RoleManagement = () => {
                   rowsPerPageOptions={[5, 15, 30, 50]}
                   onPageSizeChange={onPageSizeChange}
                   pagination
+                  localeText={dataGridLocale}
                 />
               </Container>
             </Grid>

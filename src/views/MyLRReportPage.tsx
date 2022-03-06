@@ -15,7 +15,7 @@ import { LrReportsService } from '../api';
 import { useFetchV2 } from '../hooks';
 import { LrReport, Class } from '../interfaces';
 import { formatFullDateTime } from '../utils/TimeHelper';
-import { comparers, dcpReportStatus, dcpReportStatusDic } from '../appConsts';
+import { comparers, dcpReportStatus, dcpReportStatusDic, dataGridLocale } from '../appConsts';
 import { routes, routeWithParams } from '../routers/routesDictionary';
 import FilterButton, { IFilterOption } from '../components/FilterButton';
 import { ReactComponent as FilterIcon } from '../assets/img/filter.svg';
@@ -254,7 +254,7 @@ const cols: GridColDef[] =  [
   },
 ];
 
-const fetchAPIDebounced = AwesomeDebouncePromise(LrReportsService.getMyLrReports, 500);
+const fetchAPIDebounced = AwesomeDebouncePromise(LrReportsService.getMyLrReports, 100);
 
 const LRReportApprovalPage = () => {
   
@@ -466,6 +466,7 @@ const LRReportApprovalPage = () => {
                   rowsPerPageOptions={[5, 15, 30, 50]}
                   onPageSizeChange={onPageSizeChange}
                   pagination
+                  localeText={dataGridLocale}
                 />
               </Container>
             </Grid>

@@ -1,30 +1,28 @@
 import { FC, memo, useState } from 'react';
 import { AppBar, IconButton, Badge, Toolbar,
   InputBase, Menu, MenuItem, ListItemIcon, ListItemText, Typography } from '@material-ui/core';
-  import { StyledMenu, StyledMenuItem } from './HeaderMenu';
-  import ExitToAppIcon from '@material-ui/icons/ExitToApp';
-  import AccountCircle from '@material-ui/icons/AccountCircle';
-  import SettingsIcon from '@material-ui/icons/Settings';
-  import SearchIcon from '@material-ui/icons/Search';
-  import NotificationsIcon from '@material-ui/icons/Notifications';
-  import MoreIcon from '@material-ui/icons/MoreVert';
-  import { useHistory } from 'react-router';
-  import { withRedux } from '../../utils/ReduxConnect';
-  import { AuthActions } from '../../store/actions';
-  import { routes } from '../../routers/routesDictionary';
-  import { useDebouncedCallback } from 'use-debounce/lib';
-  import useHeaderStyles from '../../assets/jss/components/Header/headerStyles';
+import { StyledMenu, StyledMenuItem } from './HeaderMenu';
+import ExitToAppIcon from '@material-ui/icons/ExitToApp';
+import AccountCircle from '@material-ui/icons/AccountCircle';
+import SettingsIcon from '@material-ui/icons/Settings';
+import SearchIcon from '@material-ui/icons/Search';
+import NotificationsIcon from '@material-ui/icons/Notifications';
+import MoreIcon from '@material-ui/icons/MoreVert';
+import { useHistory } from 'react-router';
+import { AuthActions } from '../../store/actions';
+import { routes } from '../../routers/routesDictionary';
+import { useDebouncedCallback } from 'use-debounce/lib';
+import useHeaderStyles from '../../assets/jss/components/Header/headerStyles';
+import { useDispatch } from 'react-redux';
 
 interface Props {
   hiddenSearchBar?: boolean;
   onTextChange?: (text: string) => void;
-  postlogoutAsync: () => void;
   searchBarPlaceholder?: string;
   pageName?: string;
 }
 
 const Header: FC<Props> = ({ 
-  postlogoutAsync, 
   onTextChange, 
   hiddenSearchBar = false,
   searchBarPlaceholder = "Tìm kiếm...",
@@ -37,9 +35,11 @@ const Header: FC<Props> = ({
   const [anchorEl, setAnchorEl] = useState(null);
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = useState(null);
 
+  const dispatch = useDispatch();
+
   const onSearchChangeDebounced = useDebouncedCallback(
     (value: string) => onTextChange && onTextChange(value),
-    500
+    200
   );
 
   const isMenuOpen = Boolean(anchorEl);
@@ -70,7 +70,8 @@ const Header: FC<Props> = ({
 
   const handleLogoutClick = () => {
     setAnchorEl(null);
-    postlogoutAsync();
+    
+    dispatch(AuthActions.postLogoutAsync())
     handleMobileMenuClose();
   };
 
@@ -121,9 +122,9 @@ const Header: FC<Props> = ({
             <NotificationsIcon />
           </Badge>
         </IconButton>
-        <p>Notifications</p>
+        <p>Thông báo</p>
       </MenuItem>
-      <MenuItem onClick={handleProfileMenuOpen}>
+      <MenuItem onClick={handleProfileClick}>
         <IconButton
           aria-label="account of current user"
           aria-controls="primary-search-account-menu"
@@ -132,7 +133,29 @@ const Header: FC<Props> = ({
         >
           <AccountCircle />
         </IconButton>
-        <p>Profile</p>
+        <p>Tài khoản của tôi</p>
+      </MenuItem>
+      <MenuItem onClick={handleAdminClick}>
+        <IconButton
+          aria-label="account of current user"
+          aria-controls="primary-search-account-menu"
+          aria-haspopup="true"
+          color="inherit"
+        >
+          <SettingsIcon />
+        </IconButton>
+        <p>Đi tới trang quản trị</p>
+      </MenuItem>
+      <MenuItem onClick={handleLogoutClick}>
+        <IconButton
+          aria-label="account of current user"
+          aria-controls="primary-search-account-menu"
+          aria-haspopup="true"
+          color="inherit"
+        >
+          <ExitToAppIcon />
+        </IconButton>
+        <p>Đăng xuất</p>
       </MenuItem>
     </Menu>
   );
@@ -198,9 +221,4 @@ const Header: FC<Props> = ({
   )
 };
 
-export default withRedux<Props>({
-  component: memo(Header),
-  dispatchProps: ({
-    postlogoutAsync: AuthActions.postLogoutAsync
-  })
-});
+export default memo(Header);

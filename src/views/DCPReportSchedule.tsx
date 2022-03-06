@@ -8,7 +8,7 @@ import { Class, TaskAssignment, User } from '../interfaces';
 import { DataGrid, GridColDef, GridValueFormatterParams } from '@material-ui/data-grid';
 import { TaskAssignmentService } from '../api';
 import { getDayOfWeek, formatTime, formatDate } from '../utils/TimeHelper';
-import { taskType } from '../appConsts';
+import { dataGridLocale, taskType } from '../appConsts';
 import AlarmIcon from '@material-ui/icons/Alarm';
 import PermContactCalendarIcon from '@material-ui/icons/PermContactCalendar';
 import { routes } from '../routers/routesDictionary';
@@ -207,6 +207,7 @@ const DCPReportSchedule = () => {
                   paginationMode='server'
                   hideFooter
                   hideFooterPagination
+                  localeText={dataGridLocale}
                 />
               </Container>
             </Grid>

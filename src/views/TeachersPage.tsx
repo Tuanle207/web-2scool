@@ -14,7 +14,7 @@ import PublishIcon from '@material-ui/icons/Publish';
 import { formatDate } from '../utils/TimeHelper';
 import ActionModal from '../components/Modal';
 import CreateOrUpdateTeacherRequest from '../components/Modal/CreateOrUpdateTeacherRequest';
-import { comparers } from '../appConsts';
+import { comparers, dataGridLocale } from '../appConsts';
 import { toast } from 'react-toastify';
 import { routes } from '../routers/routesDictionary';
 import useStyles from '../assets/jss/views/TeachersPage';
@@ -116,7 +116,7 @@ const cols: GridColDef[] =  [
   }
 ];
 
-const fetchAPIDebounced = AwesomeDebouncePromise(TeachersService.getAllTeachers, 500);
+const fetchAPIDebounced = AwesomeDebouncePromise(TeachersService.getAllTeachers, 100);
 
 const TeachersPage = () => {
 
@@ -251,6 +251,7 @@ const TeachersPage = () => {
                   rowsPerPageOptions={[5, 15, 30, 50]}
                   onPageSizeChange={onPageSizeChange}
                   pagination
+                  localeText={dataGridLocale}
                 />
               </Container>
             </Grid>

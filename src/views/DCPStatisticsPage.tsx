@@ -16,6 +16,7 @@ import { sleep } from '../utils/SetTimeOut';
 import { Stats } from '../interfaces';
 import { routes } from '../routers/routesDictionary';
 import useStyles from '../assets/jss/views/DCPStatisticsPage';
+import { dataGridLocale } from '../appConsts';
 
 
 const classFaultsStatsCols: GridColDef[] = [
@@ -430,6 +431,7 @@ const DCPStatisticsPage = () => {
                       hideFooterPagination
                       loading={loading}
                       hideFooter
+                      localeText={dataGridLocale}
                     />
                   )
                 }
@@ -442,6 +444,7 @@ const DCPStatisticsPage = () => {
                       hideFooterPagination
                       loading={loading}
                       hideFooter
+                      localeText={dataGridLocale}
                     />
                   )
                 }
@@ -454,6 +457,7 @@ const DCPStatisticsPage = () => {
                       hideFooterPagination
                       loading={loading}
                       hideFooter
+                      localeText={dataGridLocale}
                     />
                   )
                 }

@@ -13,7 +13,7 @@ import { IdentityService } from '../api';
 import { useFetchV2 } from '../hooks';
 import CreateOrUpdateUserRequest from '../components/Modal/CreateOrUpdateUserRequest';
 import ActionModal from '../components/Modal';
-import { comparers } from '../appConsts';
+import { comparers, dataGridLocale } from '../appConsts';
 import { routes } from '../routers/routesDictionary';
 import useStyles from '../assets/jss/views/UserManagement';
 
@@ -101,7 +101,6 @@ const cols: GridColDef[] =  [
     headerName: 'Vai trò',
     width: 200,
     valueFormatter: (params: GridValueFormatterParams) => {
-      console.log({params});
       if (params.value) {
         const value = params.value as Identity.RoleForSimpleListDto[];
         return value.map(x => x.name).join(', ');
@@ -127,7 +126,7 @@ const cols: GridColDef[] =  [
   }
 ];
 
-const fetchAPIDebounced = AwesomeDebouncePromise(IdentityService.getUsers, 500);
+const fetchAPIDebounced = AwesomeDebouncePromise(IdentityService.getUsers, 100);
 
 const UserManagement = () => {
 
@@ -218,7 +217,7 @@ const UserManagement = () => {
                   rowsPerPageOptions={[5, 15, 30, 50]}
                   onPageSizeChange={onPageSizeChange}
                   pagination
-                  
+                  localeText={dataGridLocale}
                 />
               </Container>
             </Grid>

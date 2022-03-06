@@ -14,7 +14,7 @@ import { ClassesService, GradesService, DataImportService } from '../api';
 import { useFetchV2 } from '../hooks';
 import ActionModal from '../components/Modal';
 import CreateOrUpdateClassRequest from '../components/Modal/CreateOrUpdateClassRequest';
-import { comparers } from '../appConsts';
+import { comparers, dataGridLocale } from '../appConsts';
 import { routes } from '../routers/routesDictionary';
 import useStyles from '../assets/jss/views/ClassesPage';
 import FilterButton, { IFilterOption } from '../components/FilterButton';
@@ -118,7 +118,7 @@ const cols: GridColDef[] =  [
   },
 ];
 
-const fetchAPIDebounced = AwesomeDebouncePromise(ClassesService.getAllClasss, 500);
+const fetchAPIDebounced = AwesomeDebouncePromise(ClassesService.getAllClasss, 100);
 
 const ClassesPage = () => {
 
@@ -286,6 +286,7 @@ const ClassesPage = () => {
                   rowsPerPageOptions={[5, 15, 30, 50]}
                   onPageSizeChange={onPageSizeChange}
                   pagination
+                  localeText={dataGridLocale}
                 />
               </Container>
             </Grid>

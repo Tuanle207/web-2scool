@@ -13,7 +13,7 @@ import { DcpReportsService } from '../api';
 import { useFetchV2 } from '../hooks';
 import { DcpReport } from '../interfaces';
 import { formatFullDateTime } from '../utils/TimeHelper';
-import { comparers, dcpReportStatus, dcpReportStatusDic } from '../appConsts';
+import { comparers, dataGridLocale, dcpReportStatus, dcpReportStatusDic } from '../appConsts';
 import { routes, routeWithParams } from '../routers/routesDictionary';
 import FilterButton, { IFilterOption } from '../components/FilterButton';
 import { useHistory } from 'react-router-dom';
@@ -221,7 +221,7 @@ const cols: GridColDef[] =  [
   },
 ];
 
-const fetchAPIDebounced = AwesomeDebouncePromise(DcpReportsService.getMyDcpReports, 500);
+const fetchAPIDebounced = AwesomeDebouncePromise(DcpReportsService.getMyDcpReports, 100);
 
 const MyDCPReportPage = () => {
   
@@ -434,6 +434,7 @@ const MyDCPReportPage = () => {
                   rowsPerPageOptions={[5, 15, 30, 50]}
                   onPageSizeChange={onPageSizeChange}
                   pagination
+                  localeText={dataGridLocale}
                 />
               </Container>
             </Grid>

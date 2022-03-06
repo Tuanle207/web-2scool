@@ -7,7 +7,6 @@ function* getAppConfig() {
   try {
     yield put(LoadingActions.fetchingAppConfig(true));
     const data: Util.AppConfig = yield call(AppConfigService.getAppConfig);
-    console.log({data});
     yield put(AppConfigsActions.setAppConfigStorage(data));
 
   } catch (err) {

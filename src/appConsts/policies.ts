@@ -1,4 +1,4 @@
-const policies = {
+export const policies = {
   AbpIdentityRoles: 'AbpIdentity.Roles',
   AbpIdentityRolesCreate: 'AbpIdentity.Roles.Create',
   AbpIdentityRolesUpdate: 'AbpIdentity.Roles.Update',
@@ -54,5 +54,3 @@ const policies = {
   GetScheduleList: 'GetScheduleList',
   GetMyAssignedSchedule: 'GetMyAssignedSchedule',
 };
-
-export default policies;

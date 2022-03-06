@@ -14,7 +14,8 @@ const CreateStudentAccountRequest = ({id}: {id?: string}) => {
     phoneNumber: '',
     roleNames: [''],
     password: '',
-    extraProperties: {}
+    extraProperties: {},
+    concurrencyStamp: ''
   });
   const [ selectedRoles ] = useState<Identity.UserRoleDto[]>([]);
   const { errors } = useDataValidator();

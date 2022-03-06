@@ -14,10 +14,9 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@material-ui/icons/Edit';
 import PublishIcon from '@material-ui/icons/Publish';
 import ActionModal from '../components/Modal';
-import { comparers } from '../appConsts';
+import { comparers, regulationType, dataGridLocale } from '../appConsts';
 import { toast } from 'react-toastify';
 import { routes } from '../routers/routesDictionary';
-import regulationType from '../appConsts/regulationType';
 import CreateOrUpdateRegulationModal from '../components/Modal/CreateOrUpdateRegulationModal';
 import useStyles from '../assets/jss/views/StudentsPage';
 
@@ -113,7 +112,7 @@ const cols: GridColDef[] =  [
   },
 ];
 
-const fetchAPIDebounced = AwesomeDebouncePromise(RegulationsService.getAllRegulations, 500);
+const fetchAPIDebounced = AwesomeDebouncePromise(RegulationsService.getAllRegulations, 100);
 
 const RegulationsPage = () => {
 
@@ -338,6 +337,7 @@ const RegulationsPage = () => {
                   onPageSizeChange={onPageSizeChange}
                   pagination
                   onCellClick={onCellClick}
+                  localeText={dataGridLocale}
                 />
               </Container>
             </Grid>

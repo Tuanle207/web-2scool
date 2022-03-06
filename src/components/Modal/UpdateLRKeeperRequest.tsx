@@ -1,9 +1,13 @@
 import { useState, useEffect } from 'react';
-import { Container, Radio, RadioGroup, RadioProps, makeStyles, FormControlLabel, TextField} from '@material-ui/core';
+import { Container, Radio, RadioGroup, RadioProps, makeStyles, FormControlLabel, TextField, Grid} from '@material-ui/core';
 import { Identity } from '../../interfaces';
 import { IdentityService } from '../../api';
 import ActionModal from '.';
 import { withoutVNSign } from '../../utils/StringHelper';
+import { KeyboardDatePicker, MuiPickersUtilsProvider } from '@material-ui/pickers';
+import { MaterialUiPickersDate } from '@material-ui/pickers/typings/date';
+import DateFnsUtils from '@date-io/date-fns';
+import moment from 'moment';
 
 const useStyles = makeStyles({
   root: {
@@ -64,13 +68,19 @@ function StyledRadio(props: RadioProps) {
 const UpdateLRKeeperRequest = ({
   classId,
   assignedStudentId,
+  initStartTime,
+  initEndTime
 }: {
   classId: string;
   assignedStudentId?: string;
+  initStartTime?: Date;
+  initEndTime?: Date;
 }) => {
 
   const [ students, setStudents ] = useState<Identity.UserForTaskAssignmentDto[]>([]);
   const [ selectedUserId, setSelectedUserId] = useState<string | null>(null);
+  const [ startTime, setStartTime ] = useState<Date>(initStartTime ?? new Date());
+  const [ endTime, setEndTime ] = useState<Date>(initEndTime ?? moment().add(3, 'months').toDate());
   const [ studentName, setStudentName ] = useState<string>('');
   const [ loadingData, setLoadingData ] = useState(true);
 
@@ -79,7 +89,6 @@ const UpdateLRKeeperRequest = ({
       const { items } = await IdentityService.getUsersForTaskAssignment(classId);
       setStudents(items);
       const assignee = items.find((x) => x.userProfileId === assignedStudentId);
-      console.log({items, assignee, assignedStudentId});
       setSelectedUserId(assignee ? assignee.userProfileId : null);
       setLoadingData(false);
     };
@@ -89,23 +98,32 @@ const UpdateLRKeeperRequest = ({
   }, [classId, assignedStudentId]);
 
   useEffect(() => {
-    console.log({selectedUserId});
     if (selectedUserId)  {
       ActionModal.setData({ 
         data: {
-          classId: classId,
-          userId: selectedUserId
+          userId: selectedUserId,
+          classId,
+          startTime,
+          endTime
         },
         error: undefined
       });
     }
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedUserId]);
+  }, [selectedUserId, startTime, endTime]);
 
   const handleRadioChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     console.log((event.target as HTMLInputElement).value);
     setSelectedUserId((event.target as HTMLInputElement).value);
+  };
+
+  const onStartDateChange = (date: MaterialUiPickersDate) => {
+    date && setStartTime(date);
+  };
+
+  const onEndDateChange = (date: MaterialUiPickersDate) => {
+    date && setEndTime(date);
   };
 
   return (
@@ -144,6 +162,42 @@ const UpdateLRKeeperRequest = ({
           )
         }
       </Container>
+      <MuiPickersUtilsProvider utils={DateFnsUtils}>
+        <Grid direction="row" alignItems="center" justify="center">
+          <KeyboardDatePicker
+            disableToolbar
+            fullWidth
+            size="small"
+            variant="inline"
+            format="dd/MM/yyyy"
+            margin="dense"
+            id="get-start-date"
+            placeholder="Bắt đầu từ"
+            label="Ngày bắt đầu"
+            value={startTime}
+            onChange={onStartDateChange}
+            KeyboardButtonProps={{
+              "aria-label": "lr - keeper - start end date",
+            }}
+          />
+          <KeyboardDatePicker
+            disableToolbar
+            fullWidth
+            size="small"
+            variant="inline"
+            format="dd/MM/yyyy"
+            margin="dense"
+            id="get-end-date"
+            placeholder="Đến ngày"
+            label="Ngày kết thúc"
+            value={endTime}
+            onChange={onEndDateChange}
+            KeyboardButtonProps={{
+              "aria-label": "lr - keeper - change end date",
+            }}
+          />
+        </Grid>
+      </MuiPickersUtilsProvider>
     </form>
   );
 };

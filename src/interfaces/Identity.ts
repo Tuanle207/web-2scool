@@ -22,6 +22,7 @@ export namespace Identity {
     phoneNumberConfirmed: boolean;
     roles: RoleForSimpleListDto[];
     listRoleId: string[];
+    concurrencyStamp: string;
   }
 
   export interface CreateUpdateUserDto extends Util.IHaveExtraProperties {
@@ -31,6 +32,7 @@ export namespace Identity {
     phoneNumber: string;
     roleNames: string[];
     password: string;
+    concurrencyStamp: string;
   }
 
   export interface UserRoleDto {
