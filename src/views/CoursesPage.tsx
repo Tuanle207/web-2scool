@@ -11,9 +11,8 @@ import PageTitleBar from '../components/PageTitleBar';
 import { Course } from '../interfaces';
 import { CoursesService } from '../api';
 import { formatDate } from '../utils/TimeHelper';
-import { useFetchV2 } from '../hooks';
+import { useDialog, useFetchV2 } from '../hooks';
 import CreateOrUpdateCourseRequest from '../components/Modal/CreateOrUpdateCourseRequest';
-import ActionModal from '../components/Modal';
 import { routes } from '../routers/routesDictionary';
 import useStyles from '../assets/jss/views/CoursesPage';
 import { dataGridLocale } from '../appConsts';
@@ -26,48 +25,70 @@ interface RowMenuProps {
 const RowMenuCell = (props: RowMenuProps) => {
   const { api, id } = props;
 
+  const { showDialog } = useDialog<Course.CreateUpdateCourseDto>({
+    type: 'data',
+    title: 'Cập nhật thông tin khóa học',
+    acceptText: 'Lưu',
+    cancelText: 'Hủy',
+    renderFormComponent: CreateOrUpdateCourseRequest
+  });
+
   const reloadCurrentPageData = () => {
     api.setPage(api.getState().pagination.page);
   };
 
   const onRequestDelete = async () => {
-    await CoursesService.removeCourse({courseId: id.toString()});
-    toast(`Xóa khóa học ${api.getCellValue(id, 'name')} thành công`, {
-      type: toast.TYPE.SUCCESS
-    });
-    reloadCurrentPageData();
+    try {
+      const courseId = id.toString();
+      const courseName = api.getCellValue(id, 'name')?.toString().toUpperCase();
+      const deleteResult = await showDialog(null, {
+        type: 'default',
+        title: `Xác nhận xóa khóa học ${courseName}?`
+      });
+      const { result } = deleteResult;
+      if (result === 'Ok') {
+        await CoursesService.removeCourse({ courseId });
+        toast(`Xóa khóa học ${courseName} thành công`, {
+          type: toast.TYPE.SUCCESS
+        });
+        reloadCurrentPageData();
+      }
+    } catch (err) {
+      toast.error('Đã có lỗi xảy ra, không thể xóa khóa học');
+    }
   };
 
-  const onRequestUpdate = async (data: Course.CreateUpdateCourseDto) => {
-    await CoursesService.updateCourse({id: id.toString(), data});
-    toast('Cập nhật thông tin khóa học thành công', {
-      type: toast.TYPE.SUCCESS
-    });
-    
-    reloadCurrentPageData();
+  const onRequestUpdate = async () => {
+    try {
+      const courseId = id.toString();
+      const course = await CoursesService.getCourseById(courseId);
+      const editResult = await showDialog({ editItem: course });
+      const { result, data } = editResult;
+      console.log({result});
+      if (result === 'Ok' && data) {
+        await CoursesService.updateCourse({id: courseId, data});
+        toast('Cập nhật thông tin khóa học thành công', {
+          type: toast.TYPE.SUCCESS
+        });
+        reloadCurrentPageData();
+      }
+    } catch (err) {
+      toast.error('Đã có lỗi xảy ra, không thể cập nhật khóa học');
+    }
   };
 
   return (
     <div>
       <Tooltip title='Cập nhật thông tin khóa học này'>
           <IconButton  
-            onClick={() => ActionModal.show({
-              title: 'Cập nhật thông tin khóa học',
-              acceptText: 'Lưu',
-              cancelText: 'Hủy',
-              component: <CreateOrUpdateCourseRequest id={id.toString()}/>,
-              onAccept: onRequestUpdate
-            })} 
+            onClick={onRequestUpdate} 
           >
             <EditIcon />
           </IconButton>
         </Tooltip>
       <Tooltip title='Xóa học khóa học này'>
         <IconButton
-          onClick={() => ActionModal.show({
-            title: `Xác nhận xóa khóa học ${api.getCellValue(id, 'name')}?`,
-            onAccept: onRequestDelete
-          })}
+          onClick={onRequestDelete}
         >
           <DeleteIcon />
         </IconButton>
@@ -129,6 +150,14 @@ const CoursesPage = () => {
     error,
     resetFilter
   } = useFetchV2({ fetchFn: fetchAPIDebounced });
+
+  const { showDialog } = useDialog<Course.CreateUpdateCourseDto>({
+    type: 'data',
+    title: 'Thêm khóa học mới',
+    acceptText: 'Lưu',
+    cancelText: 'Hủy',
+    renderFormComponent: CreateOrUpdateCourseRequest
+  });
   
   useEffect(() => {
     document.title = "2Scool | Quản lý khóa học";
@@ -142,12 +171,20 @@ const CoursesPage = () => {
     setPageSize(param.pageSize);
   };
 
-  const onRequestCreate = async (data: Course.CreateUpdateCourseDto) => {
-    await CoursesService.createCourse(data);
-    toast('Thêm khóa học thành công', {
-      type: toast.TYPE.SUCCESS
-    });
-    resetFilter();
+  const onRequestCreate = async () => {
+    try {
+      const editResult = await showDialog();
+      const { result, data } = editResult;
+      if (result === 'Ok' && data) {
+        await CoursesService.createCourse(data);
+        toast('Thêm khóa học thành công', {
+          type: toast.TYPE.SUCCESS
+        });
+        resetFilter();
+      }
+    } catch (err) {
+      toast.error('Đã có lỗi xảy ra, không thể thêm khóa học');
+    }
   };
 
   return (
@@ -174,13 +211,7 @@ const CoursesPage = () => {
               <Paper variant="outlined" elevation={1}>
                 <PageTitleBar 
                   title={`Khóa học`} 
-                  onMainButtonClick={() => ActionModal.show({
-                    title: 'Thêm khóa học mới',
-                    acceptText: 'Lưu',
-                    cancelText: 'Hủy',
-                    component: <CreateOrUpdateCourseRequest />,
-                    onAccept: onRequestCreate
-                  })}
+                  onMainButtonClick={onRequestCreate}
                   onOptionsButtonClick={() => toast('default toast', {
                     type: toast.TYPE.INFO,
                   })}

@@ -2,6 +2,7 @@ import { theme } from '../../../themes/theme';
 import { CSSProperties } from 'react';
 
 
+
 const modalStyles: {[key: string]: CSSProperties} = {
   root: {
     top: `50%`,
@@ -24,10 +25,13 @@ const modalStyles: {[key: string]: CSSProperties} = {
   },
   warning: {
     display: "flex",
-    justifyContent: "center",
+    justifyContent: "space-around",
+    alignItems: "center",
     flexDirection: "row",
-    marginBottom: theme.spacing(2),
-    color: theme.palette.warning.dark
+    color: theme.palette.warning.dark,
+    border: `1px solid ${theme.palette.warning.main}`,
+    padding: '8px 4px',
+    borderRadius: 4
   }
 }
 

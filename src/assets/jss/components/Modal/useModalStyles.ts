@@ -16,6 +16,7 @@ const useModalStyles = makeStyles((theme: Theme) => ({
   titleBar: {
     borderBottom: `1px solid ${theme.palette.divider}`,
     marginBottom: theme.spacing(2),
+    paddingBottom: 4,
   },
   buttonGroup: {
     padding: theme.spacing(2),
@@ -26,7 +27,10 @@ const useModalStyles = makeStyles((theme: Theme) => ({
     justifyContent: "center",
     flexDirection: "row",
     marginBottom: theme.spacing(2),
-    color: theme.palette.warning.dark
+    color: theme.palette.warning.main,
+    border: `1px solid ${theme.palette.warning.main}`,
+    padding: '8px 4px',
+    borderRadius: 4
   }
 }));
 

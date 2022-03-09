@@ -1,21 +1,58 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useEffect, useState } from 'react';
-import { Container, Grid, Typography, IconButton, Paper } from '@material-ui/core';
-import Header from '../components/Header';
-import Sidebar from '../components/Sidebar';
-import { Class, Identity, TaskAssignment, User, Util } from '../interfaces';
-import { ClassesService, IdentityService, TaskAssignmentService } from '../api';
-import { getDayOfWeek, formatTime, formatDate } from '../utils/TimeHelper';
-import { dataGridLocale, taskType } from '../appConsts';
+import { 
+  useEffect, 
+  useMemo, 
+  useState 
+} from 'react';
+import { 
+  Container, 
+  Grid, 
+  Typography, 
+  IconButton, 
+  Paper 
+} from '@material-ui/core';
 import AlarmIcon from '@material-ui/icons/Alarm';
 import PermContactCalendarIcon from '@material-ui/icons/PermContactCalendar';
 import EditIcon from '@material-ui/icons/Edit';
-import { routes } from '../routers/routesDictionary';
-import { DataGrid, GridApi, GridCellParams, GridColDef, GridRowId, GridValueFormatterParams } from '@material-ui/data-grid';
-import ActionModal from '../components/Modal';
-import UpdateLRKeeperRequest from '../components/Modal/UpdateLRKeeperRequest';
+import { 
+  DataGrid, 
+  GridApi, 
+  GridCellParams, 
+  GridColDef, 
+  GridRowId, 
+  GridValueFormatterParams 
+} from '@material-ui/data-grid';
 import { toast } from 'react-toastify';
 import moment from 'moment';
+import Header from '../components/Header';
+import Sidebar from '../components/Sidebar';
+import { 
+  Class, 
+  Identity, 
+  TaskAssignment, 
+  User, 
+  Util
+ } from '../interfaces';
+import { 
+  ClassesService, 
+  IdentityService, 
+  TaskAssignmentService
+ } from '../api';
+import { 
+  getDayOfWeek, 
+  formatTime, 
+  formatDate
+ } from '../utils/TimeHelper';
+import { 
+  dataGridLocale, 
+  taskType
+ } from '../appConsts';
+import { routes } from '../routers/routesDictionary';
+import UpdateLRKeeperRequest from '../components/Modal/UpdateLRKeeperRequest';
+import { 
+  useDialog, 
+  IDialogOptions
+ } from '../hooks';
 import useStyles from '../assets/jss/views/LessonRegisterReportSchedule';
 
 interface IAssignClass {
@@ -32,7 +69,6 @@ interface RowMenuProps {
 }
 
 const RowMenuCell = (props: RowMenuProps) => {
-
   return (
     <Grid container justify="center">
       <IconButton
@@ -44,7 +80,6 @@ const RowMenuCell = (props: RowMenuProps) => {
     </Grid>
   );
 };
-
 
 const cols: GridColDef[] = [
   {
@@ -107,7 +142,6 @@ const cols: GridColDef[] = [
   }
 ];
 
-
 const LessonRegisterReportSchedule = () => {
 
   const classes = useStyles();
@@ -122,6 +156,11 @@ const LessonRegisterReportSchedule = () => {
   const [ data, setData ] = useState<TaskAssignment.TaskAssignmentDto[]>([]);
   const [ loading, setLoading ] = useState(true);
 
+  const { showDialog } = useDialog<{ classId: string; userId: string; startTime: Date; endTime: Date; }>({
+    type: 'data',
+    renderFormComponent: UpdateLRKeeperRequest,
+    acceptText: 'Lưu phân công',
+  });
 
   useEffect(() => {
     
@@ -130,30 +169,35 @@ const LessonRegisterReportSchedule = () => {
 
   }, []);
 
-  const getData = async () => {
-    setLoading(true);
-    const promises: [
-      Promise<Util.PagingModel<Class.ClassForSimpleListDto>>,
-      Promise<Util.PagingModel<Identity.UserForTaskAssignmentDto>>,
-      Promise<Util.PagingModel<TaskAssignment.TaskAssignmentDto>>
-    ] = [
-      ClassesService.getClassForSimpleList(),
-      IdentityService.getUsersForTaskAssignment(),
-      TaskAssignmentService.getAll({taskType: taskType.LessonRegisterReport})
-    ];
-
-    const [classRes, userRes, taskAssignRes] = await Promise.all(promises);
-
-    setClassData(classRes.items);
-    setUserData(userRes.items);
-    parseAssignmentScheduleData(classRes.items, taskAssignRes.items);
-    setLoading(false);
+  const getData = async (): Promise<void> => {
+    try {
+      setLoading(true);
+      const promises: [
+        Promise<Util.PagingModel<Class.ClassForSimpleListDto>>,
+        Promise<Util.PagingModel<Identity.UserForTaskAssignmentDto>>,
+        Promise<Util.PagingModel<TaskAssignment.TaskAssignmentDto>>
+      ] = [
+        ClassesService.getClassForSimpleList(),
+        IdentityService.getUsersForTaskAssignment(),
+        TaskAssignmentService.getAll({taskType: taskType.LessonRegisterReport})
+      ];
+  
+      const [classRes, userRes, taskAssignRes] = await Promise.all(promises);
+  
+      setClassData(classRes.items);
+      setUserData(userRes.items);
+      parseAssignmentScheduleData(classRes.items, taskAssignRes.items);
+    } catch (err: any)  {
+      toast.error('Đã có lỗi xảy ra khi khởi tạo dữ liệu');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const parseAssignmentScheduleData = (classItems: Class.ClassForSimpleListDto[],
-    taskAssignItems: TaskAssignment.TaskAssignmentDto[]) => {
+    taskAssignItems: TaskAssignment.TaskAssignmentDto[]): void => {
 
-    const scheData: TaskAssignment.TaskAssignmentDto[] = [];
+    const scheData: TaskAssignment.TaskAssignmentDto[] = [];  
     if (taskAssignItems.length > 0) {
       const firstItem = taskAssignItems[0];
       setCreatorInfo(firstItem.creator);
@@ -192,25 +236,30 @@ const LessonRegisterReportSchedule = () => {
     setAssignClasses(assigns);
   };
   
-  const handleSubmit = async (assigment: IAssignClass[]) => {
-    const body: TaskAssignment.CreateUpdateTaskAssignmentDto = {
-      items: [],
-      taskType: taskType.LessonRegisterReport
-    };
-
-    body.items = assigment.filter(x => x.assigned).map(x => ({
-      assigneeId: x.user!.id,
-      classId: x.classId,
-      startTime: x.startTime!,
-      endTime: x.endTime!
-    }));
-
-    await TaskAssignmentService.createUpdate(body);
+  const handleSubmit = async (assigment: IAssignClass[]): Promise<void> => {
+    try {
+      const body: TaskAssignment.CreateUpdateTaskAssignmentDto = {
+        items: [],
+        taskType: taskType.LessonRegisterReport
+      };
+  
+      body.items = assigment.filter(x => x.assigned).map(x => ({
+        assigneeId: x.user!.id,
+        classId: x.classId,
+        startTime: x.startTime!,
+        endTime: x.endTime!
+      }));
+  
+      await TaskAssignmentService.createUpdate(body);
+    } catch (err: any) {
+      throw err;
+    }
+    
   };
 
-  const onUpdateAssignment = async ({ classId, userId, startTime, endTime } : {
+  const updateAssignment = async ({ classId, userId, startTime, endTime } : {
     classId: string; userId: string; startTime: Date; endTime: Date;
-  }) =>  {
+  }): Promise<void> =>  {
     try {
       const newAssignment = [...assignClasses];
       const assign = newAssignment.find(x => x.classId === classId);
@@ -246,34 +295,35 @@ const LessonRegisterReportSchedule = () => {
       setLoading(false);
     } catch (err) {
       console.log({err});
-      toast.error('Đã có lỗi xảy ra! Không thể lưu phân công!');
+      toast.error('Đã có lỗi xảy ra. Không thể lưu phân công!');
     }
-    
   };
 
-  const handleEditAssignment = (classId: string) => {
-
+  const handleEditAssignment = async (classId: string): Promise<void> => {
     const classItem = classData.find(x => x.id === classId);
     if (classItem) {
 
       const assign = assignClasses.find(x => x.classId === classId);
-
-      ActionModal.show({
+      const initialData = {
+        classId,
+        assignedStudentId: assign?.user?.id,
+        initStartTime:assign?.startTime,
+        initEndTime: assign?.endTime
+      };
+      const options: IDialogOptions = {
         title: `Chọn học sinh giữ sổ đầu bài cho ${classItem.name}`,
-        onAccept: onUpdateAssignment,
-        acceptText: "Lưu phân công",
-        component: <UpdateLRKeeperRequest 
-          classId={classId}
-          assignedStudentId={assign?.user?.id}
-          initStartTime={assign?.startTime}
-          initEndTime={assign?.endTime}
-          />
-      });
+      };
+      const result = await showDialog(initialData, options);
+      if (result.result === 'Ok' && result.data) {
+        await updateAssignment(result.data);
+      }
     }
   };
 
-  const timeText = 'Cập nhật lần cuối vào ' + (updatedTime ? `${getDayOfWeek(updatedTime.toLocaleString())} - ${formatTime(updatedTime.toLocaleString())}` : 'Không xác định');
-  const creatorText = creatorInfo ? `Phân công bởi ${creatorInfo.name}` : 'Chưa được ai phân công';
+  const timeText = useMemo(() => 'Cập nhật lần cuối vào ' + 
+    (updatedTime ? `${getDayOfWeek(updatedTime.toLocaleString())} - ${formatTime(updatedTime.toLocaleString())}` 
+    : 'Không xác định'), [updatedTime]);
+  const creatorText = useMemo(() => creatorInfo ? `Phân công bởi ${creatorInfo.name}` : 'Chưa được ai phân công', [creatorInfo]);
 
   return (
     <div style={{ height: '100%' }}>

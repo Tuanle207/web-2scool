@@ -1,13 +1,29 @@
-import { useState, useEffect } from 'react';
-import { Container, Radio, RadioGroup, RadioProps, makeStyles, FormControlLabel, TextField, Grid} from '@material-ui/core';
+import { 
+  useState, 
+  useEffect, 
+  useMemo 
+} from 'react';
+import { 
+  Container, 
+  Radio, 
+  RadioGroup, 
+  RadioProps, 
+  makeStyles, 
+  FormControlLabel, 
+  TextField, 
+  Grid
+} from '@material-ui/core';
+import { 
+  KeyboardDatePicker, 
+  MuiPickersUtilsProvider 
+} from '@material-ui/pickers';
+import { MaterialUiPickersDate } from '@material-ui/pickers/typings/date';
+import DateFnsUtils from '@date-io/date-fns';
+import moment from 'moment';
 import { Identity } from '../../interfaces';
 import { IdentityService } from '../../api';
 import ActionModal from '.';
 import { withoutVNSign } from '../../utils/StringHelper';
-import { KeyboardDatePicker, MuiPickersUtilsProvider } from '@material-ui/pickers';
-import { MaterialUiPickersDate } from '@material-ui/pickers/typings/date';
-import DateFnsUtils from '@date-io/date-fns';
-import moment from 'moment';
 
 const useStyles = makeStyles({
   root: {
@@ -126,6 +142,10 @@ const UpdateLRKeeperRequest = ({
     date && setEndTime(date);
   };
 
+  const filteredUsers = useMemo(() => {
+    return students.filter(item => withoutVNSign(item.name).toLowerCase().includes(studentName));
+  }, [students, studentName]) ;
+
   return (
     <form style={{padding: '20px 0', paddingTop: 8, width: "100%"}}>
       <TextField
@@ -148,8 +168,7 @@ const UpdateLRKeeperRequest = ({
               onChange={handleRadioChange}
             >
               {
-                students.filter(item => withoutVNSign(item.name).toLowerCase().includes(studentName))
-                  .map((item) =>  (
+                filteredUsers.map((item) =>  (
                   <FormControlLabel
                     key={item.id}
                     value={item.userProfileId} 
@@ -161,14 +180,19 @@ const UpdateLRKeeperRequest = ({
             </RadioGroup> 
           )
         }
+        {
+          !loadingData && filteredUsers.length === 0 && (
+            <p>Không có học sinh nào.</p>
+          )
+        }
       </Container>
       <MuiPickersUtilsProvider utils={DateFnsUtils}>
-        <Grid direction="row" alignItems="center" justify="center">
+        <Grid container direction="row" justify="center" alignItems="center">
           <KeyboardDatePicker
             disableToolbar
             fullWidth
             size="small"
-            variant="inline"
+            variant="dialog"
             format="dd/MM/yyyy"
             margin="dense"
             id="get-start-date"
@@ -184,7 +208,7 @@ const UpdateLRKeeperRequest = ({
             disableToolbar
             fullWidth
             size="small"
-            variant="inline"
+            variant="dialog"
             format="dd/MM/yyyy"
             margin="dense"
             id="get-end-date"

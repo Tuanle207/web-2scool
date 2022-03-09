@@ -1,118 +1,157 @@
-import { useEffect, useState } from 'react';
+import { FC, useEffect } from 'react';
 import { Box, Container, TextField } from '@material-ui/core';
 import DateFnsUtils from '@date-io/date-fns';
 import { MuiPickersUtilsProvider, KeyboardDatePicker } from '@material-ui/pickers';
+import { useForm, Controller } from 'react-hook-form';
+import moment from 'moment';
 import { Course } from '../../interfaces';
-import ActionModal from '.';
-import { Validator } from '../../utils/DataValidation';
-import { useDataValidator } from '../../hooks';
-import { CoursesService } from '../../api';
+import { useDialogController } from '../../hooks';
 
-const CreateOrUpdateCourseRequest = ({id}: {id?: string}) => {
+export interface CreateOrUpdateCourseRequestProps {
+  editItem?: Course.CourseDto;
+}
 
-  const [data, setData] = useState<Course.CreateUpdateCourseDto>({
-    name: '',
-    description: '',
-    startTime: new Date(),
-    finishTime: new Date()
+const CreateOrUpdateCourseRequest: FC<CreateOrUpdateCourseRequestProps> = ({
+  editItem
+}) => {
+
+  const { control, getValues, reset, trigger, formState } = useForm<Course.CreateUpdateCourseDto>({
+    defaultValues: {
+      name: '',
+      description: '',
+      startTime: new Date(),
+      finishTime: moment().add(1, 'year').toDate()
+    },
   });
-  const {errors, validate, getError} = useDataValidator();
+
+  useDialogController({ control, trigger, formState });
 
   useEffect(() => {
-    if (id) {
-      CoursesService.getCourseById(id).then(res => setData({
-        name: res.name || '',
-        description: res.description || '',
-        startTime: res.startTime || new Date(),
-        finishTime: res.finishTime || new Date()
-      }))
+    if (editItem) {
+      const { name, description, startTime, finishTime} = editItem;
+      reset({ name, description, startTime, finishTime });
     }
-  }, [id]);
-
-  useEffect(() => {
-    ActionModal.setData({
-      data,
-      error: errors.length > 0 ? {
-        error: true,
-        msg: errors[0].msg
-      } : undefined
-    });
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data]);
-
-
-  const nameChange = (value: string) => {
-    setData(prev => ({...prev, name: value}))
-    validate('tên', value, Validator.isNotEmpty);
-  };
-  const descriptionChange = (value: string) => {
-    setData(prev => ({...prev, description: value}))
-    validate('mô tả', value, Validator.isNotEmpty);
-  };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [editItem]);
 
   return (
     <form style={{padding: '20px 0'}}>
       <Container>
         <Box style={{marginBottom: '10px'}}>
-          <TextField
-            {...getError('tên')}
-            id='create-course-name' 
-            label='Tên khóa học' 
-            required
-            autoComplete='off'
-            autoFocus={true}
-            style={{width: '40ch'}}
-            value={data.name}
-            onChange={({target: { value }}) => nameChange(value)}
+          <Controller
+            control={control}
+            name="name"
+            rules={{
+              required: {
+                value: true,
+                message: 'Tên khóa học là bắt buộc'
+              }
+            }}
+            render={({field, fieldState: { error }}) => (
+              <TextField
+                id='create-course-name' 
+                label='Tên khóa học' 
+                autoComplete='off'
+                autoFocus={true}
+                style={{width: '40ch'}}
+                {...field}
+                error={!!error}
+                helperText={error?.message}
+              />
+            )}
           />
         </Box>
         <Box style={{marginBottom: '10px'}}>
-          <TextField 
-            {...getError('mô tả')}
-            id='create-course-description' 
-            label='Mô tả'
-            autoComplete='off'
-            multiline
-            rowsMax={4}
-            rows={4}
-            style={{width: '40ch'}}
-            value={data.description}
-            onChange={({target: { value }}) => descriptionChange(value)}
+          <Controller
+            control={control}
+            name="description"
+            rules={{
+              required: {
+                value: true,
+                message: 'Mô tả khóa học là bắt buộc'
+              }
+            }}
+            render={({field: { name, value, onChange, onBlur }, fieldState: { error }}) => (
+              <TextField
+                id='create-course-description' 
+                label='Mô tả'
+                autoComplete='off'
+                multiline
+                rowsMax={4}
+                rows={4}
+                style={{width: '40ch'}}
+                name={name}
+                value={value}
+                onChange={onChange}
+                onBlur={onBlur}
+                error={!!error}
+                helperText={error?.message}
+              />
+            )}
           />
         </Box>
         <Box>
           <MuiPickersUtilsProvider utils={DateFnsUtils}>
             <Box>
-              <KeyboardDatePicker
-                disableToolbar
-                fullWidth
-                variant="dialog"
-                format="dd/MM/yyyy"
-                margin="dense"
-                id="create-course-start-date"
-                label="Ngày bắt đầu"
-                value={data.startTime}
-                onChange={date => setData((prev) => ({...prev, startTime: date || prev.startTime}))}
-                KeyboardButtonProps={{
-                  'aria-label': 'change date',
-                }}
-              />
+            <Controller
+              control={control}
+              name="startTime"
+              render={({field: { name, value, onChange, onBlur }, fieldState: { error }}) => (
+                <KeyboardDatePicker
+                  disableToolbar
+                  fullWidth
+                  variant="dialog"
+                  format="dd/MM/yyyy"
+                  margin="dense"
+                  id="create-course-start-date"
+                  label="Ngày bắt đầu"
+                  KeyboardButtonProps={{
+                    'aria-label': 'change date',
+                  }}
+                  name={name}
+                  value={value}
+                  onChange={onChange}
+                  onBlur={onBlur}
+                  error={!!error}
+                  helperText={error?.message}
+                />
+              )}
+            />
           </Box>
           <Box>
-            <KeyboardDatePicker
-              disableToolbar
-              fullWidth
-              variant="dialog"
-              format="dd/MM/yyyy"
-              margin="normal"
-              id="create-course-end-date"
-              label="Ngày kết thúc"
-              value={data.finishTime}
-              onChange={date => setData((prev) => ({...prev, finishTime: date || prev.startTime}))}
-              KeyboardButtonProps={{
-                'aria-label': 'change date',
+            <Controller 
+              control={control}
+              name="finishTime"
+              rules={{
+                validate: (value: Date) => {
+                  const startTime = getValues('startTime');
+                  if (moment(value).isSameOrBefore(startTime)) {
+                    return 'Ngày kết thúc phải sau ngày bắt đầu'
+                  }
+                }
               }}
+              render={({field: { name, value, onChange, onBlur }, fieldState: { error }}) => (
+                <KeyboardDatePicker
+                  disableToolbar
+                  fullWidth
+                  variant="dialog"
+                  format="dd/MM/yyyy"
+                  margin="normal"
+                  id="create-course-end-date"
+                  label="Ngày kết thúc"
+                  KeyboardButtonProps={{
+                    'aria-label': 'change date',
+                  }}
+                  name={name}
+                  value={value}
+                  onChange={onChange}
+                  onBlur={onBlur}
+                  error={!!error}
+                  helperText={error?.message}
+                />
+              )}
             />
+            
           </Box>
         </MuiPickersUtilsProvider>
         

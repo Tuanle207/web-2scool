@@ -10,6 +10,7 @@ import { AuthSelector, LoadingSelector } from '../../store/selectors';
 import { AppConfigsActions } from '../../store/actions';
 import { isTokenValid } from '../../config/axios/util';
 import 'react-toastify/dist/ReactToastify.css';
+import Dialog from '../Modal/Dialog';
 
 interface IAppContainerProps {
   
@@ -24,19 +25,19 @@ const AppContainer: React.FC<IAppContainerProps> = () => {
   const isValid = useMemo(() => isTokenValid(token ?? ''), [token]);
 
   useEffect(() => {
-    if (isTokenValid(token ?? ''))
+    if (isValid)
     {
       dispatch(AppConfigsActions.getAppConfigAsync());
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [token]);
+  }, [isValid]);
 
   return (
     <ThemeProvider theme={theme} >
       <StylesProvider jss={jss} >
         <CssBaseline>
           {
-            fetchingAppConfig ? <div>loading...</div> :
+            fetchingAppConfig ? <div>Đang tải...</div> :
             isValid ? <DashboardRouter /> : <AuthRouter />
           }
           <ToastContainer 
@@ -47,6 +48,7 @@ const AppContainer: React.FC<IAppContainerProps> = () => {
             limit={6}
           />
           <ActionModal />
+          <Dialog />
         </CssBaseline>
       </StylesProvider>
     </ThemeProvider>
