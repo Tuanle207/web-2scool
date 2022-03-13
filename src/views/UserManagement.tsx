@@ -10,11 +10,11 @@ import Header from '../components/Header';
 import PageTitleBar from '../components/PageTitleBar';
 import { Identity } from '../interfaces';
 import { IdentityService } from '../api';
-import { useFetchV2 } from '../hooks';
-import CreateOrUpdateUserRequest from '../components/Modal/CreateOrUpdateUserRequest';
-import ActionModal from '../components/Modal';
+import { useFetchV2, useDialog } from '../hooks';
+import CreateOrUpdateUserRequest, { CreateOrUpdateUserRequestProps, CreateUpdateUserFormValues } from '../components/Modal/CreateOrUpdateUserRequest';
 import { comparers, dataGridLocale } from '../appConsts';
 import { routes } from '../routers/routesDictionary';
+import { busyService } from '../services';
 import useStyles from '../assets/jss/views/UserManagement';
 
 interface RowMenuProps {
@@ -25,48 +25,94 @@ interface RowMenuProps {
 const RowMenuCell = (props: RowMenuProps) => {
   const { api, id } = props;
 
+  const { showDialog } = useDialog<CreateUpdateUserFormValues>({
+    type: 'data',
+    title: 'Cập nhật tài khoản người dùng',
+    acceptText: 'Lưu',
+    cancelText: 'Hủy',
+    renderFormComponent: CreateOrUpdateUserRequest
+  });
+
   const reloadCurrentPageData = () => {
     api.setPage(api.getState().pagination.page);
   };
 
   const onRequestDelete = async () => {
-    await IdentityService.deleteUserById(id.toString());
-    toast(`Xóa nguời dùng ${api.getCellValue(id, 'name')} thành công`, {
-      type: toast.TYPE.SUCCESS
+    const userName = api.getCellValue(id, 'name')?.toString().toUpperCase();
+    const { result } = await showDialog(null, {
+      type: 'default',
+      title: 'Xác nhận',
+      message: `Xác nhận tài khoản của người dùng ${userName}?`,
+      acceptText: 'Xác nhận'
     });
-    reloadCurrentPageData();
+    if (result !== 'Ok') {
+      return;
+    }
+    try {
+      busyService.busy(true);
+      const userId = id.toString();
+      await IdentityService.deleteUserById(userId);
+      toast.success(`Xóa nguời dùng ${userName} thành công!`);
+      reloadCurrentPageData();
+    } catch {
+      toast.error('Đã có lỗi xảy ra. Không thể xóa tài khoản.');
+    } finally {
+      busyService.busy(false);
+    }
   };
 
-  const onRequestUpdate = async (data: Identity.CreateUpdateUserDto) => {
-    await IdentityService.updateUser({id: id.toString(), data});
-    toast('Cập nhật thông tin người dùng thành công', {
-      type: toast.TYPE.SUCCESS
-    });
-    reloadCurrentPageData();
+  const onRequestUpdate = async () => {
+    const input = await initUpdateData();
+    if (!input) {
+      return;
+    }
+    const { result, data } = await showDialog(input);
+    if (result !== 'Ok' || !data) {
+      return;
+    }
+    try {
+      busyService.busy(true);
+      const userId = id.toString();
+      const dataCopy = {...data, roles: undefined};
+      const user: Identity.CreateUpdateUserDto = { ...dataCopy };
+      await IdentityService.updateUser({id: userId, data: user});
+      toast.success('Cập nhật thông tin tài khoản người dùng thành công');
+      reloadCurrentPageData();
+    } catch {
+      toast.error('Đã có lỗi xảy ra. Không thể cập nhật tài khoản người dùng.');
+    } finally {
+      busyService.busy(false);
+    }
   };
+
+  const initUpdateData = async () => {
+    try {
+      busyService.busy(true);
+      const { items } = await IdentityService.getAssignableRoles();
+      const userId = id.toString();
+      const user = await IdentityService.getUserById(userId);
+      const input: CreateOrUpdateUserRequestProps = {
+        assignableRoles: items,
+        editItem: user,
+      };
+      return input;
+    } catch {
+      toast.error('Đã có lỗi xảy ra. Không thể khởi tạo dữ liệu để cập nhật tài khoản.');
+      return null;
+    } finally {
+      busyService.busy(false);
+    }
+  }
 
   return (
     <div>
       <Tooltip title='Cập nhật thông tin người dùng này'>
-        <IconButton  
-          onClick={() => ActionModal.show({
-            title: 'Cập nhật thông tin người dùng',
-            acceptText: 'Lưu',
-            cancelText: 'Hủy',
-            component: <CreateOrUpdateUserRequest id={id.toString()}/>,
-            onAccept: onRequestUpdate
-          })}
-        >
+        <IconButton onClick={onRequestUpdate}>
           <EditIcon />
         </IconButton>
       </Tooltip>
       <Tooltip title='Xóa người dùng này'>
-        <IconButton
-          onClick={() => ActionModal.show({
-            title: `Xác nhận xóa người dùng ${api.getCellValue(id, 'name')}?`,
-            onAccept: onRequestDelete
-          })}
-        >
+        <IconButton onClick={onRequestDelete}>
           <DeleteIcon />
         </IconButton>
       </Tooltip>
@@ -132,6 +178,14 @@ const UserManagement = () => {
 
   const classes = useStyles();
 
+  const { showDialog } = useDialog<CreateUpdateUserFormValues>({
+    type: 'data',
+    title: 'Thêm tài khoản người dùng mới',
+    acceptText: 'Lưu',
+    cancelText: 'Hủy',
+    renderFormComponent: CreateOrUpdateUserRequest
+  });
+
   const { 
     pagingInfo,
     setFilter,
@@ -140,7 +194,8 @@ const UserManagement = () => {
     data,
     loading,
     error,
-    resetFilter
+    resetFilter,
+    getFilterCount
   } = useFetchV2({ fetchFn: fetchAPIDebounced });
 
   useEffect(() => {
@@ -155,13 +210,44 @@ const UserManagement = () => {
     setPageSize(param.pageSize);
   };
 
-  const onRequestCreate = async (data: Identity.CreateUpdateUserDto) => {
-    await IdentityService.createUser(data);
-    toast('Thêm người dùng thành công', {
-      type: toast.TYPE.SUCCESS
-    });
-    resetFilter();
+  const onRequestCreate = async () => {
+    const input = await initCreationData();
+    if (!input) {
+      return;
+    }
+    const { result, data } = await showDialog(input);
+    if (result !== 'Ok' || !data) {
+      return;
+    }
+    try {
+      busyService.busy(true);
+      const dataCopy = {...data, roles: undefined};
+      const user: Identity.CreateUpdateUserDto = { ...dataCopy };
+      await IdentityService.createUser(user);
+      toast.success('Thêm tài khoản người dùng thành công');
+      resetFilter();
+    } catch {
+      toast.error('Đã có lỗi xảy ra. Không thể tạo tài khoản người dùng.');
+    } finally {
+      busyService.busy(false);
+    }
   };
+
+  const initCreationData = async () => {
+    try {
+      busyService.busy(true);
+      const { items } = await IdentityService.getAssignableRoles();
+      const input: CreateOrUpdateUserRequestProps = {
+        assignableRoles: items,
+      };
+      return input;
+    } catch {
+      toast.error('Đã có lỗi xảy ra. Không thể khởi tạo dữ liệu để tạo tài khoản.');
+      return null;
+    } finally {
+      busyService.busy(false);
+    }
+  }
 
   return (
     <div style={{ flexGrow: 1 }}>
@@ -187,17 +273,9 @@ const UserManagement = () => {
             >
               <Paper variant="outlined" elevation={1}>
                 <PageTitleBar 
-                  title={`Người dùng`} 
-                  onMainButtonClick={() => ActionModal.show({
-                    title: 'Thêm người dùng mới',
-                    acceptText: 'Lưu',
-                    cancelText: 'Hủy',
-                    component: <CreateOrUpdateUserRequest />,
-                    onAccept: onRequestCreate
-                  })}
-                  onOptionsButtonClick={() => toast('default toast', {
-                    type: toast.TYPE.INFO,
-                  })}
+                  title={`Người dùng`}
+                  filterCount={getFilterCount()}
+                  onMainButtonClick={onRequestCreate}
                 />
               </Paper>
             </Grid>

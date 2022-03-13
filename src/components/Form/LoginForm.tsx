@@ -1,66 +1,70 @@
-import { FC, ReactNode, useEffect, useState } from 'react';
+import { FC } from 'react';
+import { useDispatch } from 'react-redux';
 import { TextField, Button, Container, FormControlLabel, Checkbox } from '@material-ui/core';
-import useLoginFormStyles from '../../assets/jss/components/Form/useLoginFormStyles';
+import { Controller, useForm } from 'react-hook-form';
 import { User } from '../../interfaces';
-import { withRedux } from '../../utils/ReduxConnect';
 import { AuthActions } from '../../store/actions';
-// import { AuthService } from '../../common/api/AuthService';
-// import { IdentityService } from '../../common/api';
+import useLoginFormStyles from '../../assets/jss/components/Form/useLoginFormStyles';
 
-interface Props {
-  children?: ReactNode;
-  history: any;
-  auth: any;
-  postLogin: (params: User.LoginReqBody) => void;
+interface LoginFormProps {
+  
 }
 
-const LoginForm: FC<Props> = ({ history, auth, postLogin }) => {
+const LoginForm: FC<LoginFormProps> = () => {
 
   const styles = useLoginFormStyles();
-  
-  const [ email, setEmail ] = useState<string>('');
-  const [ password, setPassword ] = useState<string>('');
-  // const [ authService, setAuthService ] = React.useState<AuthService>(new AuthService());
 
-  useEffect(() => {
-    // authService.getUser().then(user => console.log({user}));
-    // authService.userManager.signinCallback().then(user => console.log({user}));
-    // IdentityService.createRole({name: 'test'});
+  const { control, handleSubmit } = useForm<User.LoginReqBody>({
+    defaultValues: {
+      username: '',
+      password: ''
+    }
   });
 
-  const onFormSumbit = (e: any) => {
-    e.preventDefault();
-    postLogin({username: email, password: password});
-    // authService.login();
+  const dispatch = useDispatch();
+
+  const onSumbit = async (data: User.LoginReqBody) => {
+    const { username, password } = data;
+    dispatch(AuthActions.postLoginAsync({
+      username,
+      password
+    }));
   };
 
   return (
     <Container className={styles.formContainer}>
-      <form className={styles.form} onSubmit={onFormSumbit}>
+      <form className={styles.form} onSubmit={handleSubmit(onSumbit)}>
         <p className={styles.title}>Hệ thống quản lí nề nếp - 2COOL</p>
-        <TextField
-          className={styles.textField}
-          id='login-email'
-          label='Email'
-          // required
-          value={email}
-          onChange={e => setEmail(e.target.value)}
+        <Controller
+          name="username"
+          control={control}
+          render={({field}) => (
+            <TextField
+              className={styles.textField}
+              id="login-email"
+              label="Email"
+              {...field}
+            />
+          )}
         />
-        <TextField
-          className={styles.textField}
-          id='login-password'
-          label='Mật khẩu'
-          // required
-          value={password}
-          type='password'
-          onChange={e => setPassword(e.target.value)}
+        <Controller
+          name="password"
+          control={control}
+          render={({field}) => (
+            <TextField
+              className={styles.textField}
+              id="login-password"
+              label="Mật khẩu"
+              type="password"
+              {...field}
+            />
+          )}
         />
+        
         <FormControlLabel
-        className={styles.checkBox}
+          className={styles.checkBox}
           control={
             <Checkbox
-              // checked={state.checkedB}
-              // onChange={handleChange}
               name="checkedB"
               color="primary"
             />
@@ -69,11 +73,10 @@ const LoginForm: FC<Props> = ({ history, auth, postLogin }) => {
         />
         <Button 
           className={styles.button}
-          variant='contained'
-          color='primary'
-          type='submit'
+          variant="contained"
+          color="primary"
+          type="submit"
           disableElevation
-          onClick={onFormSumbit}
         >
           Đăng nhập
         </Button>
@@ -82,12 +85,4 @@ const LoginForm: FC<Props> = ({ history, auth, postLogin }) => {
   );
 };
 
-export default withRedux<Props>({
-  component: LoginForm,
-  stateProps: (state: any) => ({
-    auth: state.auth
-  }),
-  dispatchProps: ({
-    postLogin: AuthActions.postLoginAsync
-  })
-});
+export default LoginForm;

@@ -6,6 +6,9 @@ const useLoginFormStyles = makeStyles(theme => ({
     height: '50rem',
     background: theme.palette.common.white,
     padding: theme.spacing(10, 4),
+    '& > *': {
+      userSelect: 'none',
+    }
   },
   form: {
     display: 'flex',

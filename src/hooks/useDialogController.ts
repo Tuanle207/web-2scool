@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { Control, UseFormTrigger, FormState } from 'react-hook-form';
+import { Control, UseFormHandleSubmit } from 'react-hook-form';
 import Dialog from '../components/Modal/Dialog';
 
 interface IDialogControllerUtils {
@@ -9,17 +9,16 @@ interface IDialogControllerUtils {
 
 export interface IDialogControllerOptions<TFieldValues, TContext extends object = object> {
   control: Control<TFieldValues, TContext>;
-  trigger: UseFormTrigger<TFieldValues>;
-  formState: FormState<TFieldValues>;
+  handleSubmit: UseFormHandleSubmit<TFieldValues>;
 }
 
 export function useDialogController<TFieldValues, TContext extends object = object>({
-  control, trigger, formState
+  control, handleSubmit
 }: IDialogControllerOptions<TFieldValues, TContext>): IDialogControllerUtils {
   
   useEffect(() => {
-    Dialog.setFormController({control, trigger, formState});
-  }, [ control, trigger, formState ]);
+    Dialog.setFormController({control, handleSubmit});
+  }, [ control, handleSubmit ]);
 
   const forceCloseDialog = () => {
     Dialog.forceClose();

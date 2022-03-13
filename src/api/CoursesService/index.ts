@@ -53,12 +53,19 @@ const removeCourse =  async ({courseId}: {courseId: string}) => {
   }
 };
 
+const isNameAlreadyUsed = async (id: string, name: string) => {
+  const apiService = await getApiService();
+  const result = await apiService.get<boolean>(Endpoint.IsNameAlreadyUsed(id, name));
+  return result;
+}
+
 const CoursesService = {
   createCourse,
   getAllCourses,
   getCourseById,
   removeCourse,
-  updateCourse
+  updateCourse,
+  isNameAlreadyUsed,
 };
 
 export default CoursesService;

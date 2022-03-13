@@ -69,7 +69,7 @@ export const useFetchV2 = <T = any> ({ fetchFn, filter, pageIndex, pageSize }: I
   };
 
   const getFilterCount = () => {
-    return [...new Set(pagingInfo.filter?.filter((x) => !!x).map((x) => x.key))].length || 0;
+    return [...new Set(pagingInfo.filter?.filter((x) => !!x && !!x.value).map((x) => x.key))].length || 0;
   };
 
   const resetFilter = () => {

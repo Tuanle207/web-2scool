@@ -11,6 +11,8 @@ const Endpoint = {
     `/api/app/teachers/${id}`,
   RemoveTeacher: (id: string) =>
     `/api/app/teachers/${id}`,
+  IsAlreadyFormTeacher: (teacherId: string, classId: string) =>
+    `/api/app/teachers/is-already-form-teacher?teacherId=${teacherId}&classId=${classId}`,
 }
 
 export default Endpoint;

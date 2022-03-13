@@ -10,14 +10,14 @@ import Header from '../components/Header';
 import { toast } from 'react-toastify';
 import PageTitleBar from '../components/PageTitleBar';
 import { Class, Grade, Teacher } from '../interfaces';
-import { ClassesService, GradesService, DataImportService } from '../api';
-import { useFetchV2 } from '../hooks';
-import ActionModal from '../components/Modal';
-import CreateOrUpdateClassRequest from '../components/Modal/CreateOrUpdateClassRequest';
+import { ClassesService, GradesService, DataImportService, CoursesService, TeachersService } from '../api';
+import { useDialog, useFetchV2 } from '../hooks';
+import CreateOrUpdateClassRequest, { CreateOrUpdateClassRequestProps } from '../components/Modal/CreateOrUpdateClassRequest';
 import { comparers, dataGridLocale } from '../appConsts';
 import { routes } from '../routers/routesDictionary';
-import useStyles from '../assets/jss/views/ClassesPage';
 import FilterButton, { IFilterOption } from '../components/FilterButton';
+import { busyService } from '../services';
+import useStyles from '../assets/jss/views/ClassesPage';
 
 interface RowMenuProps {
   api: GridApi;
@@ -27,49 +27,103 @@ interface RowMenuProps {
 const RowMenuCell = (props: RowMenuProps) => {
   const { api, id } = props;
 
+  const { showDialog } = useDialog({
+    type: 'data',
+    title: 'Cập nhật thông tin lớp học',
+    acceptText: 'Lưu',
+    cancelText: 'Hủy',
+    renderFormComponent: CreateOrUpdateClassRequest
+  });
+
   const reloadCurrentPageData = () => {
     api.setPage(api.getState().pagination.page);
   };
 
   const onRequestDelete = async () => {
-    await ClassesService.removeClass({id: id.toString()});
-    
-    toast(`Xóa lớp học ${api.getCellValue(id, 'name')} thành công`, {
-      type: toast.TYPE.SUCCESS
+    const classId = id.toString();
+    const className = api.getCellValue(id, 'name')?.toString().toUpperCase();
+    const deleteResult = await showDialog(null, {
+      type: 'default',
+      title: 'Xác nhận',
+      message: `Bạn có chắc muốn xóa lớp ${className}?`,
+      acceptText: 'Xác nhận'
     });
-    reloadCurrentPageData();
+    const { result } = deleteResult;
+    if (result !== 'Ok') {
+      return;
+    }
+    try {
+      busyService.busy(true);
+      await ClassesService.removeClass({id: classId});
+      toast.success(`Xóa lớp học ${className} thành công`)
+      reloadCurrentPageData();
+    } catch (err) {
+      toast.error('Đã có lỗi xảy ra, không thể xóa lớp học');
+    } finally {
+      busyService.busy(false);
+    }
+    
   };
 
-  const onRequestUpdate = async (data: Class.CreateUpdateClassDto) => {
-    await ClassesService.updateClass({id: id.toString(), data});
-    toast('Cập nhật thông tin lớp học thành công', {
-      type: toast.TYPE.SUCCESS
-    });
-    reloadCurrentPageData();
+  const onRequestUpdate = async () => {
+    const input = await initUpdateData();
+    if (!input) {
+      return;
+    }
+    const { result, data } = await showDialog(input);
+    if  (result !== 'Ok' || !data) {
+      return;
+    }
+    await saveUpdateData(data);
   };
+
+  const initUpdateData = async (): Promise<CreateOrUpdateClassRequestProps | null> => {
+    try {
+      busyService.busy(true);
+      const { items: courses } = await CoursesService.getAllCourses({});
+      const { items: grades } = await GradesService.getAllGrades({});
+      const { items: teachers } = await TeachersService.getAllTeachersSimpleList();
+      const classId = id.toString();
+      const editItem = await ClassesService.getClassById(classId);
+      busyService.busy(false);
+      const data: CreateOrUpdateClassRequestProps = {
+        courses,
+        grades,
+        teachers,
+        editItem
+      };
+      return data;
+    } catch (err) {
+      toast.error('Đã có lỗi xảy ra. Không thể khởi tạo cập nhật');
+      return null;
+    } finally {
+      busyService.busy(false);
+    }
+  }
+
+  const saveUpdateData = async (data: Class.CreateUpdateClassDto): Promise<void> => {
+    try {
+      busyService.busy(true);
+      const classId = id.toString();
+      await ClassesService.updateClass({id: classId, data});
+      toast.success('Cập nhật thông tin lớp học thành công');
+      reloadCurrentPageData();
+    } catch (err: any) {
+      toast.error('Đã có lỗi xảy ra. Không thể cập nhật lớp học');
+    } finally {
+      busyService.busy(false);
+    }
+  }
 
   return (
     <div>
       <Tooltip title='Cập nhật thông tin lớp học này'>
-        <IconButton  
-          onClick={() => ActionModal.show({
-            title: 'Cập nhật thông tin lớp học',
-            acceptText: 'Lưu',
-            cancelText: 'Hủy',
-            component: <CreateOrUpdateClassRequest id={id.toString()}/>,
-            onAccept: onRequestUpdate
-          })} 
-        >
+        <IconButton onClick={onRequestUpdate}>
           <EditIcon />
         </IconButton>
       </Tooltip>
       <Tooltip title='Xóa lớp học này'>
-        <IconButton
-          onClick={() => ActionModal.show({
-            title: `Xác nhận xóa lớp ${api.getCellValue(id, 'name')}?`,
-            onAccept: onRequestDelete
-          })}
-        >
+        <IconButton onClick={onRequestDelete}>
           <DeleteIcon />
         </IconButton>
       </Tooltip>
@@ -125,6 +179,14 @@ const ClassesPage = () => {
   const classes = useStyles();
   const fileRef = useRef<HTMLInputElement>(null);
 
+  const { showDialog } = useDialog({
+    type: 'data',
+    title: 'Thêm lớp học mới',
+    acceptText: 'Lưu',
+    cancelText: 'Hủy',
+    renderFormComponent: CreateOrUpdateClassRequest
+  });
+
   const [ gradeOptions, setGradeOptions ] = useState<IFilterOption[]>([]);
 
   const { 
@@ -135,7 +197,8 @@ const ClassesPage = () => {
     data,
     loading,
     error,
-    resetFilter
+    resetFilter,
+    getFilterCount
   } = useFetchV2({ fetchFn: fetchAPIDebounced });
   
   useEffect(() => {
@@ -172,38 +235,84 @@ const ClassesPage = () => {
     });
   };
 
-  const onRequestCreate = async (data: Class.CreateUpdateClassDto) => {
-    await ClassesService.createClass(data);
-    toast('Thêm lớp học thành công', {
-      type: toast.TYPE.SUCCESS
-    });
-    resetFilter();
+  const onRequestCreate = async () => {
+    const input = await initCreationData();
+    if (!input) {
+      return;
+    }
+    const { result, data } = await showDialog(input);
+    if  (result !== 'Ok' && !data) {
+      return;
+    }
+    try {
+      busyService.busy(true);
+      await ClassesService.createClass(data);
+      toast('Thêm lớp học thành công', {
+        type: toast.TYPE.SUCCESS
+      });
+      resetFilter();
+    } catch (err: any) {
+      toast.error('Đã có lỗi xảy ra. Không thể tạo khóa học.')
+    } finally {
+      busyService.busy(false);
+    }
   };
+
+  const initCreationData = async (): Promise<CreateOrUpdateClassRequestProps | null> => {
+    try {
+      busyService.busy(true);
+      const { items: courses } = await CoursesService.getAllCourses({});
+      const { items: grades } = await GradesService.getAllGrades({});
+      const { items: teachers } = await TeachersService.getAllTeachersSimpleList();
+      busyService.busy(false);
+      const data: CreateOrUpdateClassRequestProps = {
+        courses,
+        grades,
+        teachers,
+      };
+      return data;
+    } catch (err) {
+      toast.error('Đã có lỗi xảy ra. Không thể khởi tạo dữ liệu');
+      return null;
+    } finally {
+      busyService.busy(false);
+    }
+  }
 
   const onImportFromExcel = async () => {
     fileRef.current?.click();
   };
 
-  const onFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+  const onFileChange = async (event: ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files || [];
-    if (files.length > 0) {
-      const file = files[0];
-
-      ActionModal.show({
-        title: 'Xác nhận nhập dữ liệu từ excel',
-        onAccept: () => importFromExcel(file),
-        onClose: resetFileInput
-      });
+    if (files.length === 0) {
+      return;
     }
+    const { result } = await showDialog(null, {
+      type: 'default',
+      acceptText: 'Xác nhận',
+      title: 'Xác nhận',
+      message: 'Xác nhận nhập dữ liệu từ excel'
+    })
+    if (result !== 'Ok') {
+      resetFileInput();
+      return;
+    }
+    const file = files[0];
+    await importFromExcel(file);
+    resetFileInput();
   };
 
   const importFromExcel = async (file: File) => {
     try {
+      busyService.busy(true);
       await DataImportService.importClassesData(file);
       toast.success("Nhập từ excel thành công!");
       resetFilter();
     } catch (err) {
       toast.error("Không thành công, đã có lỗi xảy ra");
+    } finally {
+      busyService.busy(false);
     }
   };
 
@@ -238,16 +347,8 @@ const ClassesPage = () => {
               <Paper variant="outlined" elevation={1}>
                 <PageTitleBar 
                   title={`Học sinh`} 
-                  onMainButtonClick={() => ActionModal.show({
-                    title: 'Thêm lớp học mới',
-                    acceptText: 'Lưu',
-                    cancelText: 'Hủy',
-                    component: <CreateOrUpdateClassRequest />,
-                    onAccept: onRequestCreate
-                  })}
-                  onOptionsButtonClick={() => toast('default toast', {
-                    type: toast.TYPE.INFO,
-                  })}
+                  onMainButtonClick={onRequestCreate}
+                  filterCount={getFilterCount()}
                   filterComponent={(
                     <>
                       <FilterButton

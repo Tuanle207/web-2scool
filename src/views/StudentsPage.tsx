@@ -1,26 +1,28 @@
 import { ChangeEvent, Fragment, useEffect, useRef, useState } from 'react';
 import AwesomeDebouncePromise from 'awesome-debounce-promise';
 import { Container, Grid, IconButton, Paper, Tooltip } from '@material-ui/core';
-import Sidebar from '../components/Sidebar';
-import Header from '../components/Header';
-import PageTitleBar from '../components/PageTitleBar';
-import FilterButton, { IFilterOption } from '../components/FilterButton';
 import { DataGrid, GridColDef, GridPageChangeParams, GridValueFormatterParams,
   GridApi, GridRowId } from '@material-ui/data-grid';
-import { Student, Class, Identity } from '../interfaces';
-import { ClassesService, IdentityService, StudentsService, GradesService, DataImportService } from '../api';
-import { useFetchV2 } from '../hooks/useFetchV2';
 import PersonAddIcon from '@material-ui/icons/PersonAdd';
 import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@material-ui/icons/Edit';
 import PublishIcon from '@material-ui/icons/Publish';
+import Sidebar from '../components/Sidebar';
+import Header from '../components/Header';
+import PageTitleBar from '../components/PageTitleBar';
+import FilterButton, { IFilterOption } from '../components/FilterButton';
+import { Student, Class } from '../interfaces';
+import { ClassesService, IdentityService, StudentsService, GradesService, DataImportService } from '../api';
+import { useFetchV2 } from '../hooks/useFetchV2';
 import { formatDate } from '../utils/TimeHelper';
-import ActionModal from '../components/Modal';
+import { EMAIL_PATTERN } from '../utils/regex-pattern';
 import { comparers, dataGridLocale } from '../appConsts';
 import { toast } from 'react-toastify';
-import CreateOrUpdateStudentRequest from '../components/Modal/CreateOrUpdateStudentRequest';
-import CreateStudentAccountRequest from '../components/Modal/CreateStudentAccountRequest';
+import CreateOrUpdateStudentRequest, { CreateOrUpdateStudentRequestProps } from '../components/Modal/CreateOrUpdateStudentRequest';
+import CreateStudentAccountRequest, { CreateStudentAccountRequestProps } from '../components/Modal/CreateStudentAccountRequest';
 import { routes } from '../routers/routesDictionary';
+import { useDialog } from '../hooks';
+import { busyService } from '../services';
 import useStyles from '../assets/jss/views/StudentsPage';
 
 interface RowMenuProps {
@@ -31,67 +33,153 @@ interface RowMenuProps {
 const RowMenuCell = (props: RowMenuProps) => {
   const { api, id } = props;
 
+  const { showDialog } = useDialog({
+    type: 'data',
+    title: 'Cập nhật thông tin học sinh',
+    acceptText: 'Lưu',
+    cancelText: 'Hủy',
+    renderFormComponent: CreateOrUpdateStudentRequest
+  });
+
   const reloadCurrentPageData = () => {
     api.setPage(api.getState().pagination.page);
   };
 
-  const onRequestUpdate = async (data: Student.CreateUpdateStudentDto) => {
-    await StudentsService.updateStudent({id: id.toString(), data});
-    toast('Cập nhật thông tin học sinh thành công', {
-      type: toast.TYPE.SUCCESS
-    });
-    reloadCurrentPageData();
+  const onRequestUpdate = async () => {
+    const input = await initUpdateData();
+    if (!input) {
+      return;
+    }
+    const editResult = await showDialog(input);
+    const { result, data } = editResult;
+    if (result !== 'Ok' || !data) {
+      return;
+    }
+    await saveUpdateData(data);
   };
 
-  const onRequestAccountCreate = async (data: Identity.CreateUpdateUserDto) => {
-    await IdentityService.createUser(data);
-    toast('Cấp tài khoản thành công', {
-      type: toast.TYPE.SUCCESS
-    });
+  const onRequestAccountCreate = async () => {
+    const input = await initCreateAccountData();
+    if (!input) {
+      return;
+    }
+    const { result, data } = await showDialog(input, {
+      type: 'data',
+      title: 'Cấp tài khoản cho học sinh',
+      acceptText: 'Cấp tài khoản',
+      cancelText: 'Hủy',
+      renderFormComponent: CreateStudentAccountRequest
+    })
+    if (result !== 'Ok' || !data) {
+      return;
+    }
+    try {
+      busyService.busy(false);
+      await IdentityService.createUser(data);
+      toast.success('Cấp tài khoản thành công');
+    } catch {
+      toast.error('Đã có lỗi xảy ra. Không thể cấp tài khoản cho học sinh.');
+    } finally {
+      busyService.busy(false);
+    }
   };
+
+  const initCreateAccountData = async (): Promise<CreateStudentAccountRequestProps | null> => {
+    try {
+      busyService.busy(true);
+      const studentId = id.toString();
+      const foundEmail = await IdentityService.doesStudentHaveAccountAlready(studentId);
+      if (!!foundEmail && EMAIL_PATTERN.test(foundEmail))  {
+        toast.info(`Học sinh này đã được cấp tài khoản với địa chỉ email "${foundEmail}" rồi`, {
+          autoClose: 4000
+        });
+        return null;
+      }
+      const student = await StudentsService.getStudentById(studentId);
+      const input: CreateStudentAccountRequestProps = {
+        studentName: student.name,
+        parentPhoneNumber: student.parentPhoneNumber,
+        studentId: student.id,
+      };
+      return input;
+    } catch (err) {
+      toast.error('Đã có lỗi xảy ra. Không thể khởi tạo dữ liệu để cấp tài khoản');
+      return null;
+    } finally {
+      busyService.busy(false);
+    }
+  }
 
   const onRequestDelete = async () => {
-    await StudentsService.removeStudent({id: id.toString()});
-    toast(`Xóa học sinh ${api.getCellValue(id, 'name')} thành công`, {
-      type: toast.TYPE.SUCCESS
-    });
-    reloadCurrentPageData();
+    try {
+      const studenId = id.toString();
+      const studenName = api.getCellValue(id, 'name')?.toString().toUpperCase();
+      const deleteResult = await showDialog(null, {
+        type: 'default',
+        title: 'Xác nhận',
+        message: `Bạn có chắc muốn xóa học sinh ${studenName}?`,
+        acceptText: 'Xác nhận'
+      });
+      const { result } = deleteResult;
+      if (result === 'Ok') {
+        busyService.busy(true);
+        await StudentsService.removeStudent({ id: studenId });
+        toast.success(`Xóa học sinh ${studenName} thành công`);
+        reloadCurrentPageData();
+      }
+    } catch (err) {
+      toast.error('Đã có lỗi xảy ra, không thể xóa giáo viên');
+    } finally {
+      busyService.busy(false);
+    }
   };
+
+  const initUpdateData = async (): Promise<CreateOrUpdateStudentRequestProps | null> => {
+    try {
+      busyService.busy(true);
+      const studentId = id.toString();
+      const student = await StudentsService.getStudentById(studentId);
+      const { items: classes } = await ClassesService.getClassForSimpleList();
+      return {
+        editItem: student,
+        classes
+      };
+    } catch (err) {
+      toast.error('Đã có lỗi xảy ra. Không thể khởi tạo cập nhật');
+      return null;
+    } finally {
+      busyService.busy(false);
+    }
+  }
+
+  const saveUpdateData = async (data: Student.CreateUpdateStudentDto) => {
+    try {
+      busyService.busy(true);
+      const studentId = id.toString();
+      await StudentsService.updateStudent({id: studentId, data});
+      toast.success('Cập nhật thông tin học sinh thành công');
+      reloadCurrentPageData();
+    } catch (err: any) {
+      toast.error('Đã có lỗi xảy ra. Không thể cập nhật lớp học');
+    } finally {
+      busyService.busy(false);
+    }
+  }
 
   return (
     <div>
       <Tooltip title='Cập nhật thông tin học sinh này'>
-          <IconButton  
-            onClick={() => ActionModal.show({
-              title: 'Cập nhật thông tin học sinh',
-              acceptText: 'Lưu',
-              cancelText: 'Hủy',
-              component: <CreateOrUpdateStudentRequest id={id.toString()}/>,
-              onAccept: onRequestUpdate
-            })} 
-          >
+          <IconButton onClick={onRequestUpdate}>
             <EditIcon />
           </IconButton>
         </Tooltip>
       <Tooltip title='Cấp tài khoản cho học sinh này'>
-        <IconButton
-          onClick={() => ActionModal.show({
-            title: "Cấp tài khoản cho học sinh",
-            acceptText: "Cấp tài khoản",
-            component: <CreateStudentAccountRequest id={id.toString()} />,
-            onAccept: onRequestAccountCreate
-          })}
-        >
+        <IconButton onClick={onRequestAccountCreate}>
           <PersonAddIcon />
         </IconButton>
       </Tooltip>
       <Tooltip title='Xóa học sinh này'>
-        <IconButton
-          onClick={() => ActionModal.show({
-            title: `Xác nhận xóa học sinh ${api.getCellValue(id, 'name')}?`,
-            onAccept: onRequestDelete
-          })}
-        >
+        <IconButton onClick={onRequestDelete}>
           <DeleteIcon />
         </IconButton>
       </Tooltip>
@@ -146,6 +234,14 @@ const StudentsPage = () => {
 
   const classes = useStyles();
   const fileRef = useRef<HTMLInputElement>(null);
+
+  const { showDialog } = useDialog({
+    type: 'data',
+    title: 'Thêm học sinh mới',
+    acceptText: 'Lưu',
+    cancelText: 'Hủy',
+    renderFormComponent: CreateOrUpdateStudentRequest
+  });
 
   const [ classOptions, setClassOptions ] = useState<IFilterOption[]>([]);
   const [ gradeOptions, setGradeOptions ] = useState<IFilterOption[]>([]);
@@ -213,42 +309,75 @@ const StudentsPage = () => {
     });
   };
 
-  const onRequestCreate = async (data: Student.CreateUpdateStudentDto) => {
+  const onRequestCreate = async () => {
+    const input = await initUpdateData();
+    if (!input) {
+      return;
+    }
+    const editResult = await showDialog(input);
+    const { result, data } = editResult;
+    if (result !== 'Ok' || !data)  {
+      return;
+    } 
     try {
+      busyService.busy(true);
       await StudentsService.createStudent(data);
-      toast('Thêm học sinh thành công', {
-        type: toast.TYPE.SUCCESS
-      });
+      toast.success('Thêm học sinh thành công');
       resetFilter();
     } catch (err) {
-      toast.error("Không thành công, đã có lỗi xảy ra");
+      toast.error('Đã có lỗi xảy ra, không thể thêm học sinh');
+    } finally {
+      busyService.busy(false);
     }
   };
+
+  const initUpdateData = async (): Promise<CreateOrUpdateStudentRequestProps | null> => {
+    try {
+      busyService.busy(true);
+      const { items: classes } = await ClassesService.getClassForSimpleList();
+      return { classes };
+    } catch (err) {
+      toast.error('Đã có lỗi xảy ra. Không thể khởi tạo cập nhật');
+      return null;
+    } finally {
+      busyService.busy(false);
+    }
+  }
 
   const onImportFromExcel = async () => {
     fileRef.current?.click();
   };
 
-  const onFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+  const onFileChange = async (event: ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files || [];
-    if (files.length > 0) {
-      const file = files[0];
-
-      ActionModal.show({
-        title: 'Xác nhận nhập dữ liệu từ excel',
-        onAccept: () => importFromExcel(file),
-        onClose: resetFileInput
-      });
+    if (files.length === 0) {
+      return;
     }
+    const { result } = await showDialog(null, {
+      type: 'default',
+      acceptText: 'Xác nhận',
+      title: 'Xác nhận',
+      message: 'Xác nhận nhập dữ liệu từ excel'
+    })
+    if (result !== 'Ok') {
+      resetFileInput();
+      return;
+    }
+    const file = files[0];
+    await importFromExcel(file);
+    resetFileInput();
   };
 
   const importFromExcel = async (file: File) => {
     try {
+      busyService.busy(true);
       await DataImportService.importStudentsData(file);
       toast.success("Nhập từ excel thành công!");
       resetFilter();
     } catch (err) {
       toast.error("Không thành công, đã có lỗi xảy ra");
+    } finally {
+      busyService.busy(false);
     }
   };
 
@@ -283,16 +412,7 @@ const StudentsPage = () => {
               <Paper variant="outlined" elevation={1}>
                 <PageTitleBar 
                   title={`Học sinh`} 
-                  onMainButtonClick={() => ActionModal.show({
-                    title: 'Thêm học sinh mới',
-                    acceptText: 'Lưu',
-                    cancelText: 'Hủy',
-                    component: <CreateOrUpdateStudentRequest />,
-                    onAccept: onRequestCreate
-                  })}
-                  onOptionsButtonClick={() => toast('default toast', {
-                    type: toast.TYPE.INFO,
-                  })}
+                  onMainButtonClick={onRequestCreate}
                   filterCount={getFilterCount()}
                   filterComponent={(
                     <Fragment>

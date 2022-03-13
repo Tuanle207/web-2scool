@@ -1,134 +1,209 @@
-import { useState, useEffect } from 'react';
-import { Box, Container, TextField, Select, InputLabel, FormControl, MenuItem } from '@material-ui/core';
+import { useEffect, FC } from 'react';
+import { 
+  Box, 
+  Container, 
+  TextField, 
+  Select, 
+  InputLabel, 
+  FormControl, 
+  MenuItem, 
+  FormHelperText 
+} from '@material-ui/core';
+import AwesomeDebouncePromise from 'awesome-debounce-promise';
 import { Class, Course, Grade, Teacher } from '../../interfaces';
-import { useDataValidator } from '../../hooks';
-import { ClassesService, CoursesService, GradesService, TeachersService } from '../../api';
-import ActionModal from '.';
+import { useDialogController } from '../../hooks';
+import { Controller, useForm } from 'react-hook-form';
+import { ClassesService, TeachersService } from '../../api';
 
-const CreateOrUpdateClassRequest = ({id}: {id?: string}) => {
+export interface CreateOrUpdateClassRequestProps {
+  editItem?: Class.ClassDto;
+  courses: Course.CourseDto[];
+  grades: Grade.GradeDto[];
+  teachers: Teacher.TeacherForSimpleListDto[];
+}
 
-  const [data, setData] = useState<Class.CreateUpdateClassDto>({
-    name: '',
-    courseId: '',
-    gradeId: '',
-    formTeacherId: '',
+const isNameAlreadyUsedDebounced = AwesomeDebouncePromise(ClassesService.isNameAlreadyUsed, 200);
+
+const CreateOrUpdateClassRequest: FC<CreateOrUpdateClassRequestProps> = ({
+  editItem,
+  courses,
+  grades,
+  teachers,
+}) => {
+
+  const { control, reset, handleSubmit } = useForm<Class.CreateUpdateClassDto>({
+    defaultValues: {
+      name: '',
+      courseId: '',
+      gradeId: '',
+      formTeacherId: '',
+    }
   });
-  const [courses, setCourses] = useState<Course.CourseDto[]>([]);
-  const [grades, setGrades] = useState<Grade.GradeDto[]>([]);
-  const [teachers, setTeachers] = useState<Teacher.TeacherForSimpleListDto[]>([]);
-  const {errors} = useDataValidator();
+
+  useDialogController({ control, handleSubmit });
 
   useEffect(() => {
-
-    const initData = async () => {
-      const coursesRes = await CoursesService.getAllCourses({});
-      setCourses(coursesRes.items);
-      const gradesRes = await GradesService.getAllGrades({});
-      setGrades(gradesRes.items);
-      const teachersRes = await TeachersService.getAllTeachersSimpleList();
-      setTeachers(teachersRes);
-      if (id) {
-        const classRes = await ClassesService.getClassById(id);
-        setData({
-            name: classRes.name || '',
-            courseId: classRes.courseId || '',
-            gradeId: classRes.gradeId || '',
-            formTeacherId: classRes.formTeacherId || '',
-        })
-      }
-
-    };
-   
-    initData();
-  }, [id]);
-
-  useEffect(() => {
-    console.log({courses})
-  }, [courses]);
-
-  useEffect(() => {
-    ActionModal.setData({
-      data,
-      error: errors.length > 0 ? {
-        error: true,
-        msg: errors[0].msg
-      } : undefined
-    });
+    if (!!editItem) {
+      const { name, courseId, gradeId, formTeacherId } = editItem;
+      reset({ name, courseId, gradeId, formTeacherId });
+    }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data]);
+  }, [editItem]);
 
+  const validateNotAFormTeacher = async (value: string) => {
+    if (!value) {
+      return;
+    }
+    try {
+      const isFormTeacher = await TeachersService.isAlreadyFormTeacher(value, editItem?.id || '');
+      if (isFormTeacher) {
+        return 'Giáo viên này đã là giáo viên chủ nhiệm';
+      }
+    } catch {
+      return true;
+    }
+  }
+
+  const validateName = async (value: string) => {
+    console.log({value});
+    if (!value || value?.length > 20) {
+      return;
+    }
+    if (value.length <= 7 || ['Lớp 10', 'Lớp 11', 'Lớp 12'].every(grade => !value.startsWith(grade))) {
+      return 'Tên lớp phải có dạng "Lớp <khối><Kí tự phân loại><STT>", VD: Lớp 10A1';
+    }
+    try {
+      const alreadyUsed = await isNameAlreadyUsedDebounced(editItem?.id ?? '', value);
+      if (alreadyUsed) {
+        return 'Tên lớp học này đã được sử dụng';
+      }
+    } catch {
+      return true;
+    }
+  };
 
   return (
-    <form style={{padding: '20px 0'}}>
-      <Container>
-        <Box style={{marginBottom: '10px'}}>
-          <TextField 
-            // {...getError('mô tả')}
-            id='create-class-name' 
-            label='Tên lớp'
-            autoComplete='off'
-            style={{width: '40ch'}}
-            value={data.name}
-            onChange={e => setData((prev) => ({...prev, name: e.target.value}))}
-
-          />
-        </Box>
-        <Box style={{marginBottom: '10px'}}>
-          <FormControl fullWidth>
-            <InputLabel htmlFor="create-class-course">Khóa học</InputLabel>
-            <Select
-              // native
-              value={data.courseId}
-              onChange={e => setData((prev) => ({...prev, courseId: (e.target.value as string)}))}
-              inputProps={{
-                name: 'class-course',
-                id: 'create-class-course',
-              }}
-            >
-            {
-              courses.map(el => (<MenuItem value={el.id}>{el.name}</MenuItem>))
-            }
-            </Select>
-          </FormControl>
-        </Box>
-        <Box style={{marginBottom: '10px'}}>
-          <FormControl fullWidth>
-            <InputLabel htmlFor="create-class-grade">Khối</InputLabel>
-            <Select
-              // native
-              value={data.gradeId}
-              onChange={e => setData(prev => ({...prev, gradeId: (e.target.value as string)}))}
-              inputProps={{
-                name: 'class-grade',
-                id: 'create-class-grade',
-              }}
-            >
-            {
-              grades.map(el => (<MenuItem value={el.id}>{el.displayName}</MenuItem>))
-            }
-            </Select>
-          </FormControl>
-        </Box>
-        <Box style={{marginBottom: '10px'}}>
-          <FormControl fullWidth>
-            <InputLabel htmlFor="create-class-teacher">Giáo viên</InputLabel>
-            <Select
-              // native
-              value={data.formTeacherId}
-              onChange={e => setData((prev) => ({...prev, formTeacherId: (e.target.value as string)}))}
-              inputProps={{
-                name: 'class-teacher',
-                id: 'create-class-teacher',
-              }}
-            >
-            {
-              teachers.map(el => (<MenuItem value={el.id}>{el.name}</MenuItem>))
-            }
-            </Select>
-          </FormControl>
-        </Box>
-      </Container>
-    </form>
+    <Container>
+      <Box style={{marginBottom: 16}}>
+        <Controller
+          control={control}
+          name="name"
+          rules={{
+            required: {
+              value: true,
+              message: 'Tên lớp là bắt buộc'
+            },
+            maxLength: {
+              value: 20,
+              message: 'Tên lớp không thể vượt quá 20 kí tự'
+            },
+            validate: validateName,
+          }}
+          render={({field, fieldState: { error }}) => (
+            <TextField
+              id='create-class-name' 
+              label='Tên lớp'
+              required
+              autoComplete='off'
+              autoFocus
+              style={{width: '40ch'}}
+              {...field}
+              error={!!error}
+              helperText={error?.message}
+              
+            />
+          )}
+        />
+      </Box>
+      <Box style={{marginBottom: 16}}>
+        <Controller
+          control={control}
+          name="courseId"
+          rules={{
+            required: {
+              value: true,
+              message: 'Khóa học là bắt buộc'
+            },
+          }}
+          render={({field, fieldState: { error }}) => (
+            <FormControl fullWidth error={!!error}>
+              <InputLabel required htmlFor="create-class-course">Khóa học</InputLabel>
+              <Select
+                {...field}
+                inputProps={{
+                  name: 'class-course',
+                  id: 'create-class-course',
+                }}
+              >
+              {
+                courses.map(el => (<MenuItem value={el.id}>{el.name}</MenuItem>))
+              }
+              </Select>
+              <FormHelperText>{error?.message}</FormHelperText>
+            </FormControl>
+          )}
+        />
+      </Box>
+      <Box style={{marginBottom: 16}}>
+        <Controller
+          control={control}
+          name="gradeId"
+          rules={{
+            required: {
+              value: true,
+              message: 'Khối là bắt buộc'
+            },
+          }}
+          render={({field, fieldState: { error }}) => (
+            <FormControl fullWidth error={!!error}>
+              <InputLabel required htmlFor="create-class-grade">Khối</InputLabel>
+              <Select
+                {...field}
+                inputProps={{
+                  name: 'class-grade',
+                  id: 'create-class-grade',
+                }}
+              >
+              {
+                grades.map(el => (<MenuItem value={el.id}>{el.displayName}</MenuItem>))
+              }
+              </Select>
+              <FormHelperText>{error?.message}</FormHelperText>
+            </FormControl>
+          )}
+        />
+      </Box>
+      <Box style={{marginBottom: '10px'}}>
+        <Controller
+          control={control}
+          name="formTeacherId"
+          rules={{
+            required: {
+              value: true,
+              message: 'Giáo viên chủ nhiệm là bắt buộc'
+            },
+            validate: validateNotAFormTeacher
+          }}
+          render={({field, fieldState: { error }}) => (
+            <FormControl fullWidth error={!!error}>
+              <InputLabel required htmlFor="create-class-teacher">Giáo viên</InputLabel>
+              <Select
+                {...field}
+                inputProps={{
+                  name: 'class-teacher',
+                  id: 'create-class-teacher',
+                }}
+              >
+              {
+                teachers.map(el => (<MenuItem value={el.id}>{el.name}</MenuItem>))
+              }
+              </Select>
+              <FormHelperText>{error?.message}</FormHelperText>
+            </FormControl>
+          )}
+        />
+      </Box>
+    </Container>
   );
 };
 

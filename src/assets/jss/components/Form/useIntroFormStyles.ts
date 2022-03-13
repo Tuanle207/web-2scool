@@ -7,7 +7,10 @@ const useIntroFormStyles = makeStyles(theme => ({
     background: '#267dff',
     padding: theme.spacing(2, 4),
     color: '#fff',
-    borderColor: theme.palette.grey.A200
+    borderColor: theme.palette.grey.A200,
+    '& > *':  {
+      userSelect: 'none',
+    }
   },
   wrapper: {
     height: '100%',
@@ -23,12 +26,16 @@ const useIntroFormStyles = makeStyles(theme => ({
       borderColor: '#fff',
     }
   },
+  welcome: {
+    borderBottom: '3px solid #fff',
+  },
   welcomeText: {
-    borderBottom: '3px solid #fff'
+    display: 'inline-block',
   },
   descriptionText: {
     fontWeight: 300,
-    margin: theme.spacing(3, 0)
+    margin: theme.spacing(3, 0),
+    lineHeight: 1.6,
   }
 }));
 

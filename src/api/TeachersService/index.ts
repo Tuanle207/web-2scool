@@ -4,64 +4,46 @@ import Endpoint from './@endpoint';
 
 
 const createTeacher = async (input: Teacher.CreateUpdateTeacherDto) => {
-  try {
-    const apiService = await getApiService();
-    const result = await apiService.post(Endpoint.CreateTeacher(), input);
-    return result;
-  } catch (error) {
-    throw error;
-  }
+  const apiService = await getApiService();
+  const result = await apiService.post(Endpoint.CreateTeacher(), input);
+  return result;
 };
 
 const updateTeacher = async ({id, data}: {id: string, data: Teacher.CreateUpdateTeacherDto}) => {
-  try {
-    const apiService = await getApiService();
-    const result = await apiService.put(Endpoint.UpdateTeacher(id), data);
-    return result;
-  } catch (error) {
-    throw error;
-  }
+  const apiService = await getApiService();
+  const result = await apiService.put(Endpoint.UpdateTeacher(id), data);
+  return result;
 };
 
 const getTeacherById = async (id: string) => {
-  try {
-    const apiService = await getApiService();
-    const result = await apiService.get<Teacher.TeacherDto>(Endpoint.GetTeacherById(id));
-    return result;
-  } catch (error) {
-    throw error;
-  }
+  const apiService = await getApiService();
+  const result = await apiService.get<Teacher.TeacherDto>(Endpoint.GetTeacherById(id));
+  return result;
 };
 
 const getAllTeachers =  async (pagingInfo: Util.PagingInfo) => {
-  try {
-    const apiService = await getApiService();
-    const result = await apiService.post<Util.PagingModel<Teacher.TeacherDto>>(Endpoint.GetAllTeachers(), pagingInfo);
-    return result;
-  } catch (error) {
-    throw error;
-  }
+  const apiService = await getApiService();
+  const result = await apiService.post<Util.PagingModel<Teacher.TeacherDto>>(Endpoint.GetAllTeachers(), pagingInfo);
+  return result;
 };
 
 const getAllTeachersSimpleList = async () =>  {
-  try {
-    const apiService = await getApiService();
-    const result = await apiService.get<Teacher.TeacherForSimpleListDto[]>(Endpoint.getAllTeachersSimpleList());
-    return result;
-  } catch (error) {
-    throw error;
-  }
+  const apiService = await getApiService();
+  const result = await apiService.get<Util.PagingModel<Teacher.TeacherForSimpleListDto>>(Endpoint.getAllTeachersSimpleList());
+  return result;
 };
 
-const removeTeacher =  async ({id}: {id: string}) => {
-  try {
-    const apiService = await getApiService();
-    const result = await apiService.delete(Endpoint.RemoveTeacher(id));
-    return result;
-  } catch (error) {
-    throw error;
-  }
+const removeTeacher = async ({id}: {id: string}) => {
+  const apiService = await getApiService();
+  const result = await apiService.delete(Endpoint.RemoveTeacher(id));
+  return result;
 };
+
+const isAlreadyFormTeacher = async(teacherId: string, classId: string) => {
+  const apiService = await getApiService();
+  const result = await apiService.get<boolean>(Endpoint.IsAlreadyFormTeacher(teacherId, classId));
+  return result;
+}
 
 const TeachersService = {
   createTeacher,
@@ -69,7 +51,8 @@ const TeachersService = {
   getAllTeachersSimpleList,
   getTeacherById,
   removeTeacher,
-  updateTeacher
+  updateTeacher,
+  isAlreadyFormTeacher
 };
 
 export default TeachersService;

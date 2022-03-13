@@ -1,74 +1,87 @@
-import { useState, useEffect } from 'react';
+import { useEffect, FC } from 'react';
 import { Box, Container, TextField } from '@material-ui/core';
 import DateFnsUtils from '@date-io/date-fns';
 import { MuiPickersUtilsProvider, KeyboardDatePicker } from '@material-ui/pickers';
+import moment from 'moment';
 import { Teacher } from '../../interfaces';
-import ActionModal from '.';
-import { useDataValidator } from '../../hooks';
-import { TeachersService } from '../../api';
+import { useDialogController } from '../../hooks';
+import { Controller, useForm } from 'react-hook-form';
+import { EMAIL_PATTERN } from '../../utils/regex-pattern';
 
-const CreateOrUpdateTeacherRequest = ({id}: {id?: string}) => {
+export interface CreateOrUpdateTeacherRequestProps {
+  editItem?: Teacher.TeacherDto;
+}
 
-  const [data, setData] = useState<Teacher.CreateUpdateTeacherDto>({
-    name: '',
-    dob: new Date(),
-    email: '',
-    phoneNumber: ''
+const CreateOrUpdateTeacherRequest: FC<CreateOrUpdateTeacherRequestProps> = ({
+  editItem
+}) => {
+
+  const { control, reset, handleSubmit } = useForm<Teacher.CreateUpdateTeacherDto>({
+    defaultValues: {
+      name: '',
+      dob: moment().add(-22, 'years').toDate(),
+      email: '',
+      phoneNumber: '' 
+    },
   });
-  const {errors, getError} = useDataValidator();
+
+  useDialogController({ control, handleSubmit });
 
   useEffect(() => {
-    if (id) {
-      TeachersService.getTeacherById(id).then(res => setData({
-        name: res.name || '',
-        dob: res.dob || new Date(),
-        email: res.email || '',
-        phoneNumber: res.phoneNumber || ''
-      }))
+    if (!!editItem) {
+      const { name, dob, email, phoneNumber } = editItem;
+      reset({ name, dob, email, phoneNumber });
     }
-  }, [id]);
-
-  useEffect(() => {
-    ActionModal.setData({
-      data,
-      error: errors.length > 0 ? {
-        error: true,
-        msg: errors[0].msg
-      } : undefined
-    });
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data]);
-
-
-  // const nameChange = (value: string) => {
-  //   setData(prev => ({...prev, name: value}))
-  //   validate('tên', value, Validator.isNotEmpty);
-  // };
-  // const descriptionChange = (value: string) => {
-  //   setData(prev => ({...prev, description: value}))
-  //   validate('mô tả', value, Validator.isNotEmpty);
-  // };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [editItem]);
 
   return (
-    <form style={{padding: '20px 0'}}>
-      <Container>
-        <Box style={{marginBottom: '10px'}}>
-          <TextField
-            {...getError('tên')}
-            id='create-teacher-name' 
-            label='Tên giáo viên' 
-            required
-            autoComplete='off'
-            autoFocus={true}
-            style={{width: '40ch'}}
-            value={data.name}
-            onChange={e => setData(prev => ({...prev, name: e.target.value}))}
-          />
-        </Box>
-        <Box>
-          <MuiPickersUtilsProvider utils={DateFnsUtils}>
-            <Box>
+    <Container>
+      <Box style={{marginBottom: 16}}>
+        <Controller
+          control={control}
+          name="name"
+          rules={{
+            required: {
+              value: true,
+              message: 'Tên giáo viên là bắt buộc'
+            },
+            maxLength: {
+              value: 50,
+              message: 'Tên giáo viên không thể vượt quá 50 kí tự'
+            },
+          }}
+          render={({field, fieldState: { error }}) => (
+            <TextField
+              id='create-teacher-name' 
+              label='Tên giáo viên' 
+              required
+              autoComplete='off'
+              autoFocus
+              style={{width: '40ch'}}
+              {...field}
+              error={!!error}
+              helperText={error?.message}
+            />
+          )}
+        />
+      </Box>
+      <MuiPickersUtilsProvider utils={DateFnsUtils}>
+        <Box style={{marginBottom: 16}}>
+          <Controller
+            control={control}
+            name="dob"
+            rules={{
+              required: 'Ngày sinh là bắt buộc',
+              validate: (value: Date) => {
+                if (moment().isSameOrBefore(value)) {
+                  return 'Ngày sinh không hợp lệ';
+                }
+              }
+            }}
+            render={({field, fieldState: { error }}) => (
               <KeyboardDatePicker
+                required
                 disableToolbar
                 fullWidth
                 variant="dialog"
@@ -76,40 +89,78 @@ const CreateOrUpdateTeacherRequest = ({id}: {id?: string}) => {
                 margin="dense"
                 id="create-teacher-dob"
                 label="Ngày sinh"
-                value={data.dob}
-                onChange={date => setData(prev => ({...prev, dob: date || prev.dob}))}
                 KeyboardButtonProps={{
                   'aria-label': 'change date',
                 }}
+                {...field}
+                error={!!error}
+                helperText={error?.message}
               />
-          </Box>
-          </MuiPickersUtilsProvider>
-        </Box>
-        <Box style={{marginBottom: '10px'}}>
-          <TextField 
-            {...getError('mô tả')}
-            id='create-teacher-email' 
-            label='Email'
-            autoComplete='off'
-            style={{width: '40ch'}}
-            value={data.email}
-            onChange={e => setData(prev => ({...prev, email: e.target.value}))}
-
+            )}
           />
         </Box>
-        <Box style={{marginBottom: '10px'}}>
-          <TextField 
-            {...getError('mô tả')}
-            id='create-teacher-phoneNumber' 
-            label='Số điện thoại'
-            autoComplete='off'
-            style={{width: '40ch'}}
-            value={data.phoneNumber}
-            onChange={e => setData(prev => ({...prev, phoneNumber: e.target.value}))}
-          />
-        </Box>
-      </Container>
-    </form>
+      </MuiPickersUtilsProvider>
+      <Box style={{marginBottom: 16}}>
+        <Controller
+          control={control}
+          name="email"
+          rules={{
+            required: {
+              value: true,
+              message: 'Địa chỉ email là bắt buộc'
+            },
+            maxLength: {
+              value: 50,
+              message: 'Địa chỉ Email thể vượt quá 50 kí tự'
+            },
+            pattern: {
+              value: EMAIL_PATTERN,
+              message: 'Địa chỉ email không hợp lệ'
+            }
+          }}
+          render={({field, fieldState: { error }}) => (
+            <TextField 
+              id='create-teacher-email' 
+              label='Email'
+              autoComplete='off'
+              required
+              style={{width: '40ch'}}
+              {...field}
+              error={!!error}
+              helperText={error?.message}
+            />
+          )}
+        />
+      </Box>
+      <Box style={{marginBottom: 16}}>
+        <Controller
+          control={control}
+          name="phoneNumber"
+          rules={{
+            required: {
+              value: true,
+              message: 'Số điện thoại là bắt buộc'
+            },
+            maxLength: {
+              value: 20,
+              message: 'Số điện thoại vượt quá 20 kí tự'
+            }
+          }}
+          render={({field, fieldState: { error }}) => (
+            <TextField 
+              id='create-teacher-phoneNumber' 
+              label='Số điện thoại'
+              autoComplete='off'
+              required
+              style={{width: '40ch'}}
+              {...field}
+              error={!!error}
+              helperText={error?.message}
+            />
+          )}
+        />
+      </Box>
+    </Container>
   );
 };
 

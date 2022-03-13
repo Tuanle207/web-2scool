@@ -1,7 +1,5 @@
-import { theme } from '../../../themes/theme';
 import { CSSProperties } from 'react';
-
-
+import { theme } from '../../../themes/theme';
 
 const modalStyles: {[key: string]: CSSProperties} = {
   root: {
@@ -9,19 +7,25 @@ const modalStyles: {[key: string]: CSSProperties} = {
     left: `50%`,
     transform: `translate(-50%, -50%)`,
     position: 'absolute',
-    // minWidth: 400,
     backgroundColor: theme.palette.background.paper,
     border: `1px solid ${theme.palette.grey.A700}`,
     padding: theme.spacing(2, 3),
-    minWidth: 400
+    minWidth: 400,
   },
   titleBar: {
     borderBottom: `1px solid ${theme.palette.divider}`,
-    marginBottom: theme.spacing(2),
+    marginBottom: theme.spacing(1),
   },
   buttonGroup: {
-    padding: theme.spacing(2),
-    paddingBottom: theme.spacing(1)
+    marginTop: theme.spacing(2),
+    padding: theme.spacing(1, 2),
+  },
+  borderTop:{
+    borderTop: `1px solid ${theme.palette.divider}`,
+  },
+  content: {
+    maxHeight: 400,
+    overflowY: 'auto',
   },
   warning: {
     display: "flex",

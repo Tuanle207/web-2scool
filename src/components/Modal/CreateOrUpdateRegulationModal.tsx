@@ -159,17 +159,14 @@ const CreateOrUpdateRegulationModal: FC<ICreateOrUpdateRegulationModalProps> = (
             rules={{
               required: "Bạn cần chọn tiêu chí",
             }}
-            render={({field: { ref, value, onChange, onBlur }, fieldState: { error }}) => (
+            render={({field, fieldState: { error }}) => (
               <FormControl fullWidth variant="outlined" className={styles.field} error={!!error} >
                 <InputLabel id="criteria-input-label">Tiêu chí</InputLabel>
                 <Select
                   labelId="criteria-input-label"
                   id="criteria-input"
                   label="Tiêu chí"
-                  ref={ref}
-                  value={value}
-                  onChange={onChange}
-                  onBlur={onBlur}
+                  {...field}
                 >
                   {
                     criteriaOptions.map((option, index) => (
@@ -187,16 +184,12 @@ const CreateOrUpdateRegulationModal: FC<ICreateOrUpdateRegulationModalProps> = (
             rules={{
               required: "Bạn cần chọn loại vi phạm",
             }}
-            render={({field: { ref, value, onChange, onBlur }, fieldState: { error }}) => (
+            render={({field, fieldState: { error }}) => (
               <FormControl fullWidth variant="outlined" className={styles.field} error={!!error} >
                 <FormLabel>Loại quy định</FormLabel>
                 <RadioGroup row aria-label="quiz" 
-                  name="regulationType"
                   style={{ marginTop: 8, justifyContent: "center" }}
-                  ref={ref}
-                  value={value}
-                  onChange={onChange}
-                  onBlur={onBlur}
+                  {...field}
                 >
                 {
                   regulationTypeOptions.map((option, index) => (

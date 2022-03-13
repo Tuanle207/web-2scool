@@ -1,21 +1,25 @@
 import { FC, useEffect } from 'react';
 import { Box, Container, TextField } from '@material-ui/core';
+import AwesomeDebouncePromise from 'awesome-debounce-promise';
 import DateFnsUtils from '@date-io/date-fns';
 import { MuiPickersUtilsProvider, KeyboardDatePicker } from '@material-ui/pickers';
 import { useForm, Controller } from 'react-hook-form';
 import moment from 'moment';
 import { Course } from '../../interfaces';
+import { CoursesService } from '../../api';
 import { useDialogController } from '../../hooks';
 
 export interface CreateOrUpdateCourseRequestProps {
   editItem?: Course.CourseDto;
 }
 
+const isNameAlreadyUsedDebounced = AwesomeDebouncePromise(CoursesService.isNameAlreadyUsed, 200);
+
 const CreateOrUpdateCourseRequest: FC<CreateOrUpdateCourseRequestProps> = ({
-  editItem
+  editItem,
 }) => {
 
-  const { control, getValues, reset, trigger, formState } = useForm<Course.CreateUpdateCourseDto>({
+  const { control, getValues, reset, handleSubmit } = useForm<Course.CreateUpdateCourseDto>({
     defaultValues: {
       name: '',
       description: '',
@@ -24,18 +28,31 @@ const CreateOrUpdateCourseRequest: FC<CreateOrUpdateCourseRequestProps> = ({
     },
   });
 
-  useDialogController({ control, trigger, formState });
+  useDialogController({ control, handleSubmit });
 
   useEffect(() => {
-    if (editItem) {
+    if (!!editItem) {
       const { name, description, startTime, finishTime} = editItem;
       reset({ name, description, startTime, finishTime });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editItem]);
 
+  const validateNameUnique = async (value: string) => {
+    if (!value || value?.length > 50) {
+      return;
+    }
+    try {
+      const alreadyUsed = await isNameAlreadyUsedDebounced(editItem?.id ?? '', value);
+      if (alreadyUsed) {
+        return 'Tên khóa học này đã được sử dụng';
+      }
+    } catch {
+      return true;
+    }
+  }
+
   return (
-    <form style={{padding: '20px 0'}}>
       <Container>
         <Box style={{marginBottom: '10px'}}>
           <Controller
@@ -45,12 +62,18 @@ const CreateOrUpdateCourseRequest: FC<CreateOrUpdateCourseRequestProps> = ({
               required: {
                 value: true,
                 message: 'Tên khóa học là bắt buộc'
-              }
+              },
+              maxLength: {
+                value: 50,
+                message: 'Tên không thể vượt quá 50 kí tự'
+              },
+              validate: validateNameUnique
             }}
             render={({field, fieldState: { error }}) => (
               <TextField
                 id='create-course-name' 
-                label='Tên khóa học' 
+                label='Tên khóa học'
+                required
                 autoComplete='off'
                 autoFocus={true}
                 style={{width: '40ch'}}
@@ -61,14 +84,14 @@ const CreateOrUpdateCourseRequest: FC<CreateOrUpdateCourseRequestProps> = ({
             )}
           />
         </Box>
-        <Box style={{marginBottom: '10px'}}>
+        <Box style={{marginBottom: 10}}>
           <Controller
             control={control}
             name="description"
             rules={{
-              required: {
-                value: true,
-                message: 'Mô tả khóa học là bắt buộc'
+              maxLength: {
+                value: 100,
+                message: 'Mô tả không thể vượt quá 100 kí tự'
               }
             }}
             render={({field: { name, value, onChange, onBlur }, fieldState: { error }}) => (
@@ -90,14 +113,23 @@ const CreateOrUpdateCourseRequest: FC<CreateOrUpdateCourseRequestProps> = ({
             )}
           />
         </Box>
-        <Box>
-          <MuiPickersUtilsProvider utils={DateFnsUtils}>
-            <Box>
+        <MuiPickersUtilsProvider utils={DateFnsUtils}>
+          <Box style={{marginBottom: 10}}>
             <Controller
               control={control}
               name="startTime"
-              render={({field: { name, value, onChange, onBlur }, fieldState: { error }}) => (
+              rules={{
+                required: 'Ngày bắt đầu là bắt buộc',
+                validate: (value: Date) => {
+                  const finishTime = getValues('finishTime');
+                  if (moment(value).isSameOrAfter(finishTime)) {
+                    return 'Ngày bắt đầu phải trước ngày kết thúc'
+                  }
+                }
+              }}
+              render={({field, fieldState: { error }}) => (
                 <KeyboardDatePicker
+                  required
                   disableToolbar
                   fullWidth
                   variant="dialog"
@@ -108,21 +140,19 @@ const CreateOrUpdateCourseRequest: FC<CreateOrUpdateCourseRequestProps> = ({
                   KeyboardButtonProps={{
                     'aria-label': 'change date',
                   }}
-                  name={name}
-                  value={value}
-                  onChange={onChange}
-                  onBlur={onBlur}
+                  {...field}
                   error={!!error}
                   helperText={error?.message}
                 />
               )}
             />
           </Box>
-          <Box>
+          <Box style={{marginBottom: 10}}>
             <Controller 
               control={control}
               name="finishTime"
               rules={{
+                required: 'Ngày kết thúc là bắt buộc',
                 validate: (value: Date) => {
                   const startTime = getValues('startTime');
                   if (moment(value).isSameOrBefore(startTime)) {
@@ -132,6 +162,7 @@ const CreateOrUpdateCourseRequest: FC<CreateOrUpdateCourseRequestProps> = ({
               }}
               render={({field: { name, value, onChange, onBlur }, fieldState: { error }}) => (
                 <KeyboardDatePicker
+                  required
                   disableToolbar
                   fullWidth
                   variant="dialog"
@@ -151,13 +182,9 @@ const CreateOrUpdateCourseRequest: FC<CreateOrUpdateCourseRequestProps> = ({
                 />
               )}
             />
-            
           </Box>
         </MuiPickersUtilsProvider>
-        
-        </Box>
       </Container>
-    </form>
   );
 };
 

@@ -2,11 +2,9 @@ import { FC } from 'react';
 import { Button, Grid, Container, Box, Typography } from '@material-ui/core';
 import useIntroFormStyles from '../../assets/jss/components/Form/useIntroFormStyles';
 
-interface Props {
-  history: any;
-}
+interface IntroFormProps { }
 
-const IntroForm: FC<Props> = ({ history }) => {
+const IntroForm: FC<IntroFormProps> = () => {
 
   const styles = useIntroFormStyles();
 
@@ -14,8 +12,10 @@ const IntroForm: FC<Props> = ({ history }) => {
     <Container className={styles.formContainer}>
       <Grid container className={styles.wrapper}  alignItems={'center'}>
         <Box>
-          <Typography variant='h4' className={styles.welcomeText}>Welcome to 2SCOOL</Typography>
-          <p className={styles.descriptionText}>2SCOOL là 1 nền tảng quản lí nề nếp học sinh dành cho các trường THPT, THCS. 2SCOOL cung cấp giải pháp hiệu quả, tối ưu cho việc số hóa công tác quản lí nề nếp, mang lại sự tiện lợi mà nhanh chóng trong công tác quản lí.</p>
+          <Box className={styles.welcome}>
+            <Typography variant='h4' className={styles.welcomeText}>Welcome to 2Scool</Typography>
+          </Box>
+          <p className={styles.descriptionText}>2Scool là 1 nền tảng quản lý nề nếp học sinh dành cho các trường THPT, THCS. 2Scool cung cấp giải pháp hiệu quả, tối ưu cho việc số hóa công tác quản lý nề nếp, mang lại sự tiện lợi và nhanh chóng trong công tác quản lý.</p>
           <Button
             variant='outlined'
             color='primary'

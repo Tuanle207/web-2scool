@@ -1,4 +1,4 @@
-import React from 'react';
+import { Component } from 'react';
 import {
   Box, 
   Button, 
@@ -11,8 +11,7 @@ import CloseIcon from '@material-ui/icons/Close';
 import HighlightOffIcon from '@material-ui/icons/HighlightOff';
 import { 
   Control, 
-  FormState, 
-  UseFormTrigger 
+  UseFormHandleSubmit, 
 } from 'react-hook-form';
 import { IDialogControllerOptions } from '../../hooks';
 import styles from '../../assets/jss/components/Modal';
@@ -21,6 +20,7 @@ import styles from '../../assets/jss/components/Modal';
 export interface ModalOptions {
   component?: JSX.Element;
   title?: string;
+  message?: string;
   acceptText?: string;
   cancelText?: string;
   noCancelButton?: boolean;
@@ -34,12 +34,12 @@ interface ModalState extends ModalOptions {
   visible: boolean;
   dirty: boolean;
   formControl?: Control<any>;
-  trigger?: UseFormTrigger<any>;
-  formState?: FormState<any>;
+  handleSubmit?: UseFormHandleSubmit<any>
 }
 
 const initialState: ModalState = {
   title: 'Xác nhận tiếp tục?',
+  message: undefined,
   acceptText: 'Xác nhận',
   cancelText: 'Hủy',
   noCancelButton: false,
@@ -48,13 +48,12 @@ const initialState: ModalState = {
   dirty: false,
   visible: false,
   formControl: undefined,
-  trigger: undefined,
-  formState: undefined,
+  handleSubmit: undefined,
   accept: () => {},
   cancel: () => {},
 };
 
-class Dialog extends React.Component<{}, ModalState> {
+class Dialog extends Component<{}, ModalState> {
   
   private static _current?: Dialog;
 
@@ -65,10 +64,6 @@ class Dialog extends React.Component<{}, ModalState> {
 
   get formControl(): Control<any> | undefined {
     return this.state.formControl;
-  }
-
-  get formState(): FormState<any> | undefined {
-    return this.state.formState;
   }
 
   get isDirty(): boolean {
@@ -86,10 +81,6 @@ class Dialog extends React.Component<{}, ModalState> {
     return Object.keys(this.formControl?._formState.dirtyFields || {}).length > 0;
   }
 
-  get isFormValid(): boolean {
-    return this.formState?.isValid ?? true;
-  }
-
   get accept(): (data: any) => void {
     const defaultHandler = (data: any) => {};
     return this.state.accept ?? defaultHandler;
@@ -100,6 +91,10 @@ class Dialog extends React.Component<{}, ModalState> {
     return this.state.cancel ?? defaultHandler;
   }
 
+  get handleSubmit() {
+    return this.state.handleSubmit;
+  }
+
   componentDidMount() {
     Dialog._current = this;
   }
@@ -108,19 +103,13 @@ class Dialog extends React.Component<{}, ModalState> {
     Dialog._current = undefined;
   }
 
-  closeModal = () => {
+  closeModal() {
     this.setState({
       ...initialState
     });
   };
 
-  onAccept = async () => {
-    if (!this.isFormValid) {
-      await this.triggerValidation();
-    }
-    if (!this.isFormValid) {
-      return;
-    }
+  async onAccept() {
     if (this.isDirty) {
       this.isDirty = false;
     }
@@ -129,7 +118,7 @@ class Dialog extends React.Component<{}, ModalState> {
     this.closeModal();
   };
 
-  onCancel = () => {
+  onCancel() {
     if (this.isFormDirty && !this.isDirty) {
       this.isDirty = true;
       return;
@@ -140,14 +129,18 @@ class Dialog extends React.Component<{}, ModalState> {
     this.closeModal();
   };
 
-  onCloseConfirmAlert = () => {
+  onCloseConfirmAlert() {
     if (this.isDirty) {
       this.isDirty = false;
     }
   }
 
-  async triggerValidation(): Promise<void> {
-    await this.state.trigger?.call(null);
+
+  onSubmit (e: any) {
+    if (e?.preventDefault) {
+      e.preventDefault();
+    }
+    this.onAccept();
   }
 
   render() {
@@ -157,13 +150,16 @@ class Dialog extends React.Component<{}, ModalState> {
         aria-labelledby="scool-modal"
         aria-describedby="scool-modal-global"
       >
-        <div style={styles.root}>
-          <Box>
+        <form
+          noValidate
+          style={!this.state.message ? styles.root : { ...styles.root, width: 400 }}
+          onSubmit={this.handleSubmit ? this.handleSubmit(this.onAccept.bind(this)) : this.onSubmit.bind(this)}
+        >
+          <Box style={{ marginBottom: 20 }}>
             <Grid item container direction='row' justify='space-between' alignItems='center' style={styles.titleBar}>
               <Typography variant='h6'>{this.state.title}</Typography>
               <IconButton
-                size="small"
-                onClick={this.onCancel}
+                onClick={() => this.onCancel()}
               >
                 <CloseIcon />
               </IconButton>
@@ -175,7 +171,7 @@ class Dialog extends React.Component<{}, ModalState> {
                   <IconButton
                     size="small"
                     style={{ color: 'inherit' }}
-                    onClick={this.onCloseConfirmAlert}
+                    onClick={() => this.onCloseConfirmAlert()}
                   >
                     <HighlightOffIcon fontSize="small" />
                   </IconButton>
@@ -184,16 +180,26 @@ class Dialog extends React.Component<{}, ModalState> {
             }
           </Box>
           <Box>
-            <Grid item container>
-              {this.state.component}
+            <Grid item container style={styles.content}>
+            {
+              !!this.state.message ? (
+                <p>{this.state.message}</p>
+              ) :
+              this.state.component
+            }
             </Grid>
           </Box>
           <Box>
-            <Grid item container justify='flex-end' style={styles.buttonGroup}>
+            <Grid 
+              item
+              container
+              justify='flex-end'
+              style={!this.state.message ? {...styles.buttonGroup, ...styles.borderTop} : styles.buttonGroup}
+            >
               {
                 !this.state.noCancelButton && (
                   <Grid item>
-                    <Button onClick={this.onCancel}>
+                    <Button onClick={() => this.onCancel()}>
                       {this.state.cancelText || 'Hủy'}
                     </Button>
                   </Grid>
@@ -206,7 +212,7 @@ class Dialog extends React.Component<{}, ModalState> {
                       variant='contained' 
                       color='primary' 
                       style={styles.buttonAccept}
-                      onClick={this.onAccept}
+                      type="submit"
                     >
                       { this.state.acceptText || 'Xác nhận'}
                     </Button>
@@ -215,19 +221,18 @@ class Dialog extends React.Component<{}, ModalState> {
               }
             </Grid>
           </Box>
-        </div>
+        </form>
       </Modal>
     );
   }
 
   public static setFormController<TFieldValues, TContext extends object = object>({
-    control, trigger, formState
+    control, handleSubmit
   }: IDialogControllerOptions<TFieldValues, TContext>): void {
     Dialog._current?.setState((prevState) => ({
       ...prevState,
       formControl: control,
-      trigger,
-      formState
+      handleSubmit
     }))
   }
 

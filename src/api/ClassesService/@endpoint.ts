@@ -11,6 +11,8 @@ const Endpoint = {
     `/api/app/classes/${id}`,
   RemoveClass: (id: string) =>
     `/api/app/classes/${id}`,
+  IsNameAlreadyUsed: (id: string, name: string) =>
+    `/api/app/classes/is-name-already-used?id=${id}&name=${name}`,
 }
 
 export default Endpoint;

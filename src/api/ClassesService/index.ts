@@ -63,13 +63,20 @@ const removeClass =  async ({id}: {id: string}) => {
   }
 };
 
+const isNameAlreadyUsed = async (id: string, name: string) => {
+  const apiService = await getApiService();
+  const result = await apiService.get<boolean>(Endpoint.IsNameAlreadyUsed(id, name));
+  return result;
+}
+
 const ClassesService ={
   createClass,
   getAllClasss,
   getClassForSimpleList,
   getClassById,
   removeClass,
-  updateClass
+  updateClass,
+  isNameAlreadyUsed
 };
 
 export default ClassesService;

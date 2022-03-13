@@ -16,6 +16,7 @@ import CreateOrUpdateCourseRequest from '../components/Modal/CreateOrUpdateCours
 import { routes } from '../routers/routesDictionary';
 import useStyles from '../assets/jss/views/CoursesPage';
 import { dataGridLocale } from '../appConsts';
+import { busyService } from '../services';
 
 interface RowMenuProps {
   api: GridApi;
@@ -43,10 +44,13 @@ const RowMenuCell = (props: RowMenuProps) => {
       const courseName = api.getCellValue(id, 'name')?.toString().toUpperCase();
       const deleteResult = await showDialog(null, {
         type: 'default',
-        title: `Xác nhận xóa khóa học ${courseName}?`
+        title: 'Xác nhận',
+        message: `Bạn có chắc muốn xóa khóa học ${courseName}?`,
+        acceptText: 'Xác nhận'
       });
       const { result } = deleteResult;
       if (result === 'Ok') {
+        busyService.busy(true);
         await CoursesService.removeCourse({ courseId });
         toast(`Xóa khóa học ${courseName} thành công`, {
           type: toast.TYPE.SUCCESS
@@ -55,17 +59,21 @@ const RowMenuCell = (props: RowMenuProps) => {
       }
     } catch (err) {
       toast.error('Đã có lỗi xảy ra, không thể xóa khóa học');
+    } finally {
+      busyService.busy(false);
     }
   };
 
   const onRequestUpdate = async () => {
     try {
+      busyService.busy(true);
       const courseId = id.toString();
       const course = await CoursesService.getCourseById(courseId);
+      busyService.busy(false);
       const editResult = await showDialog({ editItem: course });
       const { result, data } = editResult;
-      console.log({result});
       if (result === 'Ok' && data) {
+        busyService.busy(true);
         await CoursesService.updateCourse({id: courseId, data});
         toast('Cập nhật thông tin khóa học thành công', {
           type: toast.TYPE.SUCCESS
@@ -74,6 +82,8 @@ const RowMenuCell = (props: RowMenuProps) => {
       }
     } catch (err) {
       toast.error('Đã có lỗi xảy ra, không thể cập nhật khóa học');
+    } finally {
+      busyService.busy(false);
     }
   };
 
@@ -172,18 +182,22 @@ const CoursesPage = () => {
   };
 
   const onRequestCreate = async () => {
+    const editResult = await showDialog();
+    const { result, data } = editResult;
+    if (result !== 'Ok' || !data) {
+      return;
+    } 
     try {
-      const editResult = await showDialog();
-      const { result, data } = editResult;
-      if (result === 'Ok' && data) {
-        await CoursesService.createCourse(data);
-        toast('Thêm khóa học thành công', {
-          type: toast.TYPE.SUCCESS
-        });
-        resetFilter();
-      }
+      busyService.busy(true);
+      await CoursesService.createCourse(data);
+      toast('Thêm khóa học thành công', {
+        type: toast.TYPE.SUCCESS
+      });
+      resetFilter();
     } catch (err) {
       toast.error('Đã có lỗi xảy ra, không thể thêm khóa học');
+    } finally {
+      busyService.busy(false);
     }
   };
 
