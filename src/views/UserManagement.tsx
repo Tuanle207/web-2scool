@@ -265,7 +265,7 @@ const UserManagement = () => {
       };
       return input;
     } catch {
-      toast.error('Đã có lỗi xảy ra. Không thể khởi tạo dữ liệu để tạo tài khoản.');
+      toast.error('Đã có lỗi xảy ra. Không thể khởi tạo dữ liệu để tạo tài khoản');
       return null;
     } finally {
       busyService.busy(false);

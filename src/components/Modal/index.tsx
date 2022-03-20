@@ -59,6 +59,9 @@ const initialState: ModalState = {
 };
 
 
+/**
+ * @deprecated Should be replaced with useDialog hook & Dialog component instead
+ */
 class ActionModal extends React.Component<{}, ModalState> {
   
   private static _self: ActionModal;

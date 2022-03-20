@@ -28,7 +28,7 @@ const getAllRegulations = async (pagingInfo: Util.PagingInfo) => {
   return result;
 };
 
-const getRegulation = async (id: string) => {
+const getRegulationById = async (id: string) => {
   const apiService = await getApiService();
   const result = await apiService.get<Regulation.RegulationDto>(Endpoint.GetRegulation(id));
   return result;
@@ -46,19 +46,19 @@ const updateRegulation = async (id: string, input: Regulation.CreateUpdateRegula
   return result;
 };
 
-const deleteRegulation = async (id: string) => {
+const removeRegulation = async (id: string) => {
   const apiService = await getApiService();
   await apiService.delete(Endpoint.DeleteRegulation(id));
 };
 
-const RegulationsService ={
+const RegulationsService = {
   getRegulationForSimpleList,
   getCriteriaForSimpleList,
   getAllRegulations,
   createRegulation,
   updateRegulation,
-  deleteRegulation,
-  getRegulation,
+  removeRegulation,
+  getRegulationById,
 };
 
 export default RegulationsService

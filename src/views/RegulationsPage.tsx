@@ -6,7 +6,7 @@ import Header from '../components/Header';
 import FilterButton, { IFilterOption } from '../components/FilterButton';
 import PageTitleBar from '../components/PageTitleBar';
 import { DataGrid, GridColDef, GridPageChangeParams, GridValueFormatterParams,
-  GridApi, GridRowId, GridCellParams } from '@material-ui/data-grid';
+  GridApi, GridRowId } from '@material-ui/data-grid';
 import { Regulation } from '../interfaces';
 import { DataImportService, RegulationsService } from '../api';
 import { useFetchV2 } from '../hooks/useFetchV2';
@@ -17,7 +17,9 @@ import ActionModal from '../components/Modal';
 import { comparers, regulationType, dataGridLocale } from '../appConsts';
 import { toast } from 'react-toastify';
 import { routes } from '../routers/routesDictionary';
-import CreateOrUpdateRegulationModal from '../components/Modal/CreateOrUpdateRegulationModal';
+import { useDialog } from '../hooks';
+import CreateOrUpdateRegulationRequest, { CreateOrUpdateRegulationRequestProps } from '../components/Modal/CreateOrUpdateRegulationRequest';
+import { busyService } from '../services';
 import useStyles from '../assets/jss/views/StudentsPage';
 
 interface RowMenuProps {
@@ -25,11 +27,99 @@ interface RowMenuProps {
   id: GridRowId;
 }
 
-const RowDeleteCell = (props: RowMenuProps) => {
+const RowMenuCell = (props: RowMenuProps) => {
+  const { api, id } = props;
+
+  const { showDialog } = useDialog({
+    type: 'data',
+    title: 'Cập nhật thông tin quy định',
+    acceptText: 'Lưu',
+    cancelText: 'Hủy',
+    renderFormComponent: CreateOrUpdateRegulationRequest,
+  });
+
+  const reloadCurrentPageData = () => {
+    api.setPage(api.getState().pagination.page);
+  };
+
+  const onRequestDelete = async () => {
+    try {
+      const regulationId = id.toString();
+      const regulationName = api.getCellValue(regulationId, 'displayName')?.toString().toUpperCase();
+      const deleteResult = await showDialog(null, {
+        type: 'default',
+        title: 'Xác nhận',
+        message: `Bạn có chắc muốn xóa quy định ${regulationName}?`,
+        acceptText: 'Xác nhận'
+      });
+      const { result } = deleteResult;
+      if (result === 'Ok') {
+        busyService.busy(true);
+        await RegulationsService.removeRegulation(regulationId);
+        toast.success(`Xóa quy định ${regulationName} thành công`);
+        reloadCurrentPageData();
+      }
+    } catch (err) {
+      toast.error('Đã có lỗi xảy ra, không thể xóa quy định');
+    } finally {
+      busyService.busy(false);
+    }
+  };
+
+  const onRequestUpdate = async () => {
+    const regulationId = id.toString();
+    const input = await initUpdateData(regulationId);
+    if (!input) {
+      return;
+    }
+    const { result, data } = await showDialog(input);
+    if (result !== 'Ok' || !data) {
+      return;
+    }
+    try {
+      busyService.busy(true);
+      await RegulationsService.updateRegulation(regulationId, data);
+      toast.success('Cập nhật quy định thành công');
+      reloadCurrentPageData();
+    } catch {
+      toast.error('Đã có lỗi xảy ra. Không thể lưu quy định');
+    } finally {
+      busyService.busy(false);
+    }
+  };
+
+  const initUpdateData = async (editId: string) =>  {
+    try {
+      busyService.busy(true);
+      
+      const { items } = await RegulationsService.getCriteriaForSimpleList();
+      const regulationTypeOptions: IFilterOption[] = [
+        { id: regulationType.Student, label: "Học sinh", value: regulationType.Student },
+        { id: regulationType.Class, label: "Lớp", value: regulationType.Class },
+      ];
+      const result: CreateOrUpdateRegulationRequestProps = {
+        criterias: items,
+        regulationTypes: regulationTypeOptions,
+      };
+      result.editItem = await RegulationsService.getRegulationById(editId);
+      return result;
+    } catch {
+      toast.error('Đã có lỗi xảy ra. Không thể khởi tạo dữ liệu.');
+      return null;
+    } finally {
+      busyService.busy(false);
+    }
+  };
+
   return (
     <div>
-      <Tooltip title="Xóa học sinh này">
-        <IconButton>
+      <Tooltip title='Cập nhật quy định này'>
+        <IconButton onClick={onRequestUpdate}>
+          <EditIcon />
+        </IconButton>
+      </Tooltip>
+      <Tooltip title='Xóa quy định này'>
+        <IconButton onClick={onRequestDelete}>
           <DeleteIcon />
         </IconButton>
       </Tooltip>
@@ -37,36 +127,13 @@ const RowDeleteCell = (props: RowMenuProps) => {
   );
 };
 
-const RowUpdateCell = (props: RowMenuProps) => {
-  return (
-    <div>
-      <Tooltip title="Cập nhật thông tin quy định này">
-          <IconButton  >
-            <EditIcon />
-          </IconButton>
-        </Tooltip>
-    </div>
-  );
-};
-
 const cols: GridColDef[] =  [
   {
-    field: 'updateAction',
-    renderCell: RowUpdateCell,
-    headerName: ' ',
+    field: 'actions',
+    headerName: 'Hành động',
+    renderCell: RowMenuCell,
     sortable: false,
-    width: 50,
-    headerAlign: 'left',
-    filterable: false,
-    align: 'center',
-    disableColumnMenu: true,
-  },
-  {
-    field: 'deleteAction',
-    renderCell: RowDeleteCell,
-    headerName: ' ',
-    sortable: false,
-    width: 50,
+    width: 150,
     headerAlign: 'left',
     filterable: false,
     align: 'center',
@@ -124,9 +191,14 @@ const RegulationsPage = () => {
     { id: regulationType.Student, label: "Học sinh", value: regulationType.Student },
     { id: regulationType.Class, label: "Lớp", value: regulationType.Class },
   ]);
-  const [ creationModalShow, setCreationModalShow ] = useState(false);
-  const [ updateModalShow, setUpdateModalShow ] = useState(false);
-  const [ editItem, setEditItem ] = useState<Regulation.RegulationDto>();
+
+  const { showDialog } = useDialog({
+    type: 'data',
+    title: 'Thêm quy định nề nếp mới',
+    acceptText: 'Lưu',
+    cancelText: 'Hủy',
+    renderFormComponent: CreateOrUpdateRegulationRequest
+  });
 
   const { 
     pagingInfo,
@@ -183,39 +255,48 @@ const RegulationsPage = () => {
     });
   };
 
-  const onCellClick = (params: GridCellParams) => {
-    const { id, colDef, api } = params;
-    const value = colDef.field;
-
-    if (value === "updateAction") {
-      updateItem(id.toString(), api);
-    } else if (value === "deleteAction") {
-      deleteItem(id.toString(), api);
+  const onCreateRequest = async () => {
+    const input = await initCreationData();
+    if (!input) {
+      return;
+    }
+    const { result, data } = await showDialog(input);
+    if (result !== 'Ok' || !data) {
+      return;
+    }
+    try {
+      busyService.busy(true);
+      await RegulationsService.createRegulation(data);
+      toast.success('Thêm quy định thành công');
+      resetFilter();
+    } catch {
+      toast.error('Đã có lỗi xảy ra. Không thể lưu quy định');
+    } finally {
+      busyService.busy(false);
     }
   };
 
-  const updateItem = (id: string, api: GridApi) => {
-    // setEditItemId(id);
-    const item = data.items.find((x) => x.id === id);
-    if (item) {
-      setEditItem(item);
-    }
-    setUpdateModalShow(true);
-  };
-
-  const deleteItem = async (id: string, api: GridApi) => {
-    ActionModal.show({
-      title: `Xác nhận xóa quy định này?`,
-      onAccept: async () => {
-        await RegulationsService.deleteRegulation(id);
-        toast.success(`Xóa quy định thành công thành công`);
-        resetFilter();
+  const initCreationData = async (editId?: string) =>  {
+    try {
+      busyService.busy(true);
+      
+      const { items } = await RegulationsService.getCriteriaForSimpleList();
+      const result: CreateOrUpdateRegulationRequestProps = {
+        criterias: items,
+        regulationTypes: regulationTypeOptions,
+      };
+      if (editId) {
+        const editItem = await RegulationsService.getRegulationById(editId);
+        result.editItem = editItem;
       }
-    });
-  };
-
-  const onDataChange = (newItem: Regulation.RegulationDto) => {
-    resetFilter();
+      
+      return result;
+    } catch {
+      toast.error('Đã có lỗi xảy ra. Không thể khởi tạo dữ liệu.');
+      return null;
+    } finally {
+      busyService.busy(false);
+    }
   };
 
   const onImportFromExcel = async () => {
@@ -276,7 +357,7 @@ const RegulationsPage = () => {
               <Paper variant="outlined" elevation={1}>
                 <PageTitleBar
                   title={`Quy định nề nếp`} 
-                  onMainButtonClick={() => setCreationModalShow(true)}
+                  onMainButtonClick={onCreateRequest}
                   filterCount={getFilterCount()}
                   filterComponent={(
                     <>
@@ -304,21 +385,6 @@ const RegulationsPage = () => {
                 />
               </Paper>
             </Grid>
-            <CreateOrUpdateRegulationModal
-              isOpen={creationModalShow}
-              onRequestClose={() => setCreationModalShow(false)}
-              criteriaOptions={criteriaOptions}
-              regulationTypeOptions={regulationTypeOptions}
-              onSuccess={onDataChange}
-            />
-            <CreateOrUpdateRegulationModal
-              isOpen={updateModalShow}
-              onRequestClose={() => setUpdateModalShow(false)}
-              item={editItem}
-              criteriaOptions={criteriaOptions}
-              regulationTypeOptions={regulationTypeOptions}
-              onSuccess={onDataChange}
-            />
             <Grid item style={{ flexGrow: 1, paddingTop: 16, paddingBottom: 16, backgroundColor: '#e8e8e8' }}>
               <Container className={classes.root}>
                 <input ref={fileRef} hidden type="file" onChange={onFileChange} /> 
@@ -336,7 +402,6 @@ const RegulationsPage = () => {
                   rowsPerPageOptions={[5, 15, 30, 50]}
                   onPageSizeChange={onPageSizeChange}
                   pagination
-                  onCellClick={onCellClick}
                   localeText={dataGridLocale}
                 />
               </Container>

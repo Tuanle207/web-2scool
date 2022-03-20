@@ -195,7 +195,7 @@ const CreateOrUpdateUserRequest: FC<CreateOrUpdateUserRequestProps> = ({
           render={({field, fieldState: { error }}) => (
             <TextField
               id='create-user-email' 
-              label='Email' 
+              label='Email đăng nhập' 
               required
               autoComplete="new-email"
               style={{width: '40ch'}}
@@ -223,7 +223,7 @@ const CreateOrUpdateUserRequest: FC<CreateOrUpdateUserRequestProps> = ({
           render={({field, fieldState: { error }}) => (
             <TextField
               id='create-user-password' 
-              label='Mật khẩu'
+              label='Mật khẩu đăng nhập'
               type="password"
               required
               autoComplete='new-password'

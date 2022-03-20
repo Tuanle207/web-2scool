@@ -50,10 +50,10 @@ import {
 import { routes } from '../routers/routesDictionary';
 import UpdateLRKeeperRequest from '../components/Modal/UpdateLRKeeperRequest';
 import { 
-  useDialog, 
-  IDialogOptions
+  useDialog
  } from '../hooks';
 import useStyles from '../assets/jss/views/LessonRegisterReportSchedule';
+import { IDialogOptions } from '../services';
 
 interface IAssignClass {
   classId: string;
