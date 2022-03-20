@@ -9,8 +9,10 @@ const Endpoint = {
     `/api/app/grades`,
   UpdateGrade: (id: string) =>
     `/api/app/grades/${id}`,
-  RemoveGrade: (id: string) =>
+  DeleteGradeById: (id: string) =>
     `/api/app/grades/${id}`,
+  IsNameAlreadyUsed: (name: string, id: string) =>
+    `/api/app/grades/is-name-already-used?name=${name}&id=${id}`,
 }
 
 export default Endpoint;

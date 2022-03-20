@@ -10,9 +10,9 @@ const Endpoint = {
   // role management
   GetAllRoles: () =>
     `/api/identity/roles/all`,
+  GetRoleById: (id: string) =>
+    `/api/identity/roles/${id}`,
   GetAllRolesWithFilter: () =>
-    `/api/identity/roles`,
-  GetRoleById: () =>
     `/api/identity/roles`,
   CreateRole: () =>
     `/api/identity/roles`,
@@ -24,8 +24,8 @@ const Endpoint = {
     `/api/identity/users/${id}/roles`,
   GetPermissions: () =>
     `/api/permission-management/permissions`,
-  UpdatePermissions: () =>
-    `/api/permission-management/permissions`,
+  UpdatePermissions: (providerName: string, providerKey: string) =>
+    `/api/permission-management/permissions?providerName=${providerName}&providerKey=${providerKey}`,
   
   // user managerment
   GetUsers: () =>
@@ -50,7 +50,8 @@ const Endpoint = {
     `/api/app/app-identity-user/is-email-already-used?email=${email}&userId=${userId}`,
   DoesStudentHaveAccountAlready: (studentId: string) =>
     `/api/app/app-identity-user/does-student-have-account-already?studentId=${studentId}`,
-    
+  IsRoleNameAlreadyUsed: (roleId: string, name: string) => 
+    `api/app/app-identity-user/is-role-name-already-used?roleId=${roleId}&name=${name}`  
 }
 
 export default Endpoint;

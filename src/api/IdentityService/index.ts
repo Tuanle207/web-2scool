@@ -47,6 +47,12 @@ const getAssignableRoles = async () => {
   return result;
 };
 
+const getRoleById = async (id: string) => {
+  const apiService = await getApiService();
+  const result = await apiService.get<Identity.RoleDto>(Endpoint.GetRoleById(id));
+  return result;
+};
+
 const getAllRoles = async () => {
   const apiService = await getApiService();
   const result = await apiService.get<Util.PagingModel<Identity.RoleDto>>(Endpoint.GetAllRoles());
@@ -78,8 +84,8 @@ const getPermissions = async (data: Identity.PermissionProvider) => {
 const updateRolePermissions = async ({provider, data}: 
   { provider: Identity.PermissionProvider; data: Identity.UpdateRolePermissionDto}) => {
   const apiService = await getApiService();
-  const queryString = `?providerName=${provider.providerName}&providerKey=${provider.providerKey}`;
-  const result = await apiService.put(Endpoint.UpdatePermissions() + queryString, data);
+  const { providerName, providerKey } = provider;
+  const result = await apiService.put(Endpoint.UpdatePermissions(providerName, providerKey || ''), data);
   return result;
 };
 
@@ -100,6 +106,12 @@ const doesStudentHaveAccountAlready = async (studentId: string) => {
   return result;
 };
 
+const isRoleNameAlreadyUsed = async (roleName: string, roleId: string) => {
+  const apiService = await getApiService();
+  const result = await apiService.get<boolean>(Endpoint.IsRoleNameAlreadyUsed(roleId, roleName));
+  return result;
+};
+
 
 const IdentityService = {
   getUsers,
@@ -109,6 +121,7 @@ const IdentityService = {
   updateUser,
   deleteUserById,
   getAllRoles,
+  getRoleById,
   createRole,
   updateRole,
   getPermissions,
@@ -116,7 +129,8 @@ const IdentityService = {
   getUsersForTaskAssignment,
   deleteRoleById,
   isEmailAlreadyUsed,
-  doesStudentHaveAccountAlready
+  doesStudentHaveAccountAlready,
+  isRoleNameAlreadyUsed
 };
 
 export default IdentityService;

@@ -121,6 +121,7 @@ const CreateStudentAccountRequest: FC<CreateStudentAccountRequestProps> = ({
               id='create-user-phonenumber'
               label='Số điện thoại' 
               required
+              autoFocus
               autoComplete='new-phone-no'
               style={{width: '40ch'}}
               {...field}
@@ -155,7 +156,6 @@ const CreateStudentAccountRequest: FC<CreateStudentAccountRequestProps> = ({
               label='Email đăng nhập' 
               required
               autoComplete='new-email'
-              autoFocus={true}
               style={{width: '40ch'}}
               {...field}
               error={!!error}

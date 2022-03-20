@@ -4,43 +4,27 @@ import Endpoint from './@endpoint';
 
 
 const createGrade = async (input: Grade.CreateUpdateGradeDto) => {
-  try {
-    const apiService = await getApiService();
-    const result = await apiService.post(Endpoint.CreateGrade(), input);
-    return result;
-  } catch (error) {
-    throw error;
-  }
+  const apiService = await getApiService();
+  const result = await apiService.post(Endpoint.CreateGrade(), input);
+  return result;
 };
 
 const updateGrade = async ({id, data}: {id: string, data: Grade.CreateUpdateGradeDto}) => {
-  try {
-    const apiService = await getApiService();
-    const result = await apiService.put(Endpoint.UpdateGrade(id), data);
-    return result;
-  } catch (error) {
-    throw error;
-  }
+  const apiService = await getApiService();
+  const result = await apiService.put(Endpoint.UpdateGrade(id), data);
+  return result;
 };
 
 const getGradeById = async (id: string) => {
-  try {
-    const apiService = await getApiService();
-    const result = await apiService.get<Grade.GradeDto>(Endpoint.GetGradeById(id));
-    return result;
-  } catch (error) {
-    throw error;
-  }
+  const apiService = await getApiService();
+  const result = await apiService.get<Grade.GradeDto>(Endpoint.GetGradeById(id));
+  return result;
 };
 
 const getAllGrades =  async (pagingInfo: Util.PagingInfo) => {
-  try {
-    const apiService = await getApiService();
-    const result = await apiService.post<Util.PagingModel<Grade.GradeDto>>(Endpoint.GetAllGrades(), pagingInfo);
-    return result;
-  } catch (error) {
-    throw error;
-  }
+  const apiService = await getApiService();
+  const result = await apiService.post<Util.PagingModel<Grade.GradeDto>>(Endpoint.GetAllGrades(), pagingInfo);
+  return result;
 };
 
 const getGradesForSimpleList = async () => {
@@ -49,23 +33,26 @@ const getGradesForSimpleList = async () => {
   return result;
 };
 
-const removeGrade =  async ({id}: {id: string}) => {
-  try {
-    const apiService = await getApiService();
-    const result = await apiService.delete(Endpoint.RemoveGrade(id));
-    return result;
-  } catch (error) {
-    throw error;
-  }
+const deleteGradeById =  async (id: string) => {
+  const apiService = await getApiService();
+  const result = await apiService.delete(Endpoint.DeleteGradeById(id));
+  return result;
 };
+
+const isNameAlreadyUsed = async (name: string, id: string) => {
+  const apiService = await getApiService();
+  const result = await apiService.get<boolean>(Endpoint.IsNameAlreadyUsed(name, id));
+  return result;
+}
 
 const GradesService = {
   createGrade,
   getAllGrades,
   getGradesForSimpleList,
   getGradeById,
-  removeGrade,
-  updateGrade
+  deleteGradeById,
+  updateGrade,
+  isNameAlreadyUsed,
 };
 
 export default GradesService;

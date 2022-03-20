@@ -1,21 +1,21 @@
 import { useEffect } from 'react';
 import AwesomeDebouncePromise from 'awesome-debounce-promise';
 import { Container, Grid, IconButton, Paper, Tooltip } from '@material-ui/core';
+import { DataGrid, GridApi, GridColDef, GridPageChangeParams, GridRowId } from '@material-ui/data-grid';
+import DeleteIcon from '@material-ui/icons/Delete';
+import EditIcon from '@material-ui/icons/Edit';
+import { toast } from 'react-toastify';
 import Sidebar from '../components/Sidebar';
 import Header from '../components/Header';
 import PageTitleBar from '../components/PageTitleBar';
-import { DataGrid, GridApi, GridColDef, GridPageChangeParams, GridRowId } from '@material-ui/data-grid';
 import { Grade } from '../interfaces';
 import { GradesService } from '../api';
-import { useFetchV2 } from '../hooks';
-import DeleteIcon from '@material-ui/icons/Delete';
-import EditIcon from '@material-ui/icons/Edit';
-import ActionModal from '../components/Modal';
-import CreateOrUpdateGradeRequest from '../components/Modal/CreateOrUpdateGradeRequest';
-import { toast } from 'react-toastify';
+import { useDialog, useFetchV2 } from '../hooks';
+import CreateOrUpdateGradeRequest,  { CreateOrUpdateGradeRequestProps } from '../components/Modal/CreateOrUpdateGradeRequest';
 import { routes } from '../routers/routesDictionary';
 import { dataGridLocale } from '../appConsts';
 import useStyles from '../assets/jss/views/GradesPage';
+import { busyService } from '../services';
 
 interface RowMenuProps {
   api: GridApi;
@@ -25,48 +25,91 @@ interface RowMenuProps {
 const RowMenuCell = (props: RowMenuProps) => {
   const { api, id } = props;
 
+  const { showDialog } = useDialog({
+    type: 'data',
+    title: 'Cập nhật thông tin khối',
+    acceptText: 'Lưu',
+    cancelText: 'Hủy',
+    renderFormComponent: CreateOrUpdateGradeRequest
+  });
+
   const reloadCurrentPageData = () => {
     api.setPage(api.getState().pagination.page);
   };
 
   const onRequestDelete = async () => {
-    await GradesService.removeGrade({id: id.toString()});
-    toast(`Xóa khối ${api.getCellValue(id, 'name')} thành công`, {
-      type: toast.TYPE.SUCCESS
+    const gradeName = api.getCellValue(id, 'displayName')?.toString().toUpperCase();
+    const { result } = await showDialog(null, {
+      type: 'default',
+      title: 'Xác nhận',
+      message: `Xác nhận xóa khối ${gradeName}?`,
+      acceptText: 'Xác nhận'
     });
-    reloadCurrentPageData();
+    if (result !== 'Ok') {
+      return;
+    }
+    try {
+      busyService.busy(true);
+      const gradeId = id.toString();
+      await GradesService.deleteGradeById(gradeId);
+      toast.success(`Xóa khối ${gradeName} thành công`);
+      reloadCurrentPageData();
+    } catch {
+      toast.error('Đã có lỗi xảy ra. Không thể xóa khối');
+    } finally {
+      busyService.busy(false);
+    }
   };
 
-  const onRequestUpdate = async (data: Grade.CreateUpdateGradeDto) => {
-    await GradesService.updateGrade({id: id.toString(), data});
-    toast('Cập nhật thông tin khối thành công', {
-      type: toast.TYPE.SUCCESS
-    });
-    reloadCurrentPageData();
+  const onRequestUpdate = async () => {
+    const input = await initUpdateData();
+    if (!input) {
+      return;
+    }
+    const { result, data } = await showDialog(input);
+    if (result !== 'Ok' || !data) {
+      return;
+    }
+    try {
+      busyService.busy(true);
+      const gradeId = id.toString();
+      await GradesService.updateGrade({id: gradeId, data});
+      toast.success('Cập nhật thông tin khối thành công');
+      reloadCurrentPageData();
+    } catch {
+      toast.error('Đã có lỗi xảy ra. Không thể cập nhật khối');
+    } finally {
+      busyService.busy(false);
+    }
   };
+
+  const initUpdateData = async () => {
+    try {
+      busyService.busy(true);
+      const gradeId = id.toString();
+      const data = await GradesService.getGradeById(gradeId);
+      const result: CreateOrUpdateGradeRequestProps = {
+        editItem: data
+      };
+      return result;
+
+    } catch {
+      toast.error('Đã có lỗi xảy ra. Không thể tạo dữ liệu cập nhật');
+      return null;
+    } finally {
+      busyService.busy(false);
+    }
+  }
 
   return (
     <div>
       <Tooltip title='Cập nhật thông tin khối này'>
-        <IconButton  
-          onClick={() => ActionModal.show({
-            title: 'Cập nhật thông tin khối',
-            acceptText: 'Lưu',
-            cancelText: 'Hủy',
-            component: <CreateOrUpdateGradeRequest id={id.toString()}/>,
-            onAccept: onRequestUpdate
-          })} 
-        >
+        <IconButton onClick={onRequestUpdate}>
           <EditIcon />
         </IconButton>
       </Tooltip>
       <Tooltip title='Xóa khối này'>
-        <IconButton
-          onClick={() => ActionModal.show({
-            title: `Xác nhận xóa khối ${api.getCellValue(id, 'name')}?`,
-            onAccept: onRequestDelete
-          })}
-        >
+        <IconButton onClick={onRequestDelete}>
           <DeleteIcon />
         </IconButton>
       </Tooltip>
@@ -109,6 +152,14 @@ const GradesPage = () => {
 
   const classes = useStyles();
 
+  const { showDialog } = useDialog<Grade.CreateUpdateGradeDto>({
+    type: 'data',
+    title: 'Thêm khối mới',
+    acceptText: 'Lưu',
+    cancelText: 'Hủy',
+    renderFormComponent: CreateOrUpdateGradeRequest
+  });
+
   const { 
     pagingInfo,
     setPageIndex,
@@ -131,12 +182,21 @@ const GradesPage = () => {
     setPageSize(param.pageSize);
   };
 
-  const onRequestCreate = async (data: Grade.CreateUpdateGradeDto) => {
-    await GradesService.createGrade(data);
-    toast('Thêm khối thành công', {
-      type: toast.TYPE.SUCCESS
-    });
-    resetFilter();
+  const onRequestCreate = async () => {
+    const { result, data } = await showDialog();
+    if (result !== 'Ok' || !data) {
+      return;
+    }
+    try {
+      busyService.busy(true);
+      await GradesService.createGrade(data);
+      toast.success('Thêm khối thành công');
+      resetFilter();
+    } catch {
+      toast.error('Đã có lỗi xảy ra. Không thể tạo khối mới');
+    } finally {
+      busyService.busy(false);
+    }
   };
 
   return (
@@ -163,16 +223,7 @@ const GradesPage = () => {
               <Paper variant="outlined" elevation={1}>
                 <PageTitleBar 
                   title={`Giáo viên`} 
-                  onMainButtonClick={() => ActionModal.show({
-                    title: 'Thêm khối mới',
-                    acceptText: 'Lưu',
-                    cancelText: 'Hủy',
-                    component: <CreateOrUpdateGradeRequest />,
-                    onAccept: onRequestCreate
-                  })}
-                  onOptionsButtonClick={() => toast('default toast', {
-                    type: toast.TYPE.INFO,
-                  })}
+                  onMainButtonClick={onRequestCreate}
                 />
               </Paper>
             </Grid>

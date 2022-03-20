@@ -41,7 +41,7 @@ export const configHttpResponse = (axios: AxiosInstance) => {
     }
     // Forbidden error
     else if (err?.response?.status === 403) {
-      toast.error('You have no right to access this page!');
+      // toast.error('You have no right to access this page!');
     }
     console.log({err});
     const message = err?.response?.data?.detail || 'Unknown error has occurred!'

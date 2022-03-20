@@ -10,7 +10,7 @@ const Endpoint = {
   RemoveCourse: (id: string) =>
     `/api/app/courses/${id}`,
   IsNameAlreadyUsed: (id: string, name: string) =>
-    `/api/app/courses/IsNameAlreadyUsed?id=${id}&name=${name}`,
+    `/api/app/courses/is-name-already-used?id=${id}&name=${name}`,
 };
 
 export default Endpoint;

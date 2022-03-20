@@ -47,6 +47,10 @@ export namespace Identity {
   export interface RoleDto {
     id: string;
     name: string;
+    isDefault: boolean;
+    isStatic: boolean;
+    isPublic: boolean;
+    concurrencyStamp: string;
   }
 
   export interface RoleForSimpleListDto {
@@ -57,6 +61,9 @@ export namespace Identity {
 
   export interface CreateUpdateRoleDto {
     name: string;
+    isDefault: boolean;
+    isPublic: boolean;
+    concurrencyStamp: string;
   }
 
   export interface PermissionProvider  {

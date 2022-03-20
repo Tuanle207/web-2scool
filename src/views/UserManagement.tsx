@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useState, useEffect, Fragment } from 'react';
 import AwesomeDebouncePromise from 'awesome-debounce-promise';
 import { Container, Grid, IconButton, Paper, Tooltip } from '@material-ui/core';
 import { DataGrid, GridApi, GridColDef, GridPageChangeParams, GridRowId, GridValueFormatterParams } from '@material-ui/data-grid';
@@ -8,6 +8,7 @@ import EditIcon from '@material-ui/icons/Edit';
 import Sidebar from '../components/Sidebar';
 import Header from '../components/Header';
 import PageTitleBar from '../components/PageTitleBar';
+import FilterButton, { IFilterOption } from '../components/FilterButton';
 import { Identity } from '../interfaces';
 import { IdentityService } from '../api';
 import { useFetchV2, useDialog } from '../hooks';
@@ -186,6 +187,8 @@ const UserManagement = () => {
     renderFormComponent: CreateOrUpdateUserRequest
   });
 
+  const [ roleOptions, setRoleOptions ] = useState<IFilterOption[]>([]);
+
   const { 
     pagingInfo,
     setFilter,
@@ -199,6 +202,17 @@ const UserManagement = () => {
   } = useFetchV2({ fetchFn: fetchAPIDebounced });
 
   useEffect(() => {
+    const initFilterData = async () => {
+      const { items: roleItems } = await IdentityService.getAssignableRoles();
+      const roleOptions: IFilterOption[] = roleItems.map((el) => ({
+        id: el.id,
+        label: el.name,
+        value: el.id
+      }));
+      setRoleOptions(roleOptions);
+    };
+
+    initFilterData();
     document.title = '2Scool | Quản lý người dùng';
   }, []);
 
@@ -208,6 +222,15 @@ const UserManagement = () => {
 
   const onPageSizeChange = (param: GridPageChangeParams) => {
     setPageSize(param.pageSize);
+  };
+
+  const onRoleFilterChange = (options: IFilterOption[]) => {
+    const roleIdList = options.map((x) => x.value);
+    setFilter({
+      key: "RoleId",
+      comparison: comparers.In,
+      value: roleIdList.join(',')
+    });
   };
 
   const onRequestCreate = async () => {
@@ -275,6 +298,15 @@ const UserManagement = () => {
                 <PageTitleBar 
                   title={`Người dùng`}
                   filterCount={getFilterCount()}
+                  filterComponent={(
+                    <Fragment>
+                      <FilterButton
+                        title="Vai trò"
+                        options={roleOptions}
+                        onSelectedOptionsChange={onRoleFilterChange}
+                      />
+                    </Fragment>
+                  )}
                   onMainButtonClick={onRequestCreate}
                 />
               </Paper>

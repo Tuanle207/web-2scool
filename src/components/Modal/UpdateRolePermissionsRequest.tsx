@@ -1,4 +1,4 @@
-import { useState, useEffect, ReactNode, ChangeEvent } from 'react';
+import { useState, useEffect, ReactNode, ChangeEvent, FC } from 'react';
 import { 
   Container, 
   Tabs, 
@@ -9,11 +9,11 @@ import {
 
  } from '@material-ui/core';
 import { Identity } from '../../interfaces';
-import { IdentityService } from '../../api';
-import ActionModal from '.';
+import { useForm } from 'react-hook-form';
+import { useDialogController } from '../../hooks';
 
 const useStyles = makeStyles(theme => ({
-  form: {
+  wrapper: {
     padding: theme.spacing(1, 0),
     marginBottom: theme.spacing(3), 
     height: 400,
@@ -24,9 +24,6 @@ const useStyles = makeStyles(theme => ({
     backgroundColor: theme.palette.background.paper,
     display: 'flex',
     height: '100%',
-    '& div:not(:first-child)': {
-
-    }
   },
   tabs: {
     borderRight: `1px solid ${theme.palette.divider}`,
@@ -43,7 +40,6 @@ const useStyles = makeStyles(theme => ({
     display: 'flex',
     flexDirection: 'column',
     height: '100%',
-    overflowX: 'auto',
     borderTop: `1px solid ${theme.palette.divider}`
   },
   parentsPermissionItem: {
@@ -82,7 +78,13 @@ function TabPanel(props: TabPanelProps) {
   );
 }
 
-const UpdateRolePermissionsRequest = ({ provider }: { provider: Identity.PermissionProvider }) => {
+export interface UpdateRolePermissionsRequestProps {
+  permissionMetadata: Identity.PermissionResDto;
+}
+
+const UpdateRolePermissionsRequest: FC<UpdateRolePermissionsRequestProps> = ({
+  permissionMetadata,
+}) => {
 
   const classes = useStyles();
 
@@ -93,9 +95,22 @@ const UpdateRolePermissionsRequest = ({ provider }: { provider: Identity.Permiss
   const [ parentsPermissions, setParentsPermissions ] = useState<string[]>([]);
 
 
- useEffect(() => {
-    const dto: Identity.UpdateRolePermissionDto = { permissions: [] };
+  const { control, reset, setValue, handleSubmit } = useForm<Identity.UpdateRolePermissionDto>({
+    defaultValues: {
+      permissions: [],
+    },
+  });
 
+  useDialogController({ control, handleSubmit });
+
+  useEffect(() => {
+    const permissions = getPermissionForUpdate(grantedPermissions);
+    setValue('permissions', permissions);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [grantedPermissions]);
+
+  const getPermissionForUpdate = (grantedPermissions: string[]) => {
+    const dto: Identity.UpdateRolePermissionDto = { permissions: [] };
     permissionGroups.forEach((group) => {
       group.permissions.forEach((permission) => {
         dto.permissions.push({
@@ -104,45 +119,41 @@ const UpdateRolePermissionsRequest = ({ provider }: { provider: Identity.Permiss
         })
       })
     });
-    
-    ActionModal.setData({
-      data: dto
-    });
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [grantedPermissions]);
-
+    return dto.permissions;
+  }
 
   useEffect(() => {
-    if (provider) {
-      IdentityService.getPermissions(provider).then(res => {
-        const permissionGroups = res.groups.filter(
-          (g) => !['FeatureManagement', 'SettingManagement'].includes(g.name) );
-        setPermissionGroups(permissionGroups);
+    const permissionGroups = permissionMetadata.groups.filter(
+      (g) => !['FeatureManagement', 'SettingManagement'].includes(g.name) );
+    setPermissionGroups(permissionGroups);
 
-        const granted: string[] = [];
-        const parents: string[] = [];
-        permissionGroups.forEach((group) => {
-          if (group.permissions.length === 1 && !parentsPermissions.includes(group.permissions[0].name)) {
-            parents.push(group.permissions[0].name);
-          }
-          group.permissions.forEach((permission) => {
+    const granted: string[] = [];
+    const parents: string[] = [];
+    permissionGroups.forEach((group) => {
+      if (group.permissions.length === 1 && !parentsPermissions.includes(group.permissions[0].name)) {
+        parents.push(group.permissions[0].name);
+      }
+      group.permissions.forEach((permission) => {
 
-            if (permission.isGranted) {
-              granted.push(permission.name);
-            }
+        if (permission.isGranted) {
+          granted.push(permission.name);
+        }
 
-            const parentName = permission.parentName;
-            if ((parentName && !parents.includes(parentName))) {
-              parents.push(parentName);
-            }
-          })
-        });
-        setGrantedPermissions(granted);
-        setParentsPermissions(parents);
+        const parentName = permission.parentName;
+        if ((parentName && !parents.includes(parentName))) {
+          parents.push(parentName);
+        }
+      })
+    });
+    setGrantedPermissions(() => {
+      reset({
+        permissions: getPermissionForUpdate(granted)
       });
-    }
+      return granted;
+    });
+    setParentsPermissions(parents);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [provider]);
+  }, [ permissionMetadata ]);
 
   const handleTabChange = (event: ChangeEvent<{}>, newValue: number) => {
     setTabIndex(newValue);
@@ -197,7 +208,10 @@ const UpdateRolePermissionsRequest = ({ provider }: { provider: Identity.Permiss
       }      
     }
 
-    setGrantedPermissions(granted);
+    setGrantedPermissions(() =>  {
+      setValue('permissions', getPermissionForUpdate(granted));
+      return granted;
+    });
   }
 
   function a11yProps(index: any) {
@@ -208,7 +222,7 @@ const UpdateRolePermissionsRequest = ({ provider }: { provider: Identity.Permiss
   }
 
   return (
-    <form className={classes.form}>
+    <Container className={classes.wrapper}>
       <Container className={classes.tabContainer}>
         <Tabs
           orientation="vertical"
@@ -271,7 +285,7 @@ const UpdateRolePermissionsRequest = ({ provider }: { provider: Identity.Permiss
           })
         }
       </Container>
-    </form>
+    </Container>
   );
 };
 
