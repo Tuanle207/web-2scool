@@ -69,7 +69,7 @@ const isNameAlreadyUsed = async (id: string, name: string) => {
   return result;
 }
 
-const ClassesService ={
+export const ClassesService ={
   createClass,
   getAllClasss,
   getClassForSimpleList,
@@ -78,5 +78,3 @@ const ClassesService ={
   updateClass,
   isNameAlreadyUsed
 };
-
-export default ClassesService;

@@ -20,10 +20,8 @@ const changePassword = async (input: Profile.ChangePasswordRequest) => {
   return result;
 };
 
-const ProfileService ={
+export const ProfileService ={
   getMyProfile,
   updateMyProfile,
   changePassword
 };
-
-export default ProfileService;

@@ -5,7 +5,6 @@ import { DataGrid, GridApi, GridColDef, GridPageChangeParams, GridRowId, GridVal
 import { toast } from 'react-toastify';
 import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@material-ui/icons/Edit';
-import Sidebar from '../components/Sidebar';
 import Header from '../components/Header';
 import PageTitleBar from '../components/PageTitleBar';
 import FilterButton, { IFilterOption } from '../components/FilterButton';
@@ -14,7 +13,6 @@ import { IdentityService } from '../api';
 import { useFetchV2, useDialog } from '../hooks';
 import CreateOrUpdateUserRequest, { CreateOrUpdateUserRequestProps, CreateUpdateUserFormValues } from '../components/Modal/CreateOrUpdateUserRequest';
 import { comparers, dataGridLocale } from '../appConsts';
-import { routes } from '../routers/routesDictionary';
 import { busyService } from '../services';
 import useStyles from '../assets/jss/views/UserManagement';
 
@@ -43,7 +41,7 @@ const RowMenuCell = (props: RowMenuProps) => {
     const { result } = await showDialog(null, {
       type: 'default',
       title: 'Xác nhận',
-      message: `Xác nhận tài khoản của người dùng ${userName}?`,
+      message: `Xác nhận xóa tài khoản của người dùng ${userName}?`,
       acceptText: 'Xác nhận'
     });
     if (result !== 'Ok') {
@@ -273,69 +271,61 @@ const UserManagement = () => {
   }
 
   return (
-    <div style={{ flexGrow: 1 }}>
-      <Grid container style={{ flex: 1 }}>
-        <Grid item xs={4} sm={3} md={2}>
-          <Sidebar activeKey={routes.UsersManager} />
-        </Grid>
-        <Grid style={{ background: '#fff', flexGrow: 1 }} item container xs={8} sm={9} md={10} direction='column'>
-          <Grid item >
-            <Header
-              onTextChange={(value) => setFilter({key: 'Name', comparison: comparers.Contains, value: value })}
-              searchBarPlaceholder="Tìm kiếm người dùng"
-              pageName="Quản lý người dùng"
+    <Grid style={{ background: '#fff', flexGrow: 1 }} item container direction='column'>
+      <Grid item >
+        <Header
+          onTextChange={(value) => setFilter({key: 'Name', comparison: comparers.Contains, value: value })}
+          searchBarPlaceholder="Tìm kiếm người dùng"
+          pageName="Quản lý người dùng"
+        />
+      </Grid>
+      <Grid item container direction='column' style={{ flexGrow: 1 }}>
+        <Grid item style={{ 
+          backgroundColor: "#e8e8e8", 
+          paddingTop: 16, 
+          paddingRight: 24, 
+          paddingLeft: 24 
+        }}
+        >
+          <Paper variant="outlined" elevation={1}>
+            <PageTitleBar 
+              title={`Người dùng`}
+              filterCount={getFilterCount()}
+              filterComponent={(
+                <Fragment>
+                  <FilterButton
+                    title="Vai trò"
+                    options={roleOptions}
+                    onSelectedOptionsChange={onRoleFilterChange}
+                  />
+                </Fragment>
+              )}
+              onMainButtonClick={onRequestCreate}
             />
-          </Grid>
-          <Grid item container direction='column' style={{ flexGrow: 1 }}>
-            <Grid item style={{ 
-              backgroundColor: "#e8e8e8", 
-              paddingTop: 16, 
-              paddingRight: 24, 
-              paddingLeft: 24 
-            }}
-            >
-              <Paper variant="outlined" elevation={1}>
-                <PageTitleBar 
-                  title={`Người dùng`}
-                  filterCount={getFilterCount()}
-                  filterComponent={(
-                    <Fragment>
-                      <FilterButton
-                        title="Vai trò"
-                        options={roleOptions}
-                        onSelectedOptionsChange={onRoleFilterChange}
-                      />
-                    </Fragment>
-                  )}
-                  onMainButtonClick={onRequestCreate}
-                />
-              </Paper>
-            </Grid>
-            <Grid item style={{ flexGrow: 1, paddingTop: 16, paddingBottom: 16, backgroundColor: '#e8e8e8' }}>
-              <Container className={classes.root}>
-                <DataGrid
-                  columns={cols}
-                  rows={data.items}
-                  pageSize={pagingInfo.pageSize} 
-                  rowCount={data.totalCount}
-                  onPageChange={onPageChange}
-                  loading={loading}
-                  page={pagingInfo.pageIndex && pagingInfo.pageIndex - 1}
-                  error={error}
-                  paginationMode="server"
-                  hideFooterSelectedRowCount
-                  rowsPerPageOptions={[5, 15, 30, 50]}
-                  onPageSizeChange={onPageSizeChange}
-                  pagination
-                  localeText={dataGridLocale}
-                />
-              </Container>
-            </Grid>
-          </Grid>
+          </Paper>
+        </Grid>
+        <Grid item style={{ flexGrow: 1, paddingTop: 16, paddingBottom: 16, backgroundColor: '#e8e8e8' }}>
+          <Container className={classes.root}>
+            <DataGrid
+              columns={cols}
+              rows={data.items}
+              pageSize={pagingInfo.pageSize} 
+              rowCount={data.totalCount}
+              onPageChange={onPageChange}
+              loading={loading}
+              page={pagingInfo.pageIndex && pagingInfo.pageIndex - 1}
+              error={error}
+              paginationMode="server"
+              hideFooterSelectedRowCount
+              rowsPerPageOptions={[5, 15, 30, 50]}
+              onPageSizeChange={onPageSizeChange}
+              pagination
+              localeText={dataGridLocale}
+            />
+          </Container>
         </Grid>
       </Grid>
-    </div>
-    
+    </Grid>
   );
 };
 

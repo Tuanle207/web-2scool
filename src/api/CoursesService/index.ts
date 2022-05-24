@@ -59,7 +59,7 @@ const isNameAlreadyUsed = async (id: string, name: string) => {
   return result;
 }
 
-const CoursesService = {
+export const CoursesService = {
   createCourse,
   getAllCourses,
   getCourseById,
@@ -67,5 +67,3 @@ const CoursesService = {
   updateCourse,
   isNameAlreadyUsed,
 };
-
-export default CoursesService;

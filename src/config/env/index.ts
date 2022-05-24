@@ -3,7 +3,7 @@ import { IEnvConfig, EnvType } from './type';
 const ENV: IEnvConfig = {
   env: EnvType.Development,
   host: 'http://localhost:5000',
-  appUrl: 'http://quanlynenep.tech',
+  appUrl: 'http://localhost:3000',
   oAuthConfig: {
     issuer: 'http://localhost:5000',
     clientId: 'Scool_App',

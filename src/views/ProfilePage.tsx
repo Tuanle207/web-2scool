@@ -1,7 +1,6 @@
 import React, { FC, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Grid, TextField, Typography, Tabs, Tab, Box, Button } from '@material-ui/core';
-import Sidebar from '../components/Sidebar';
 import Header from '../components/Header';
 import PageTitleBar from '../components/PageTitleBar';
 import { Profile, Util } from '../interfaces';
@@ -247,53 +246,45 @@ const ProfilePage = () => {
   };
 
   return (
-    <div style={{ flexGrow: 1 }}>
-      <Grid container style={{ flex: 1 }}>
-        <Grid item xs={4} sm={3} md={2}>
-          <Sidebar activeKey={'students'} />
-        </Grid>
-        <Grid style={{ background: '#fff', flexGrow: 1 }} item container xs={8} sm={9} md={10} direction='column'>
-          <Grid item >
-            <Header hiddenSearchBar />
-          </Grid>
-          <Grid item container direction='column' style={{ flexGrow: 1 }}>
-            <PageTitleBar 
-              title={`Tài khoản của tôi`} 
+    <Grid style={{ background: '#fff', flexGrow: 1 }} item container direction='column'>
+      <Grid item >
+        <Header hiddenSearchBar />
+      </Grid>
+      <Grid item container direction='column' style={{ flexGrow: 1 }}>
+        <PageTitleBar 
+          title={`Tài khoản của tôi`} 
+        />
+        <Grid container justify='space-between' className={classes.tabContainer}>
+          <Tabs
+            orientation="vertical"
+            variant="scrollable"
+            value={tabIndex}
+            onChange={onTabChange}
+            aria-label="Vertical tabs example"
+            className={classes.tabs}
+          >
+            <Tab label="Thông tin cá nhân" {...a11yProps(0)} />
+            <Tab label="Đổi mật khẩu" {...a11yProps(1)} />
+            <Tab label="Cài đặt" {...a11yProps(2)} />
+          </Tabs>
+          <TabPanel value={tabIndex} index={0} className={classes.tabView}>
+            <ProfileTab
+              name={userProfile?.name}
+              email={userProfile?.email}
+              phoneNumber={userProfile?.phoneNumber}
+              roles={currentUser.roles}
+              extraProperties={userProfile?.extraProperties ?? {}} 
             />
-            <Grid container justify='space-between' className={classes.tabContainer}>
-              <Tabs
-                orientation="vertical"
-                variant="scrollable"
-                value={tabIndex}
-                onChange={onTabChange}
-                aria-label="Vertical tabs example"
-                className={classes.tabs}
-              >
-                <Tab label="Thông tin cá nhân" {...a11yProps(0)} />
-                <Tab label="Đổi mật khẩu" {...a11yProps(1)} />
-                <Tab label="Cài đặt" {...a11yProps(2)} />
-              </Tabs>
-              <TabPanel value={tabIndex} index={0} className={classes.tabView}>
-                <ProfileTab
-                  name={userProfile?.name}
-                  email={userProfile?.email}
-                  phoneNumber={userProfile?.phoneNumber}
-                  roles={currentUser.roles}
-                  extraProperties={userProfile?.extraProperties ?? {}} 
-                />
-              </TabPanel>
-              <TabPanel value={tabIndex} index={1} className={classes.tabView}>
-                <ChangePasswordTab />
-              </TabPanel>
-              <TabPanel value={tabIndex} index={2} className={classes.tabView}>
-                Cài đặt
-              </TabPanel>
-            </Grid>
-          </Grid>
+          </TabPanel>
+          <TabPanel value={tabIndex} index={1} className={classes.tabView}>
+            <ChangePasswordTab />
+          </TabPanel>
+          <TabPanel value={tabIndex} index={2} className={classes.tabView}>
+            Cài đặt
+          </TabPanel>
         </Grid>
       </Grid>
-    </div>
-    
+    </Grid>
   );
 };
 

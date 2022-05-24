@@ -4,7 +4,7 @@ import { makeStyles } from '@material-ui/core';
 const useLoginFormStyles = makeStyles(theme => ({
   formContainer: {
     height: '50rem',
-    background: theme.palette.common.white,
+    // background: theme.palette.common.white,
     padding: theme.spacing(10, 4),
     '& > *': {
       userSelect: 'none',

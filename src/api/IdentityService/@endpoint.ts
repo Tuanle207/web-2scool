@@ -29,7 +29,7 @@ const Endpoint = {
   
   // user managerment
   GetUsers: () =>
-    `/api/app/app-identity-user/paging`,
+    `/api/app/identity/paging`,
   GetUserById: (id: string) =>
     `/api/identity/users/${id}`,
   GetUserRoleById: (id: string) =>
@@ -39,19 +39,19 @@ const Endpoint = {
   GetAssignableRoles: () =>
     `/api/identity/users/assignable-roles`,
   CreateUser: () =>
-    `/api/app/app-identity-user`,
+    `/api/app/identity`,
   UpdateUser: (id: string) =>
-    `/api/app/app-identity-user/${id}`,
+    `/api/app/identity/${id}`,
   RemoveUser: (id: string) =>
     `/api/identity/users/${id}`,
   GetUsersForTaskAssignment: (classId?: string) => 
-    `/api/app/app-identity-user/user-for-task-assignment${classId ? `?classId=${classId}` : ''}`,
+    `/api/app/identity/user-for-task-assignment${classId ? `?classId=${classId}` : ''}`,
   IsEmailAlreadyUsed: (email: string, userId: string) =>
-    `/api/app/app-identity-user/is-email-already-used?email=${email}&userId=${userId}`,
+    `/api/app/identity/is-email-already-used?email=${email}&userId=${userId}`,
   DoesStudentHaveAccountAlready: (studentId: string) =>
-    `/api/app/app-identity-user/does-student-have-account-already?studentId=${studentId}`,
+    `/api/app/identity/does-student-have-account-already?studentId=${studentId}`,
   IsRoleNameAlreadyUsed: (roleId: string, name: string) => 
-    `api/app/app-identity-user/is-role-name-already-used?roleId=${roleId}&name=${name}`  
+    `api/app/identity/is-role-name-already-used?roleId=${roleId}&name=${name}`  
 }
 
 export default Endpoint;

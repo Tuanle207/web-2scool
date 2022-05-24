@@ -3,7 +3,6 @@ import { Grid, Button, Typography, Tooltip, TextField, Paper } from '@material-u
 import React from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 import Header from '../components/Header';
-import Sidebar from '../components/Sidebar';
 import { Alarm as AlarmIcon  } from '@material-ui/icons';
 import BxBxsBookReaderIcon from '@material-ui/icons/LocalLibrary';
 import PhotoIcon from '@material-ui/icons/Photo';
@@ -112,99 +111,92 @@ const LessonRegisterReportUpdate = () => {
   };
 
   return (
-    <div style={{ height: '100%' }}>
-      <Grid container style={{ height: '100%' }}>
-        <Grid item xs={4} sm={3} md={2}>
-          <Sidebar activeKey={'my-lr-report'} />
-        </Grid>
-        <Grid style={{ height: '100%' }} item container xs={8} sm={9} md={10} direction='column'>
-          <Header pageName="Cập nhật phiếu nộp sổ đầu bài" />
-          <Grid item container direction='column' style={{ flex: 1, minHeight: 0, flexWrap: 'nowrap' }}>   
-            <Grid item container direction='column' justify='center' alignItems='center' style={{ flex: 1, background: "#e8e8e8" }}>
-              {
-                reportClass ? (
-                  <Paper style={{ margin: "0 24px" }}>
-                    <form className={classes.formContainer}>
-                      <Grid item container direction='column' justify='space-between' style={{width: 'auto'}} >
-                        <Grid item container alignItems='center' style={{ width: 'auto' }}>
-                            <BxBxsBookReaderIcon />
-                            <Typography variant={'body1'} style={{marginLeft: 8}}>{reportClass?.name || 'Bạn không được phân công giữ sổ đầu bài'}</Typography>
-                        </Grid>
-                        <Grid item container alignItems='center' style={{ width: 'auto'}} >
-                            <AlarmIcon />
-                            <Typography variant={'body1'} style={{marginLeft: 8}} > {`${getDayOfWeek(new Date().toLocaleString())} - ${formatTime(new Date().toLocaleString())}`} </Typography>
-                        </Grid>
-                        <Grid item container alignItems='center' style={{ width: 'auto' }} >
-                          <ControlPointIcon style={{marginTop: 16, marginRight: 8}} />
-                          <TextField
-                            label='Tổng điểm'
-                            type='number'
-                            value={noPoint}
-                            onChange={e => setNoPoint(parseInt(e.target.value))}
-                          />
-                        </Grid>
-                        <Grid item container alignItems='center' style={{ width: 'auto' }} >
-                          <RemoveCircleOutlineIcon style={{marginTop: 16, marginRight: 8}} />
-                          <TextField
-                            label='Số lượt vắng'
-                            type='number'
-                            value={noAbsence}
-                            onChange={e => setNoAbsence(parseInt(e.target.value))}
-                          />
-                        </Grid>
+    <Grid style={{ height: '100%' }} item container direction='column'>
+      <Header pageName="Cập nhật phiếu nộp sổ đầu bài" />
+      <Grid item container direction='column' style={{ flex: 1, minHeight: 0, flexWrap: 'nowrap' }}>   
+        <Grid item container direction='column' justify='center' alignItems='center' style={{ flex: 1, background: "#e8e8e8" }}>
+          {
+            reportClass ? (
+              <Paper style={{ margin: "0 24px" }}>
+                <form className={classes.formContainer}>
+                  <Grid item container direction='column' justify='space-between' style={{width: 'auto'}} >
+                    <Grid item container alignItems='center' style={{ width: 'auto' }}>
+                        <BxBxsBookReaderIcon />
+                        <Typography variant={'body1'} style={{marginLeft: 8}}>{reportClass?.name || 'Bạn không được phân công giữ sổ đầu bài'}</Typography>
+                    </Grid>
+                    <Grid item container alignItems='center' style={{ width: 'auto'}} >
+                        <AlarmIcon />
+                        <Typography variant={'body1'} style={{marginLeft: 8}} > {`${getDayOfWeek(new Date().toLocaleString())} - ${formatTime(new Date().toLocaleString())}`} </Typography>
+                    </Grid>
+                    <Grid item container alignItems='center' style={{ width: 'auto' }} >
+                      <ControlPointIcon style={{marginTop: 16, marginRight: 8}} />
+                      <TextField
+                        label='Tổng điểm'
+                        type='number'
+                        value={noPoint}
+                        onChange={e => setNoPoint(parseInt(e.target.value))}
+                      />
+                    </Grid>
+                    <Grid item container alignItems='center' style={{ width: 'auto' }} >
+                      <RemoveCircleOutlineIcon style={{marginTop: 16, marginRight: 8}} />
+                      <TextField
+                        label='Số lượt vắng'
+                        type='number'
+                        value={noAbsence}
+                        onChange={e => setNoAbsence(parseInt(e.target.value))}
+                      />
+                    </Grid>
+                  </Grid>
+                  <Grid item container 
+                    direction='column'
+                    justify='center'
+                    alignItems='center'
+                    style={{width: 'auto', flex: 1}}
+                  > 
+                    <Button
+                      startIcon={<AddAPhotoIcon/>}
+                      onClick={handleOpenFileDialog}
+                    >
+                      Chọn ảnh sổ đầu bài
+                      <input ref={inputRef} type='file' hidden onChange={handleFileChange} accept="image/*" />
+                    </Button>
+                    {
+                      fileUrl !== null && (
+                      <Grid item container className={classes.imgContainer}>
+                        <Tooltip title='Ảnh chụp sổ đầu bài'>
+                          <PhotoIcon className={classes.imgIcon} />
+                        </Tooltip>
+                        <img 
+                          src={fileUrl}
+                          alt='test img'
+                        />
                       </Grid>
-                      <Grid item container 
-                        direction='column'
-                        justify='center'
-                        alignItems='center'
-                        style={{width: 'auto', flex: 1}}
-                      > 
-                        <Button
-                          startIcon={<AddAPhotoIcon/>}
-                          onClick={handleOpenFileDialog}
-                        >
-                          Chọn ảnh sổ đầu bài
-                          <input ref={inputRef} type='file' hidden onChange={handleFileChange} accept="image/*" />
-                        </Button>
-                        {
-                          fileUrl !== null && (
-                          <Grid item container className={classes.imgContainer}>
-                            <Tooltip title='Ảnh chụp sổ đầu bài'>
-                              <PhotoIcon className={classes.imgIcon} />
-                            </Tooltip>
-                            <img 
-                              src={fileUrl}
-                              alt='test img'
-                            />
-                          </Grid>
-                          )
-                        }
-                      </Grid>
-                      <Grid item container justify='flex-end' style={{ paddingTop: 40 }}>
-                        <Button
-                          variant={'contained'} 
-                          color={'primary'} 
-                          endIcon={<DoneIcon />} 
-                          onClick={handleSubmit}
-                          style={{marginRight: 200}}
-                          >
-                          Cập nhật phiếu nộp sổ đầu bài
-                        </Button>
-                      </Grid>
-                    </form>
-                  </Paper>
-                ) : (
-                  <>
-                    <Typography variant={'body1'} style={{marginLeft: 8}}>Bạn không được phân công giữ sổ đầu bài!</Typography>
-                    <Button color="primary" onClick={() => history.goBack()}>Quay lại trang trước</Button>
-                  </>
-                )
-              }
-            </Grid>
-          </Grid>
+                      )
+                    }
+                  </Grid>
+                  <Grid item container justify='flex-end' style={{ paddingTop: 40 }}>
+                    <Button
+                      variant={'contained'} 
+                      color={'primary'} 
+                      endIcon={<DoneIcon />} 
+                      onClick={handleSubmit}
+                      style={{marginRight: 200}}
+                      >
+                      Cập nhật phiếu nộp sổ đầu bài
+                    </Button>
+                  </Grid>
+                </form>
+              </Paper>
+            ) : (
+              <>
+                <Typography variant={'body1'} style={{marginLeft: 8}}>Bạn không được phân công giữ sổ đầu bài!</Typography>
+                <Button color="primary" onClick={() => history.goBack()}>Quay lại trang trước</Button>
+              </>
+            )
+          }
         </Grid>
       </Grid>
-    </div>
+    </Grid>
   );
 
 };

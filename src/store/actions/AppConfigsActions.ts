@@ -1,5 +1,5 @@
 import { createAction } from '@reduxjs/toolkit';
-import { Util } from '../../interfaces';
+import { Account, Util } from '../../interfaces';
 
 const getAppConfigAsync = createAction(
   'app/AppConfig/getAppConfigAsync'
@@ -10,7 +10,13 @@ const setAppConfigStorage = createAction(
   (payload: Util.AppConfig) => ({payload})
 );
 
+const setCurrentAccountStorage = createAction(
+  'app/AppConfig/setCurrentAccountStoage',
+  (payload: Account.CurrentAccountDto) => ({payload})
+)
+
 export const AppConfigsActions = {
   getAppConfigAsync,
-  setAppConfigStorage
+  setAppConfigStorage,
+  setCurrentAccountStorage,
 };

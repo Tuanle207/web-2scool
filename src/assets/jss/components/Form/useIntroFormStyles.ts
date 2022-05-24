@@ -4,7 +4,7 @@ const useIntroFormStyles = makeStyles(theme => ({
   formContainer: {
     height: '50rem',
     width: '50rem',
-    background: '#267dff',
+    // background: '#267dff',
     padding: theme.spacing(2, 4),
     color: '#fff',
     borderColor: theme.palette.grey.A200,

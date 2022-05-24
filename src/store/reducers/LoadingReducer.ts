@@ -2,9 +2,9 @@ import { createReducer } from '@reduxjs/toolkit';
 import { Util } from '../../interfaces';
 import { LoadingActions } from '../actions';
 
-const initial: Util.IObject<boolean> = {
-  fetchingAppConfig: false,
-  sendingDcpReport: false
+const initial: Util.IObject<boolean | undefined> = {
+  fetchingAppConfig: undefined,
+  sendingDcpReport: undefined
 };
 
 export default createReducer(initial, build => {

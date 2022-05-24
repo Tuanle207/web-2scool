@@ -43,7 +43,7 @@ export const configHttpResponse = (axios: AxiosInstance) => {
       // toast.error('You have no right to access this page!');
     }
     console.log({err});
-    const message = err?.response?.data?.detail || 'Unknown error has occurred!'
+    const message = err?.response?.data?.detail || 'Đã có lỗi xảy ra!'
     throw new Error(message);
   });
 };

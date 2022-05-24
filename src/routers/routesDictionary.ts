@@ -24,6 +24,7 @@ export const routes = {
   GradesManager: '/quan-ly-khoi',
   UsersManager: '/quan-ly-nguoi-dung',
   RolesManager: '/quan-ly-vai-tro-nguoi-dung',
+  TenansManager: '/quan-ly-khach-thue',
   Profile: '/tai-khoan-cua-toi',
   RegulationManager: '/quan-ly-quy-dinh',
 

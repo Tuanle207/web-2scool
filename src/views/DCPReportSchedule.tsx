@@ -3,8 +3,7 @@ import { Container, Grid, Button, makeStyles, Typography, Paper } from '@materia
 import { useState, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 import Header from '../components/Header';
-import Sidebar from '../components/Sidebar';
-import { Class, TaskAssignment, User } from '../interfaces';
+import { Class, TaskAssignment, Account } from '../interfaces';
 import { DataGrid, GridColDef, GridValueFormatterParams } from '@material-ui/data-grid';
 import { TaskAssignmentService } from '../api';
 import { getDayOfWeek, formatTime, formatDate } from '../utils/TimeHelper';
@@ -73,7 +72,7 @@ const cols: GridColDef[] = [
     headerName: 'Cờ đỏ chấm ',
     flex: 1,
     valueFormatter: (params: GridValueFormatterParams) => {
-      const value = params.value as TaskAssignment.UserProfleForTaskAssignmentDto;
+      const value = params.value as Account.SimpleAccountDto;
       return value.name;
     }
   },
@@ -82,8 +81,8 @@ const cols: GridColDef[] = [
     headerName: 'Thuộc lớp ',
     width: 120,
     valueFormatter: (params: GridValueFormatterParams) => {
-      const value = params.getValue('assignee') as TaskAssignment.UserProfleForTaskAssignmentDto;
-      return value.class.name;
+      const value = params.getValue('assignee') as Account.SimpleAccountDto;
+      return value.classDisplayName;
     }
   },
   {
@@ -118,7 +117,7 @@ const DCPReportSchedule = () => {
   const [error, setError] = useState<string | null>(null);
 
   const [updatedTime, setUpdatedTime] = useState<Date>();
-  const [creatorInfo, setCreatorInfo] = useState<User.UserForSimpleListDto>();
+  const [creatorInfo, setCreatorInfo] = useState<Account.SimpleAccountDto>();
 
   useEffect(() => {
     
@@ -157,64 +156,57 @@ const DCPReportSchedule = () => {
 
 
   return (
-    <div style={{ height: '100%' }}>
-      <Grid container className={classes.container}>
-        <Grid item xs={4} sm={3} md={2}>
-          <Sidebar activeKey={routes.DCPReportSchedule} />
+    <Grid style={{ height: '100%' }} item container direction={'column'}>
+      <Grid item >
+        <Header
+          pageName="Phân công trực cờ đỏ"
+        />
+      </Grid>
+      <Grid item container direction='column' style={{ flexGrow: 1 }}>
+        <Grid item style={{ 
+          backgroundColor: "#e8e8e8", 
+          paddingTop: 16, 
+          paddingRight: 24, 
+          paddingLeft: 24 
+        }}
+        >
+          <Paper variant="outlined" elevation={1}>
+            <Grid item container alignItems="center" justify="space-between" className={titleBarStyles.container}>
+              <Grid item container direction="row" alignItems="center" justify="center" >
+                <AlarmIcon style={{ marginRight: 8 }}/>
+                <Typography variant="body2">{timeText}</Typography>
+              </Grid>
+              <Grid item container direction="row" alignItems="center" justify="center">
+                <PermContactCalendarIcon style={{ marginRight: 8 }}/>
+                <Typography variant="body2">{creatorText}</Typography>
+              </Grid>
+              <Grid item container justify="flex-end">
+                <Button variant="contained"
+                  color={'primary'}
+                  onClick={onMainButtonClick}
+                >
+                  Cập nhật
+                </Button>
+              </Grid>
+            </Grid>
+          </Paper>
         </Grid>
-        <Grid style={{ height: '100%' }} item container xs={8} sm={9} md={10} direction={'column'}>
-          <Grid item >
-            <Header
-              pageName="Phân công trực cờ đỏ"
+        <Grid item style={{ flexGrow: 1, paddingTop: 16, paddingBottom: 16, backgroundColor: '#e8e8e8' }}>
+          <Container className={classes.root}>
+            <DataGrid
+              columns={cols}
+              rows={data}
+              loading={loading}
+              error={error}
+              paginationMode='server'
+              hideFooter
+              hideFooterPagination
+              localeText={dataGridLocale}
             />
-          </Grid>
-          <Grid item container direction='column' style={{ flexGrow: 1 }}>
-            <Grid item style={{ 
-              backgroundColor: "#e8e8e8", 
-              paddingTop: 16, 
-              paddingRight: 24, 
-              paddingLeft: 24 
-            }}
-            >
-              <Paper variant="outlined" elevation={1}>
-                <Grid item container alignItems="center" className={titleBarStyles.container}>
-                  <Grid item container direction="row" alignItems="center">
-                    <AlarmIcon style={{ marginRight: 8 }}/>
-                    <Typography variant="body2">{timeText}</Typography>
-                  </Grid>
-                  <Grid item container direction="row" alignItems="center" justify="center">
-                    <PermContactCalendarIcon style={{ marginRight: 8 }}/>
-                    <Typography variant="body2">{creatorText}</Typography>
-                  </Grid>
-                  <Grid item container justify="flex-end">
-                    <Button variant="contained"
-                      color={'primary'}
-                      onClick={onMainButtonClick}
-                    >
-                      Cập nhật
-                    </Button>
-                  </Grid>
-                </Grid>
-              </Paper>
-            </Grid>
-            <Grid item style={{ flexGrow: 1, paddingTop: 16, paddingBottom: 16, backgroundColor: '#e8e8e8' }}>
-              <Container className={classes.root}>
-                <DataGrid
-                  columns={cols}
-                  rows={data}
-                  loading={loading}
-                  error={error}
-                  paginationMode='server'
-                  hideFooter
-                  hideFooterPagination
-                  localeText={dataGridLocale}
-                />
-              </Container>
-            </Grid>
-          </Grid>
+          </Container>
         </Grid>
       </Grid>
-    </div>
+    </Grid>
   );
 };
 

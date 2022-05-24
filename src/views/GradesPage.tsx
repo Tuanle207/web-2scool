@@ -5,14 +5,12 @@ import { DataGrid, GridApi, GridColDef, GridPageChangeParams, GridRowId } from '
 import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@material-ui/icons/Edit';
 import { toast } from 'react-toastify';
-import Sidebar from '../components/Sidebar';
 import Header from '../components/Header';
 import PageTitleBar from '../components/PageTitleBar';
 import { Grade } from '../interfaces';
 import { GradesService } from '../api';
 import { useDialog, useFetchV2 } from '../hooks';
 import CreateOrUpdateGradeRequest,  { CreateOrUpdateGradeRequestProps } from '../components/Modal/CreateOrUpdateGradeRequest';
-import { routes } from '../routers/routesDictionary';
 import { dataGridLocale } from '../appConsts';
 import useStyles from '../assets/jss/views/GradesPage';
 import { busyService } from '../services';
@@ -200,58 +198,50 @@ const GradesPage = () => {
   };
 
   return (
-    <div style={{ flexGrow: 1 }}>
-      <Grid container style={{ flex: 1 }}>
-        <Grid item xs={4} sm={3} md={2}>
-          <Sidebar activeKey={routes.GradesManager} />
-        </Grid>
-        <Grid style={{ background: '#fff', flexGrow: 1 }} item container xs={8} sm={9} md={10} direction='column'>
-          <Grid item >
-            <Header
-              hiddenSearchBar
-              pageName="Quản lý khối"
+    <Grid style={{ background: '#fff', flexGrow: 1 }} item container direction='column'>
+      <Grid item >
+        <Header
+          hiddenSearchBar
+          pageName="Quản lý khối"
+        />
+      </Grid>
+      <Grid item container direction='column' style={{ flexGrow: 1 }}>
+        <Grid item style={{ 
+          backgroundColor: "#e8e8e8", 
+          paddingTop: 16, 
+          paddingRight: 24, 
+          paddingLeft: 24 
+        }}
+        >
+          <Paper variant="outlined" elevation={1}>
+            <PageTitleBar 
+              title={`Giáo viên`} 
+              onMainButtonClick={onRequestCreate}
             />
-          </Grid>
-          <Grid item container direction='column' style={{ flexGrow: 1 }}>
-            <Grid item style={{ 
-              backgroundColor: "#e8e8e8", 
-              paddingTop: 16, 
-              paddingRight: 24, 
-              paddingLeft: 24 
-            }}
-            >
-              <Paper variant="outlined" elevation={1}>
-                <PageTitleBar 
-                  title={`Giáo viên`} 
-                  onMainButtonClick={onRequestCreate}
-                />
-              </Paper>
-            </Grid>
-            <Grid item style={{ flexGrow: 1, paddingTop: 16, paddingBottom: 16, backgroundColor: '#e8e8e8' }}>
-              <Container className={classes.root}>
-                <DataGrid
-                  columns={cols}
-                  rows={data.items}
-                  pageSize={pagingInfo.pageSize} 
-                  rowCount={data.totalCount}
-                  onPageChange={onPageChange}
-                  loading={loading}
-                  page={pagingInfo.pageIndex && pagingInfo.pageIndex - 1}
-                  error={error}
-                  paginationMode='server'
-                  hideFooterSelectedRowCount
-                  rowsPerPageOptions={[5, 15, 30, 50]}
-                  onPageSizeChange={onPageSizeChange}
-                  pagination
-                  localeText={dataGridLocale}
-                />
-              </Container>
-            </Grid>
-          </Grid>
+          </Paper>
+        </Grid>
+        <Grid item style={{ flexGrow: 1, paddingTop: 16, paddingBottom: 16, backgroundColor: '#e8e8e8' }}>
+          <Container className={classes.root}>
+            <DataGrid
+              columns={cols}
+              rows={data.items}
+              pageSize={pagingInfo.pageSize} 
+              rowCount={data.totalCount}
+              onPageChange={onPageChange}
+              loading={loading}
+              page={pagingInfo.pageIndex && pagingInfo.pageIndex - 1}
+              error={error}
+              paginationMode='server'
+              hideFooterSelectedRowCount
+              rowsPerPageOptions={[5, 15, 30, 50]}
+              onPageSizeChange={onPageSizeChange}
+              pagination
+              localeText={dataGridLocale}
+            />
+          </Container>
         </Grid>
       </Grid>
-    </div>
-    
+    </Grid>
   );
 };
 

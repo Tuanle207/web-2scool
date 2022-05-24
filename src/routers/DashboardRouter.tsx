@@ -1,4 +1,5 @@
 import { Route, BrowserRouter as Router, Switch, Redirect } from 'react-router-dom';
+import { Grid } from '@material-ui/core';
 import Dashboard from '../views/Dashboard';
 import ProtectedRoute from '../components/Router/ProtectedRoute';
 import CoursesPage from '../views/CoursesPage';
@@ -24,157 +25,188 @@ import MyLRReportPage from '../views/MyLRReportPage';
 import LessonRegisterReportCreate from '../views/LessonRegisterReportCreate';
 import LessonRegisterReportUpdate from '../views/LessonRegisterReportUpdate';
 import ProfilePage from '../views/ProfilePage';
+import RegulationsPage from '../views/RegulationsPage';
+import TenantManagement from '../views/TenantManagement';
+import Sidebar from '../components/Sidebar';
 import { policies } from '../appConsts';
 import { routes } from './routesDictionary';
-import RegulationsPage from '../views/RegulationsPage';
+import { useEffect, useState } from 'react';
+import { signalrService } from '../services/signal-r-service';
 
-const DashboardRouter = () => {
+const DashboardRouteDictionary = () => {
   return (
-    <Router>
-      <Switch>
-        <Route 
-          path={routes.Dashboard} 
-          exact
-          component={Dashboard}
-        />
+    <Switch>
+      <Route 
+        path={routes.Dashboard} 
+        exact
+        component={Dashboard}
+      />
+      <ProtectedRoute 
+        path={routes.DCPReportApproval}
+        exact
+        policyName={policies.DcpReportApproval}
+        component={DCPReportsApprovalPage}
+      />
+      <ProtectedRoute 
+        path={routes.DCPReportDetail}
+        exact
+        policyName={policies.GetDcpReportDetail}
+        component={DCPReportPage}
+      />
+      <ProtectedRoute 
+        path={routes.LRReportApproval}
+        exact
+        policyName={policies.LRReportApproval}
+        component={DCPReportHistoryPage}
+      />
+      <ProtectedRoute 
+        path={routes.MyDCPReport}
+        exact
+        policyName={policies.GetMyDcpReport}
+        component={MyDCPReportPage}
+      />
         <ProtectedRoute 
-          path={routes.DCPReportApproval}
-          exact
-          policyName={policies.DcpReportApproval}
-          component={DCPReportsApprovalPage}
-        />
-        <ProtectedRoute 
-          path={routes.DCPReportDetail}
-          exact
-          policyName={policies.GetDcpReportDetail}
-          component={DCPReportPage}
-        />
-        <ProtectedRoute 
-          path={routes.LRReportApproval}
-          exact
-          policyName={policies.LRReportApproval}
-          component={DCPReportHistoryPage}
-        />
-        <ProtectedRoute 
-          path={routes.MyDCPReport}
-          exact
-          policyName={policies.GetMyDcpReport}
-          component={MyDCPReportPage}
-        />
-         <ProtectedRoute 
-          path={routes.MyLRReport}
-          exact
-          policyName={policies.GetMyLRReport}
-          component={MyLRReportPage}
-        />
-        <ProtectedRoute 
-          path={routes.CreateDCPReport}
-          exact
-          policyName={policies.CreateNewDcpReport}
-          component={DCPReportCreatePage}
-        />
-        <ProtectedRoute 
-          path={routes.CreateLRReport}
-          exact
-          policyName={policies.CreateNewLRReport}
-          component={LessonRegisterReportCreate}
-        />
-        <ProtectedRoute 
-          path={routes.UpdateLRReport}
-          exact
-          policyName={policies.UpdateLRReport}
-          component={LessonRegisterReportUpdate}
-        />
-        <ProtectedRoute 
-          path={routes.UpdateDCPReport}
-          exact
-          policyName={policies.UpdateDcpReport}
-          component={DCPReportUpdatePage}
-        />
-        <ProtectedRoute 
-          path={routes.DCPReportSchedule}
-          exact
-          policyName={policies.GetScheduleList}
-          component={DCPReportSchedule}
-        />
-        <ProtectedRoute
-          path={routes.DCPReportScheduleAssignment}
-          exact
-          policyName={policies.AssignDcpReport}
-          component={DCPReportScheduleAssignment}
-        />
-        <ProtectedRoute 
-          path={routes.LRReportSchedule}
-          exact
-          policyName={policies.AssignLessonRegisterReport}
-          component={LessonRegisterReportSchedule}
-        />
-        <ProtectedRoute 
-          path={routes.DCPRanking}
-          exact
-          policyName={policies.Rankings}
-          component={DCPRankingPage}
-        />
-        <ProtectedRoute 
-          path={routes.DCPStatistics}
-          exact
-          policyName={policies.Statistics}
-          component={DCPStatisticsPage}
-        />
-        <ProtectedRoute 
-          path={routes.Profile}
-          // policyName={policies.Courses}
-          component={ProfilePage}
-        />
-        <ProtectedRoute
-          path={routes.CoursesManager} 
-          exact
-          policyName={policies.Courses}
-          component={CoursesPage}
-        />
-        <ProtectedRoute 
-          path={routes.ClassesManager}
-          policyName={policies.Courses}
-          component={ClassesPage}
-        />
-        <ProtectedRoute 
-          path={routes.StudentsManager}
-          policyName={policies.Courses}
-          component={StudentsPage}
-        />
-        <ProtectedRoute 
-          path={routes.TeachersManager}
-          policyName={policies.Courses}
-          component={TeachersPage}
-        />
-        <ProtectedRoute 
-          path={routes.GradesManager}
-          policyName={policies.Courses}
-          component={GradesPage}
-        />
-         <ProtectedRoute 
-          path={routes.RegulationManager}
-          policyName={policies.Courses}
-          component={RegulationsPage}
-        />
-        <ProtectedRoute 
-          path={routes.UsersManager}
-          policyName={policies.AbpIdentityUsers}
-          component={UserManagement}
-        />
-        <ProtectedRoute 
-          path={routes.RolesManager}
-          policyName={policies.AbpIdentityRoles}
-          component={RoleManagement}
-        />
-        <Route 
-          path='/errors'
-          component={ErrorPage}
-        />
-        <Redirect to={routes.Dashboard} />
-      </Switch>
-    </Router>
+        path={routes.MyLRReport}
+        exact
+        policyName={policies.GetMyLRReport}
+        component={MyLRReportPage}
+      />
+      <ProtectedRoute 
+        path={routes.CreateDCPReport}
+        exact
+        policyName={policies.CreateNewDcpReport}
+        component={DCPReportCreatePage}
+      />
+      <ProtectedRoute 
+        path={routes.CreateLRReport}
+        exact
+        policyName={policies.CreateNewLRReport}
+        component={LessonRegisterReportCreate}
+      />
+      <ProtectedRoute 
+        path={routes.UpdateLRReport}
+        exact
+        policyName={policies.UpdateLRReport}
+        component={LessonRegisterReportUpdate}
+      />
+      <ProtectedRoute 
+        path={routes.UpdateDCPReport}
+        exact
+        policyName={policies.UpdateDcpReport}
+        component={DCPReportUpdatePage}
+      />
+      <ProtectedRoute 
+        path={routes.DCPReportSchedule}
+        exact
+        policyName={policies.GetScheduleList}
+        component={DCPReportSchedule}
+      />
+      <ProtectedRoute
+        path={routes.DCPReportScheduleAssignment}
+        exact
+        policyName={policies.AssignDcpReport}
+        component={DCPReportScheduleAssignment}
+      />
+      <ProtectedRoute 
+        path={routes.LRReportSchedule}
+        exact
+        policyName={policies.AssignLessonRegisterReport}
+        component={LessonRegisterReportSchedule}
+      />
+      <ProtectedRoute 
+        path={routes.DCPRanking}
+        exact
+        policyName={policies.Rankings}
+        component={DCPRankingPage}
+      />
+      <ProtectedRoute 
+        path={routes.DCPStatistics}
+        exact
+        policyName={policies.Statistics}
+        component={DCPStatisticsPage}
+      />
+      <ProtectedRoute 
+        path={routes.Profile}
+        // policyName={policies.Courses}
+        component={ProfilePage}
+      />
+      <ProtectedRoute
+        path={routes.CoursesManager} 
+        exact
+        policyName={policies.Courses}
+        component={CoursesPage}
+      />
+      <ProtectedRoute 
+        path={routes.ClassesManager}
+        policyName={policies.Courses}
+        component={ClassesPage}
+      />
+      <ProtectedRoute 
+        path={routes.StudentsManager}
+        policyName={policies.Courses}
+        component={StudentsPage}
+      />
+      <ProtectedRoute 
+        path={routes.TeachersManager}
+        policyName={policies.Courses}
+        component={TeachersPage}
+      />
+      <ProtectedRoute 
+        path={routes.GradesManager}
+        policyName={policies.Courses}
+        component={GradesPage}
+      />
+      <ProtectedRoute
+        path={routes.RegulationManager}
+        policyName={policies.Courses}
+        component={RegulationsPage}
+      />
+      <ProtectedRoute 
+        path={routes.UsersManager}
+        policyName={policies.AbpIdentityUsers}
+        component={UserManagement}
+      />
+      <ProtectedRoute 
+        path={routes.RolesManager}
+        policyName={policies.AbpIdentityRoles}
+        component={RoleManagement}
+      />
+      <ProtectedRoute 
+        path={routes.TenansManager}
+        policyName={policies.AbpTenantManagementTenants}
+        component={TenantManagement}
+      />
+      <Route 
+        path='/errors'
+        component={ErrorPage}
+      />
+      <Redirect to={routes.Dashboard} />
+    </Switch>
   );
 };
+
+const DashboardRouter = () => {
+  useEffect(() => {
+    return () => {
+      // clean signalr connection on component unmount
+      signalrService.closeAsync().then(() => {
+        console.log('signalr connection closed.')
+      });
+    };
+  }, []);
+
+  return (
+    <Router>
+      <div style={{ height: '100%' }}>
+        <Grid container direction="row" style={{ height: '100%', flexWrap: 'nowrap' }}>
+          <Sidebar />
+          <Grid style={{ flexGrow: 1, width: 'auto' }} item container>
+            <DashboardRouteDictionary />
+          </Grid>
+        </Grid>
+      </div>
+    </Router>
+  )
+}
 
 export default DashboardRouter;

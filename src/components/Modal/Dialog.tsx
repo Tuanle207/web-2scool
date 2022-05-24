@@ -152,6 +152,7 @@ class Dialog extends Component<{}, ModalState> {
       >
         <form
           noValidate
+          className="global-dialog-modal"
           style={!this.state.message ? styles.root : { ...styles.root, width: 400 }}
           onSubmit={this.handleSubmit ? this.handleSubmit(this.onAccept.bind(this)) : this.onSubmit.bind(this)}
         >

@@ -1,11 +1,9 @@
 import { useState, useEffect } from 'react';
 import { Grid, Paper, Typography } from '@material-ui/core';
-import Sidebar from '../components/Sidebar';
 import Header from '../components/Header';
 import { Util, Stats, Class } from '../interfaces';
 import { StatisticsService, ClassesService } from '../api';
 import moment from 'moment';
-import { routes } from '../routers/routesDictionary';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { useSelector } from 'react-redux';
 import { AppConfigSelector } from '../store/selectors';
@@ -65,6 +63,7 @@ const Dashboard = () => {
     fetchData();
 
     document.title = "2Scool | Trang chủ";
+
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -129,86 +128,78 @@ const Dashboard = () => {
   const weekDay = moment().startOf('isoWeek').format('DD/MM/YYYY');
 
   return (
-    <div style={{ height: '100%' }}>
-      <Grid container style={{ height: '100%' }}>
-        <Grid item xs={4} sm={3} md={2}>
-          <Sidebar activeKey={routes.Dashboard} />
-        </Grid>
-        <Grid style={{ background: '#fff', flexGrow: 1 }} item container xs={8} sm={9} md={10} direction='column'>
-          <Grid item >
-            <Header
-              pageName="Trang chủ"
-              hiddenSearchBar
-            />
-          </Grid>
-          <Grid item container direction='column' style={{ flex: 1, minHeight: 0, flexWrap: 'nowrap', background: "#e8e8e8" }}>
-            <Paper elevation={3} variant="outlined" style={{ height: "100%", margin: "16px 24px", overflowY: 'hidden' }}>
-              {
-                grantedPolicy[policies.Statistics] === true && (
-                  <Grid container direction="row" justify="center" alignItems="center" style={{ height: "100%" }} >
-                    <Grid item>
-                      <ResponsiveContainer width={500} height={300}>
-                        <LineChart
-                          width={500}
-                          height={300}
-                          data={pointsChartData}
-                          margin={{
-                            top: 5,
-                            right: 30,
-                            left: 10,
-                            bottom: 5,
-                          }}
-                        >
-                          <CartesianGrid strokeDasharray="3 3" />
-                          <XAxis dataKey="name" />
-                          <YAxis />
-                          <Tooltip />
-                          <Legend />
-                          {
-                            listClass.map((el, index) => (
-                              <Line type="monotone" dataKey={el.name} stroke={colors[index]} />
-                            ))
-                          }
-                        </LineChart>
-                      </ResponsiveContainer>
-                      <Typography style={{ margin: "40px 0 40px 80px"}}>Biểu đồ nề nếp theo điểm nề nếp tuần {weekDay}</Typography>
-                    </Grid>
-                    <Grid item>
-                      <ResponsiveContainer width={500} height={300}>
-                        <LineChart
-                          width={500}
-                          height={300}
-                          data={faultsChartData}
-                          margin={{
-                            top: 5,
-                            right: 30,
-                            left: 10,
-                            bottom: 5,
-                          }}
-                        >
-                          <CartesianGrid strokeDasharray="3 3" />
-                          <XAxis dataKey="name" />
-                          <YAxis />
-                          <Tooltip />
-                          <Legend />
-                          {
-                            listClass.map((el, index) => (
-                              <Line type="monotone" dataKey={el.name} stroke={colors[index]} />
-                            ))
-                          }
-                        </LineChart>
-                      </ResponsiveContainer>
-                      <Typography style={{ margin: "40px 0 40px 80px"}}>Biểu đồ nề nếp theo lượt vi phạm tuần {weekDay}</Typography>
-                    </Grid>
-                  </Grid>
-                )
-              }
-            </Paper>
-          </Grid>
-        </Grid>
+    <Grid style={{ background: '#fff', flexGrow: 1,}} item container direction='column'>
+      <Grid item >
+        <Header
+          pageName="Trang chủ"
+          hiddenSearchBar
+        />
       </Grid>
-    </div>
-    
+      <Grid item container direction='column' style={{ flex: 1, minHeight: 0, flexWrap: 'nowrap', background: "#e8e8e8" }}>
+        <Paper elevation={3} variant="outlined" style={{ height: "100%", margin: "16px 24px", overflowY: 'hidden' }}>
+          {
+            grantedPolicy[policies.Statistics] === true && (
+              <Grid container direction="row" justify="center" alignItems="center" style={{ height: "100%" }} >
+                <Grid item>
+                  <ResponsiveContainer width={500} height={300}>
+                    <LineChart
+                      width={500}
+                      height={300}
+                      data={pointsChartData}
+                      margin={{
+                        top: 5,
+                        right: 30,
+                        left: 10,
+                        bottom: 5,
+                      }}
+                    >
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="name" />
+                      <YAxis />
+                      <Tooltip />
+                      <Legend />
+                      {
+                        listClass.map((el, index) => (
+                          <Line key={index} type="monotone" dataKey={el.name} stroke={colors[index]} />
+                        ))
+                      }
+                    </LineChart>
+                  </ResponsiveContainer>
+                  <Typography style={{ margin: "40px 0 40px 80px"}}>Biểu đồ nề nếp theo điểm nề nếp tuần {weekDay}</Typography>
+                </Grid>
+                <Grid item>
+                  <ResponsiveContainer width={500} height={300}>
+                    <LineChart
+                      width={500}
+                      height={300}
+                      data={faultsChartData}
+                      margin={{
+                        top: 5,
+                        right: 30,
+                        left: 10,
+                        bottom: 5,
+                      }}
+                    >
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="name" />
+                      <YAxis />
+                      <Tooltip />
+                      <Legend />
+                      {
+                        listClass.map((el, index) => (
+                          <Line key={index} type="monotone" dataKey={el.name} stroke={colors[index]} />
+                        ))
+                      }
+                    </LineChart>
+                  </ResponsiveContainer>
+                  <Typography style={{ margin: "40px 0 40px 80px"}}>Biểu đồ nề nếp theo lượt vi phạm tuần {weekDay}</Typography>
+                </Grid>
+              </Grid>
+            )
+          }
+        </Paper>
+      </Grid>
+    </Grid>
   );
 };
 

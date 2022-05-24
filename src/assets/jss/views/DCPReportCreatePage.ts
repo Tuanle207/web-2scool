@@ -69,6 +69,16 @@ const useStyles = makeStyles(theme => ({
   classesSelector: {
     width: 160,
   },
+  selectedContent: {
+    flexGrow: 1, 
+    padding: "16px 24px", 
+    backgroundColor: '#e8e8e8',
+    flexWrap: 'nowrap',
+    height: 0,
+    '& .MuiGrid-container': {
+      flexWrap: 'nowrap',
+    }
+  },
   selectedList: {
     height: 200,
     overflowX: 'auto'

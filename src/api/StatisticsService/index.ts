@@ -122,7 +122,7 @@ const getStudentsWithMostFaultsExcel = async (input: Util.DateFilterDto) => {
   }
 };
 
-const StatisticsService = {
+export const StatisticsService = {
   getOverallRanking,
   getDcpRanking,
   getClassesFaults,
@@ -135,5 +135,3 @@ const StatisticsService = {
   getCommonFaultsExcel,
   getStudentsWithMostFaultsExcel
 };
-
-export default StatisticsService;

@@ -1,52 +1,95 @@
 import { makeStyles } from '@material-ui/core'
-import logoBg from '../../../img/logo-bg.jpg';
 
 const useSidebarStyles = makeStyles(theme => ({
   container: {
     background: '#363740',
     color: '#fff', 
-    minHeight: '100vh', 
+    height: '100vh', 
     padding: 0,
     position: 'relative',
-    backdropFilter: 'blur(1px)'
-  },
-  filterBackground: {
-    content: '',
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    height: '100%',
-    width: '100%',
-    background: `url(${logoBg})`,
-    backgroundPosition: 'center',
-    backgroundSize: 'cover',
-    backgroundRepeat: 'no-repeat',
-    filter: 'blur(8px)'
+    flexBasis: 'auto',
+    [theme.breakpoints.down('md')]: {
+      flexBasis: 'auto',
+      width: 'auto',
+    }
   },
   titleWrapper: {
-    padding: '3rem 4rem',
-    backdropFilter: 'blur(1px)',
+    display: 'flex',
+    alignItems: 'center',
+    padding: '2rem',
     '& > h1': {
       letterSpacing: 3,
       display: 'inline-block',
+      marginTop: 4,
+      marginLeft: 8,
       borderBottom: '4px solid transparent',
       cursor: 'pointer',
       transition: 'border 500ms', 
       userSelect: 'none',
       '&:hover': {
-        borderBottom: `4px solid ${theme.palette.primary.main}`,
+        borderBottom: `4px solid ${theme.palette.common.white}`,
       },
-    }
+      [theme.breakpoints.down('md')]: {
+        display: 'none',
+      }
+    },
+    '& > button': {
+      marginLeft: 'auto',
+      [theme.breakpoints.down('md')]: {
+        marginLeft: 0,
+      }
+    },
+    
+  },
+  menuList: {
+    flex: 1,
+    
   },
   listItem: {
-    padding: '.8rem 2rem',
-    transition: 'background 500ms', 
+    borderLeftWidth: 4,
+    borderLeftStyle: 'solid',
+    borderLeftColor: 'transparent', 
+    transition: 'background 500ms',
     '&:hover': {
-      background: 'rgba(0,0,0,0.25)',
+      background: 'rgba(255,255,255,0.2)',
     },
+    '&.MuiListItem-root': {
+      paddingTop: 6,
+      paddingBottom: 6,
+    },
+    '& .MuiListItemText-root': {
+      [theme.breakpoints.down('md')]: {
+        display: 'none',
+      }
+    },
+    '& > svg': {
+      [theme.breakpoints.down('md')]: {
+        display: 'none',
+      }
+    }
+  },
+  subListItem: {
+    paddingLeft: 28,
+    [theme.breakpoints.down('md')]: {
+      paddingLeft: 16,
+    }
   },
   listItemActive: {
-    background: 'rgba(0,0,0,0.8)'
+    borderLeftColor: theme.palette.common.white,
+    background: 'rgba(255,255,255,0.2)',
+  },
+  iconWrapper: {
+    width: 32, 
+    height: 32,
+    marginRight: theme.spacing(1),
+    fill: theme.palette.common.white,
+    '& > svg': {
+      width: 24,
+      height: 24,
+    },
+    [theme.breakpoints.down('md')]: {
+      marginRight: 0,
+    }
   },
   listItemIcon: {
     color: '#fff'
@@ -55,14 +98,15 @@ const useSidebarStyles = makeStyles(theme => ({
     fontSize: 6
   },
   copyRight: {
-    position: 'absolute',
-    bottom: 20,
-    left: '50%',
-    transform: 'translateX(-50%)',
+    position: 'relative',
+    padding: theme.spacing(2, 0),
     '& > p': {
       color: theme.palette.grey[500],
       fontSize: 12,
       textAlign: 'center'
+    },
+    [theme.breakpoints.down('md')]: {
+      display: 'none',
     }
   },
   subMenuItem: {
@@ -73,7 +117,8 @@ const useSidebarStyles = makeStyles(theme => ({
   divider: {
     height: 1,
     margin: theme.spacing(1, 2),
-    backgroundColor: theme.palette.grey[400]
+    marginTop: theme.spacing(2),
+    backgroundColor: theme.palette.grey[500],
   }
 
 }));

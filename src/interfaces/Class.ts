@@ -33,6 +33,7 @@ export namespace Class {
   export interface ClassForSimpleListDto {
     id: string;
     name: string;
+    grade: Grade.GradeForSimpleListDto;
   }
 
   export interface ClassForStudentDto {

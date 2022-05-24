@@ -1,35 +1,30 @@
-import React from 'react';
-import { Container, Grid, Typography } from '@material-ui/core';
-import Sidebar from '../components/Sidebar';
+import { Button, Grid, Typography } from '@material-ui/core';
+import { useHistory } from 'react-router';
 import Header from '../components/Header';
+import { routes } from '../routers/routesDictionary';
 
 const ErrorPage = () => {
 
-  React.useEffect(() => {
-    // console.log('hello from ErrorPage');
-  }, []);
+  const history = useHistory();
+
+  const onHomeNavigate = () => {
+    history.replace(routes.Dashboard);
+  };
 
   return (
-    <div style={{ flexGrow: 1 }}>
-      <Grid container style={{ flex: 1 }}>
-        <Grid item xs={4} sm={3} md={2}>
-          <Sidebar />
-        </Grid>
-        <Grid style={{ background: '#fff' }} item container xs={8} sm={9} md={10} direction='column'>
-          <Grid item style={{ flex: 1 }}>
-            <Header />
-            <Grid item style={{ flex: 1 }}>
-              <Container style={{display: 'flex', justifyContent: 'center', justifyItems: 'center'}}>
-                <Typography>
-                  You have no permisison to access this page!
-                </Typography>
-              </Container>
-            </Grid>
-          </Grid>
-        </Grid>
+    <Grid style={{ background: '#fff', flexGrow: 1 }} item container direction='column'>
+      <Grid item>
+        <Header hiddenSearchBar/>
       </Grid>
-    </div>
-    
+      <Grid container item direction="column" alignItems="center" justify="center" style={{ flexGrow: 1 }}>
+        <Typography>
+          Bạn không có quyền truy cập vào trang này.
+        </Typography>
+        <Button variant="text" color="primary" onClick={onHomeNavigate}>
+          Quay về trang chủ
+        </Button>
+      </Grid>
+    </Grid>
   );
 };
 

@@ -1,27 +1,32 @@
 import { 
-  useState, 
+  FC,
+  useState,
   useEffect, 
   useMemo 
 } from 'react';
 import { 
-  Container, 
+  Container,
+  Box,
   Radio, 
   RadioGroup, 
   RadioProps, 
-  makeStyles, 
-  FormControlLabel, 
+  makeStyles,
+  FormControl,
+  FormHelperText,
+  FormControlLabel,
   TextField, 
-  Grid
 } from '@material-ui/core';
 import { 
   KeyboardDatePicker, 
   MuiPickersUtilsProvider 
 } from '@material-ui/pickers';
+import { Controller, useForm } from 'react-hook-form';
+import { useDialogController } from '../../hooks';
 import { MaterialUiPickersDate } from '@material-ui/pickers/typings/date';
 import DateFnsUtils from '@date-io/date-fns';
 import moment from 'moment';
-import { Identity } from '../../interfaces';
-import { IdentityService } from '../../api';
+import { Account } from '../../interfaces';
+import { AccountsService } from '../../api';
 import ActionModal from '.';
 import { withoutVNSign } from '../../utils/StringHelper';
 
@@ -81,79 +86,75 @@ function StyledRadio(props: RadioProps) {
   );
 }
 
-const UpdateLRKeeperRequest = ({
-  classId,
-  assignedStudentId,
-  initStartTime,
-  initEndTime
-}: {
+export interface UpdateLRKeeperRequestProps {
   classId: string;
-  assignedStudentId?: string;
+  assignedAccountId?: string;
   initStartTime?: Date;
   initEndTime?: Date;
+}
+
+export interface UpdateLRKeeperFormData {
+  classId: string;
+  accountId: string; 
+  startTime: Date; 
+  endTime: Date;
+}
+
+const UpdateLRKeeperRequest: FC<UpdateLRKeeperRequestProps> = ({
+  classId,
+  assignedAccountId,
+  initStartTime,
+  initEndTime
 }) => {
 
-  const [ students, setStudents ] = useState<Identity.UserForTaskAssignmentDto[]>([]);
-  const [ selectedUserId, setSelectedUserId] = useState<string | null>(null);
-  const [ startTime, setStartTime ] = useState<Date>(initStartTime ?? new Date());
-  const [ endTime, setEndTime ] = useState<Date>(initEndTime ?? moment().add(3, 'months').toDate());
+  const { control, getValues, setValue, reset, handleSubmit } = useForm<UpdateLRKeeperFormData>({
+    defaultValues: {
+      classId: classId,
+      accountId: assignedAccountId,
+      startTime: initStartTime ?? new Date(),
+      endTime: initEndTime ?? moment().add(3, 'months').toDate()
+    },
+  });
+
+  useDialogController({ control, handleSubmit });
+
+  const [ studentAccounts, setStudentAccounts ] = useState<Account.SimpleAccountDto[]>([]);
+  const [ selectedAccountId, setSelectedAccountId] = useState<string | null>(null);
   const [ studentName, setStudentName ] = useState<string>('');
   const [ loadingData, setLoadingData ] = useState(true);
 
   useEffect(() => {
     const initData = async () => {
-      const { items } = await IdentityService.getUsersForTaskAssignment(classId);
-      setStudents(items);
-      const assignee = items.find((x) => x.userProfileId === assignedStudentId);
-      setSelectedUserId(assignee ? assignee.userProfileId : null);
+      const { items } = await AccountsService.getTaskAssignmentAccounts(classId);
+      setStudentAccounts(items);
+      const assignee = items.find((x) => x.id === assignedAccountId);
+      setValue('accountId', assignee ? assignee.id : '');
+      // setSelectedAccountId(assignee ? assignee.id : null);
+      // reset()
+
       setLoadingData(false);
     };
 
     initData();
 
-  }, [classId, assignedStudentId]);
-
-  useEffect(() => {
-    if (selectedUserId)  {
-      ActionModal.setData({ 
-        data: {
-          userId: selectedUserId,
-          classId,
-          startTime,
-          endTime
-        },
-        error: undefined
-      });
-    }
-
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedUserId, startTime, endTime]);
+  }, [classId, assignedAccountId]);
 
   const handleRadioChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    console.log((event.target as HTMLInputElement).value);
-    setSelectedUserId((event.target as HTMLInputElement).value);
-  };
-
-  const onStartDateChange = (date: MaterialUiPickersDate) => {
-    date && setStartTime(date);
-  };
-
-  const onEndDateChange = (date: MaterialUiPickersDate) => {
-    date && setEndTime(date);
+    setSelectedAccountId((event.target as HTMLInputElement).value);
   };
 
   const filteredUsers = useMemo(() => {
-    return students.filter(item => withoutVNSign(item.name).toLowerCase().includes(studentName));
-  }, [students, studentName]) ;
+    return studentAccounts.filter(item => withoutVNSign(item.name).toLowerCase().includes(studentName));
+  }, [studentAccounts, studentName]) ;
 
   return (
-    <form style={{padding: '20px 0', paddingTop: 8, width: "100%"}}>
+    <Container>
       <TextField
         variant="outlined"
         placeholder="Tìm kiếm học sinh"
         size="small"
         fullWidth
-        style={{ marginBottom: 24 }}
+        style={{ marginBottom: 24, marginTop: 8, }}
         value={studentName}
         onChange={(e) => setStudentName(e.target.value)}
       />
@@ -162,22 +163,33 @@ const UpdateLRKeeperRequest = ({
           loadingData ? (
             <p>Đang tải dữ liệu ...</p>
           ) : (
-            <RadioGroup
-              defaultValue={assignedStudentId} 
-              value={selectedUserId} 
-              onChange={handleRadioChange}
-            >
-              {
-                filteredUsers.map((item) =>  (
-                  <FormControlLabel
-                    key={item.id}
-                    value={item.userProfileId} 
-                    control={<StyledRadio />} 
-                    label={item.name}
-                  />
-                ))
-              }
-            </RadioGroup> 
+            <Controller
+              control={control}
+              name="accountId"
+              rules={{
+                required: "Bạn cần chọn học sinh giữ sổ đầu bài",
+              }}
+              render={({field, fieldState: { error }}) => (
+                <FormControl fullWidth variant="standard" error={!!error}>
+                  <FormHelperText>{error?.message}</FormHelperText>
+                  <RadioGroup
+                    defaultValue={assignedAccountId} 
+                    {...field}
+                  >
+                    {
+                      filteredUsers.map((item) =>  (
+                        <FormControlLabel
+                          key={item.id}
+                          value={item.id} 
+                          control={<StyledRadio />} 
+                          label={item.name}
+                        />
+                      ))
+                    }
+                  </RadioGroup>
+                </FormControl>
+              )}
+            />
           )
         }
         {
@@ -187,42 +199,86 @@ const UpdateLRKeeperRequest = ({
         }
       </Container>
       <MuiPickersUtilsProvider utils={DateFnsUtils}>
-        <Grid container direction="row" justify="center" alignItems="center">
-          <KeyboardDatePicker
-            disableToolbar
-            fullWidth
-            size="small"
-            variant="dialog"
-            format="dd/MM/yyyy"
-            margin="dense"
-            id="get-start-date"
-            placeholder="Bắt đầu từ"
-            label="Ngày bắt đầu"
-            value={startTime}
-            onChange={onStartDateChange}
-            KeyboardButtonProps={{
-              "aria-label": "lr - keeper - start end date",
+        <Box style={{ marginBottom: 16 }}>
+          <Controller
+            control={control}
+            name="startTime"
+            rules={{
+              required: {
+                value: true,
+                message: 'Ngày bắt đầu là bắt buộc'
+              },
+              validate: (value: Date) => {
+                if (moment(getValues('endTime')).isSameOrBefore(value)) {
+                  return 'Ngày bắt đầu phải trước ngày kết thúc';
+                }
+              }
             }}
+            render={({field, fieldState: { error }}) => (
+              <KeyboardDatePicker
+                disableToolbar
+                fullWidth
+                required
+                size="small"
+                variant="dialog"
+                format="dd/MM/yyyy"
+                margin="dense"
+                id="get-start-date"
+                placeholder="Bắt đầu từ"
+                label="Ngày bắt đầu"
+                KeyboardButtonProps={{
+                  "aria-label": "lr - keeper - start end date",
+                }}
+                {...field}
+                error={!!error}
+                helperText={error?.message}
+              />
+            )}
           />
-          <KeyboardDatePicker
-            disableToolbar
-            fullWidth
-            size="small"
-            variant="dialog"
-            format="dd/MM/yyyy"
-            margin="dense"
-            id="get-end-date"
-            placeholder="Đến ngày"
-            label="Ngày kết thúc"
-            value={endTime}
-            onChange={onEndDateChange}
-            KeyboardButtonProps={{
-              "aria-label": "lr - keeper - change end date",
+          
+        </Box>
+        <Box style={{ marginBottom: 16 }}>
+          <Controller
+            control={control}
+            name="endTime"
+            rules={{
+              required: {
+                value: true,
+                message: 'Ngày kết thúc là bắt buộc'
+              },
+              validate: (value: Date) => {
+                if (moment().isSameOrAfter(value)) {
+                  return 'Ngày kết thúc phải tính từ sau hôm nay';
+                }
+                if (moment(getValues('startTime')).isSameOrAfter(value)) {
+                  return 'Ngày kết thúc phải sau ngày bắt đầu';
+                }
+              }
             }}
+            render={({field, fieldState: { error }}) => (
+              <KeyboardDatePicker
+                disableToolbar
+                fullWidth
+                required
+                size="small"
+                variant="dialog"
+                format="dd/MM/yyyy"
+                margin="dense"
+                id="get-end-date"
+                placeholder="Đến ngày"
+                label="Ngày kết thúc"
+                KeyboardButtonProps={{
+                  "aria-label": "lr - keeper - change end date",
+                }}
+                {...field}
+                error={!!error}
+                helperText={error?.message}
+              />
+            )}
           />
-        </Grid>
+        </Box>
       </MuiPickersUtilsProvider>
-    </form>
+    </Container>
   );
 };
 

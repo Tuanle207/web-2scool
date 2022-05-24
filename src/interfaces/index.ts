@@ -12,6 +12,8 @@ import { LrReport } from './LrReport';
 import { Stats } from './Stats';
 import { TaskAssignment } from './TaskAssignment';
 import { Profile } from './Profile';
+import { Tenant } from './Tenant';
+import { Account } from './Account';
 
 export type {
   Util,
@@ -27,5 +29,7 @@ export type {
   LrReport,
   Stats,
   TaskAssignment,
-  Profile
+  Profile,
+  Tenant,
+  Account,
 };

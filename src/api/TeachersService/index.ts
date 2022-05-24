@@ -45,7 +45,7 @@ const isAlreadyFormTeacher = async(teacherId: string, classId: string) => {
   return result;
 }
 
-const TeachersService = {
+export const TeachersService = {
   createTeacher,
   getAllTeachers,
   getAllTeachersSimpleList,
@@ -54,5 +54,3 @@ const TeachersService = {
   updateTeacher,
   isAlreadyFormTeacher
 };
-
-export default TeachersService;

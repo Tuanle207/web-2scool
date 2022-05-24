@@ -34,13 +34,9 @@ const importRegulationsData = async (excel: File) => {
   return result;
 };
 
-const DataImportService = {
+export const DataImportService = {
   importStudentsData,
   importTeachersData,
   importClassesData,
   importRegulationsData,
 };
-
-
-
-export default DataImportService;

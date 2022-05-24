@@ -13,5 +13,10 @@ export default createReducer(initialState, build => {
     AppConfigsActions.setAppConfigStorage, (state, action) => {
       state = action.payload;
       return state;
+  })
+  .addCase(
+    AppConfigsActions.setCurrentAccountStorage, (state, action) => {
+      state.currentAccount = action.payload;
+      return state;
   });
 })

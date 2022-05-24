@@ -71,6 +71,24 @@ export namespace Util {
       tenantId: string;
       isAuthenticated: boolean;
     },
+    currentAccount: {
+      isAuthenticated: boolean;
+      hasAccount: boolean;
+      isStudent: boolean;
+      isTeacher: boolean;
+      id: string;
+      userId: string;
+      displayName: string;
+      email: string;
+      phoneNumber: string;
+      dob?: Date;
+      avatar: string;
+      classId: string;
+      studentId: string;
+      teacherId: string;
+      creationTime?: Date;
+      creatorId: string;
+    },
     features: {
       value: IObject
     },
@@ -95,5 +113,10 @@ export namespace Util {
     timing: {
       timeZone: IObject;
     }
+  }
+
+  export interface TenantSetting {
+    name?: string;
+    displayName?: string;
   }
 }

@@ -4,7 +4,6 @@ import { AppBar, IconButton, Badge, Toolbar,
 import { StyledMenu, StyledMenuItem } from './HeaderMenu';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import AccountCircle from '@material-ui/icons/AccountCircle';
-import SettingsIcon from '@material-ui/icons/Settings';
 import SearchIcon from '@material-ui/icons/Search';
 import NotificationsIcon from '@material-ui/icons/Notifications';
 import MoreIcon from '@material-ui/icons/MoreVert';
@@ -63,11 +62,6 @@ const Header: FC<Props> = ({
     history.push(routes.Profile);
   };
 
-  const handleAdminClick = () => {
-    setAnchorEl(null);
-    history.push(routes.CoursesManager);
-  };
-
   const handleLogoutClick = () => {
     setAnchorEl(null);
     
@@ -89,12 +83,6 @@ const Header: FC<Props> = ({
           <AccountCircle fontSize="small" />
         </ListItemIcon>
         <ListItemText primary="Tài khoản của tôi" />
-      </StyledMenuItem>
-      <StyledMenuItem onClick={handleAdminClick}>
-        <ListItemIcon className={classes.resetMenuIconWidth}>
-          <SettingsIcon fontSize="small" />
-        </ListItemIcon>
-        <ListItemText primary="Tới trang quản trị" />
       </StyledMenuItem>
       <StyledMenuItem onClick={handleLogoutClick}>
         <ListItemIcon className={classes.resetMenuIconWidth}>
@@ -134,17 +122,6 @@ const Header: FC<Props> = ({
           <AccountCircle />
         </IconButton>
         <p>Tài khoản của tôi</p>
-      </MenuItem>
-      <MenuItem onClick={handleAdminClick}>
-        <IconButton
-          aria-label="account of current user"
-          aria-controls="primary-search-account-menu"
-          aria-haspopup="true"
-          color="inherit"
-        >
-          <SettingsIcon />
-        </IconButton>
-        <p>Đi tới trang quản trị</p>
       </MenuItem>
       <MenuItem onClick={handleLogoutClick}>
         <IconButton

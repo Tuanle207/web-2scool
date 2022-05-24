@@ -6,6 +6,7 @@ import ENV from '../config/env';
 import redux from '../store';
 import { AuthActions } from '../store/actions';
 import { IState } from '../store/reducers';
+import { getTenantNameFromCurrentLocation } from '../utils/UrlHelper';
 
 export const getApiService = async () => {
   const baseurl = ENV.host;
@@ -45,22 +46,16 @@ export const getAuthService = () => {
   return httpClient;
 };
 
-export const getLoginUrlEncodedOptions = () => {
+export const getConnectTokenUrlEncodedOptions = (forRefresh: boolean = false) => {
   const { oAuthConfig } = ENV;
-  return {
-    'grant_type': 'password',
+  const config = {
+    'grant_type': forRefresh ? 'refresh_token' : 'password',
     'scope': oAuthConfig.scope,
     'client_id': oAuthConfig.clientId,
     'client_secret': oAuthConfig.clientSecret,
   };
-};
 
-export const getRefreshUrlEncodedOptions = () => {
-  const { oAuthConfig } = ENV;
-  return {
-    'grant_type': 'refresh_token',
-    'scope': oAuthConfig.scope,
-    'client_id': oAuthConfig.clientId,
-    'client_secret': oAuthConfig.clientSecret,
-  }
+  const tenant = getTenantNameFromCurrentLocation();
+
+  return tenant ? {...config, '__tenant': tenant,} : config;
 };

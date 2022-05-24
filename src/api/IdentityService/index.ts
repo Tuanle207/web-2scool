@@ -113,7 +113,7 @@ const isRoleNameAlreadyUsed = async (roleName: string, roleId: string) => {
 };
 
 
-const IdentityService = {
+export const IdentityService = {
   getUsers,
   getAssignableRoles,
   getUserById,
@@ -132,5 +132,3 @@ const IdentityService = {
   doesStudentHaveAccountAlready,
   isRoleNameAlreadyUsed
 };
-
-export default IdentityService;

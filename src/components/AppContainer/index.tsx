@@ -8,10 +8,11 @@ import { theme, jss } from '../../assets/themes/theme';
 import ActionModal from '../Modal';
 import { AuthSelector, LoadingSelector } from '../../store/selectors';
 import { AppConfigsActions } from '../../store/actions';
-import { isTokenValid } from '../../config/axios/util';
+import { isTokenExpired } from '../../config/axios/util';
 import Dialog from '../Modal/Dialog';
-import 'react-toastify/dist/ReactToastify.css';
 import { BusyBackdrop } from '../BusyBackdrop';
+import { signalrService } from '../../services/signal-r-service';
+import 'react-toastify/dist/ReactToastify.css';
 
 interface IAppContainerProps {
   
@@ -19,18 +20,32 @@ interface IAppContainerProps {
 
 const AppContainer: React.FC<IAppContainerProps> = () => {
 
-
-  const token = useSelector(AuthSelector.token);
+  const issuedAt = useSelector(AuthSelector.issuedAt);
+  const expiresIn = useSelector(AuthSelector.expiresIn);
   const fetchingAppConfig = useSelector(LoadingSelector.fetchingAppConfig);
+  
   const dispatch = useDispatch();
 
-  const isValid = useMemo(() => isTokenValid(token ?? ''), [token]);
+  const isValid = useMemo(() => issuedAt && !isTokenExpired(issuedAt, expiresIn), [issuedAt, expiresIn]);
 
   useEffect(() => {
-    if (isValid)
-    {
-      dispatch(AppConfigsActions.getAppConfigAsync());
-    }
+    
+    dispatch(AppConfigsActions.getAppConfigAsync());
+    // if (isValid) {
+    //   signalrService.startAsync().then(() => {
+    //     console.log('signalr connection started');
+
+    //     signalrService.listen('ReceiveNotification', (message) => {
+    //       console.log({message});
+    //     })
+    //   });
+
+    //   return () => {
+    //     signalrService.closeAsync().then(() => {
+    //       console.log('signalr connection closed.')
+    //     });
+    //   };
+    // }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isValid]);
 
@@ -39,7 +54,8 @@ const AppContainer: React.FC<IAppContainerProps> = () => {
       <StylesProvider jss={jss} >
         <CssBaseline>
           {
-            fetchingAppConfig ? <div>Đang tải...</div> :
+            fetchingAppConfig === undefined || fetchingAppConfig === true ? 
+            <div>Đang tải...</div> :
             isValid ? <DashboardRouter /> : <AuthRouter />
           }
           <ToastContainer 

@@ -1,10 +1,11 @@
 import { FC } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { TextField, Button, Container, FormControlLabel, Checkbox } from '@material-ui/core';
 import { Controller, useForm } from 'react-hook-form';
 import { User } from '../../interfaces';
 import { AuthActions } from '../../store/actions';
 import useLoginFormStyles from '../../assets/jss/components/Form/useLoginFormStyles';
+import { TenantSettingSelector } from '../../store/selectors';
 
 interface LoginFormProps {
   
@@ -21,6 +22,8 @@ const LoginForm: FC<LoginFormProps> = () => {
     }
   });
 
+  const schoolName = useSelector(TenantSettingSelector.displayName);
+
   const dispatch = useDispatch();
 
   const onSumbit = async (data: User.LoginReqBody) => {
@@ -34,7 +37,7 @@ const LoginForm: FC<LoginFormProps> = () => {
   return (
     <Container className={styles.formContainer}>
       <form className={styles.form} onSubmit={handleSubmit(onSumbit)}>
-        <p className={styles.title}>Hệ thống quản lí nề nếp - 2COOL</p>
+        <p className={styles.title}>{`Hệ thống quản lí nề nếp ${schoolName} - 2Scool`}</p>
         <Controller
           name="username"
           control={control}

@@ -51,11 +51,9 @@ const getAssignedClassesForDcpReport = async (taskType: string) => {
 };
 
 
-const TaskAssignmentService = {
+export const TaskAssignmentService = {
   createUpdate,
   getAll,
   getForUpdate,
   getAssignedClassesForDcpReport
 };
-
-export default TaskAssignmentService;

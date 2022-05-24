@@ -1,5 +1,6 @@
 import { Class } from './Class';
 import { User } from './User';
+import { Account } from './Account';
 
 export namespace TaskAssignment {
 
@@ -30,14 +31,14 @@ export namespace TaskAssignment {
 
   export interface TaskAssignmentDto {
     id: string;
-    assignee: UserProfleForTaskAssignmentDto;
+    assignee: Account.SimpleAccountDto;
     classAssigned: Class.ClassForSimpleListDto;
     taskType: string;
     startTime: Date;
     endTime: Date;
     creationTime: Date;
     creatorId: string;
-    creator: User.UserForSimpleListDto;
+    creator: Account.SimpleAccountDto;
   }
 
   export interface TaskAssignmentForUpdateDto {

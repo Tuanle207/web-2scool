@@ -80,17 +80,17 @@ const CreateStudentAccountRequest: FC<CreateStudentAccountRequestProps> = ({
           rules={{
             required: {
               value: true,
-              message: 'Tên người dùng là bắt buộc'
+              message: 'Tên hiển thị là bắt buộc'
             },
             maxLength: {
               value: 50,
-              message: 'Tên người dùng không thể vượt quá 50 kí tự'
+              message: 'Tên hiển thị không thể vượt quá 50 kí tự'
             },
           }}
           render={({field, fieldState: { error }}) => (
             <TextField
               id='create-user-name' 
-              label='Tên người dùng' 
+              label='Tên hiển thị' 
               required
               autoComplete="new-user-name"
               style={{width: '40ch'}}

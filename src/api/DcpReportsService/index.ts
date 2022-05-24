@@ -111,7 +111,7 @@ const getDcpReportsForApproval = async (input: Util.PagingInfo) => {
 };
 
 
-const DcpReportsService = {
+export const DcpReportsService = {
   createDcpReport,
   getAllDcpReports,
   deleteDcpReportById,
@@ -124,7 +124,3 @@ const DcpReportsService = {
   getMyDcpReports,
   getDcpReportsForApproval
 };
-
-
-
-export default DcpReportsService;

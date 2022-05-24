@@ -7,7 +7,6 @@ import PersonAddIcon from '@material-ui/icons/PersonAdd';
 import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@material-ui/icons/Edit';
 import PublishIcon from '@material-ui/icons/Publish';
-import Sidebar from '../components/Sidebar';
 import Header from '../components/Header';
 import PageTitleBar from '../components/PageTitleBar';
 import FilterButton, { IFilterOption } from '../components/FilterButton';
@@ -20,7 +19,6 @@ import { comparers, dataGridLocale } from '../appConsts';
 import { toast } from 'react-toastify';
 import CreateOrUpdateStudentRequest, { CreateOrUpdateStudentRequestProps } from '../components/Modal/CreateOrUpdateStudentRequest';
 import CreateStudentAccountRequest, { CreateStudentAccountRequestProps } from '../components/Modal/CreateStudentAccountRequest';
-import { routes } from '../routers/routesDictionary';
 import { useDialog } from '../hooks';
 import { busyService } from '../services';
 import useStyles from '../assets/jss/views/StudentsPage';
@@ -74,7 +72,7 @@ const RowMenuCell = (props: RowMenuProps) => {
       return;
     }
     try {
-      busyService.busy(false);
+      busyService.busy(true);
       await IdentityService.createUser(data);
       toast.success('Cấp tài khoản thành công');
     } catch {
@@ -388,83 +386,76 @@ const StudentsPage = () => {
   };
 
   return (
-    <div style={{ flexGrow: 1 }}>
-      <Grid container style={{ flex: 1 }}>
-        <Grid item xs={4} sm={3} md={2}>
-          <Sidebar activeKey={routes.StudentsManager} />
-        </Grid>
-        <Grid style={{ background: '#fff', flexGrow: 1 }} item container xs={8} sm={9} md={10} direction='column'>
-          <Grid item >
-            <Header
-              searchBarPlaceholder="Tìm kiếm học sinh..."
-              onTextChange={(value) => setFilter({key: 'Name', comparison: comparers.Contains, value: value })} 
-              pageName="Quản lý học sinh"
+    <Grid style={{ background: '#fff', flexGrow: 1 }} item container direction='column'>
+      <Grid item >
+        <Header
+          searchBarPlaceholder="Tìm kiếm học sinh..."
+          onTextChange={(value) => setFilter({key: 'Name', comparison: comparers.Contains, value: value })} 
+          pageName="Quản lý học sinh"
+        />
+      </Grid>
+      <Grid item container direction='column' style={{ flexGrow: 1 }}>
+        <Grid item style={{ 
+          backgroundColor: "#e8e8e8", 
+          paddingTop: 16, 
+          paddingRight: 24, 
+          paddingLeft: 24 
+        }}
+        >
+          <Paper variant="outlined" elevation={1}>
+            <PageTitleBar 
+              title={`Học sinh`} 
+              onMainButtonClick={onRequestCreate}
+              filterCount={getFilterCount()}
+              filterComponent={(
+                <Fragment>
+                  <FilterButton
+                    title="Lớp"
+                    options={classOptions}
+                    onSelectedOptionsChange={onClassFilterChange}
+                  />
+                  <FilterButton
+                    title="Khối"
+                    options={gradeOptions}
+                    onSelectedOptionsChange={onGradeFilterChange}
+                  />
+                </Fragment>
+              )}
+              actionComponent={(
+                <Fragment>
+                  <Tooltip title="Nhập từ excel">
+                    <IconButton style={{ marginRight: 16 }} size="small" onClick={onImportFromExcel}>
+                      <PublishIcon color="primary" />
+                    </IconButton>
+                  </Tooltip>
+                </Fragment>
+              )}
             />
-          </Grid>
-          <Grid item container direction='column' style={{ flexGrow: 1 }}>
-            <Grid item style={{ 
-              backgroundColor: "#e8e8e8", 
-              paddingTop: 16, 
-              paddingRight: 24, 
-              paddingLeft: 24 
-            }}
-            >
-              <Paper variant="outlined" elevation={1}>
-                <PageTitleBar 
-                  title={`Học sinh`} 
-                  onMainButtonClick={onRequestCreate}
-                  filterCount={getFilterCount()}
-                  filterComponent={(
-                    <Fragment>
-                      <FilterButton
-                        title="Lớp"
-                        options={classOptions}
-                        onSelectedOptionsChange={onClassFilterChange}
-                      />
-                      <FilterButton
-                        title="Khối"
-                        options={gradeOptions}
-                        onSelectedOptionsChange={onGradeFilterChange}
-                      />
-                    </Fragment>
-                  )}
-                  actionComponent={(
-                    <Fragment>
-                      <Tooltip title="Nhập từ excel">
-                        <IconButton style={{ marginRight: 16 }} size="small" onClick={onImportFromExcel}>
-                          <PublishIcon color="primary" />
-                        </IconButton>
-                      </Tooltip>
-                    </Fragment>
-                  )}
-                />
-              </Paper>
-            </Grid>
-            <Grid item style={{ flexGrow: 1, paddingTop: 16, paddingBottom: 16, backgroundColor: '#e8e8e8' }}>
-              <Container className={classes.root}>
-                <input ref={fileRef} hidden type="file" onChange={onFileChange} /> 
-                <DataGrid
-                  columns={cols}
-                  rows={data.items}
-                  pageSize={pagingInfo.pageSize} 
-                  rowCount={data.totalCount}
-                  onPageChange={onPageChange}
-                  loading={loading}
-                  page={pagingInfo.pageIndex && pagingInfo.pageIndex - 1}
-                  error={error}
-                  paginationMode='server'
-                  hideFooterSelectedRowCount
-                  rowsPerPageOptions={[5, 15, 30, 50]}
-                  onPageSizeChange={onPageSizeChange}
-                  pagination
-                  localeText={dataGridLocale}
-                />
-              </Container>
-            </Grid>
-          </Grid>
+          </Paper>
+        </Grid>
+        <Grid item style={{ flexGrow: 1, paddingTop: 16, paddingBottom: 16, backgroundColor: '#e8e8e8' }}>
+          <Container className={classes.root}>
+            <input ref={fileRef} hidden type="file" onChange={onFileChange} /> 
+            <DataGrid
+              columns={cols}
+              rows={data.items}
+              pageSize={pagingInfo.pageSize} 
+              rowCount={data.totalCount}
+              onPageChange={onPageChange}
+              loading={loading}
+              page={pagingInfo.pageIndex && pagingInfo.pageIndex - 1}
+              error={error}
+              paginationMode='server'
+              hideFooterSelectedRowCount
+              rowsPerPageOptions={[5, 15, 30, 50]}
+              onPageSizeChange={onPageSizeChange}
+              pagination
+              localeText={dataGridLocale}
+            />
+          </Container>
         </Grid>
       </Grid>
-    </div>
+    </Grid>
   );
 };
 

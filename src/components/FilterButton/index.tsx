@@ -99,9 +99,10 @@ const FilterButton: FC<IFilterButtonProps> = ({
         <Box className={[styles.optionsBox, active ? styles.optionsBoxActive : ""].join(" ")}>
           <Box className={styles.options}>
             {
-              options.map((option) => (
+              options.map((option, index) => (
                 <Chip
                   id={option.id}
+                  key={index}
                   clickable
                   variant="outlined"
                   label={option.label}

@@ -119,7 +119,7 @@ const getLrReportsForApproval = async (input: Util.PagingInfo) => {
 };
 
 
-const LrReportsService = {
+export const LrReportsService = {
   createLrReport,
   getAllLrReports,
   deleteLrReportById,
@@ -131,7 +131,3 @@ const LrReportsService = {
   getMyLrReports,
   getLrReportsForApproval
 };
-
-
-
-export default LrReportsService;

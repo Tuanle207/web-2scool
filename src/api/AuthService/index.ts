@@ -4,10 +4,8 @@ import { login } from './login';
 import { logout } from './logout';
 import { refresh } from './refresh';
 
-const AuthService = {
+export const AuthService = {
   login,
   logout,
   refresh
 };
-
-export default AuthService;

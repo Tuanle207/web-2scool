@@ -45,7 +45,7 @@ const isNameAlreadyUsed = async (name: string, id: string) => {
   return result;
 }
 
-const GradesService = {
+export const GradesService = {
   createGrade,
   getAllGrades,
   getGradesForSimpleList,
@@ -54,5 +54,3 @@ const GradesService = {
   updateGrade,
   isNameAlreadyUsed,
 };
-
-export default GradesService;

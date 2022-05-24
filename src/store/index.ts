@@ -1,9 +1,9 @@
-import { configureStore, Store } from '@reduxjs/toolkit';
+import { AnyAction, configureStore, Store } from '@reduxjs/toolkit';
 import { persistReducer, persistStore } from 'redux-persist';
 import createSagaMiddleware from 'redux-saga';
 import Storage from 'redux-persist/lib/storage';
 import { Persistor } from 'redux-persist/es/types';
-import reduders from './reducers';
+import reduders, { IState } from './reducers';
 import rootSaga from './saga';
 import ENV from '../config/env';
 
@@ -11,15 +11,15 @@ export class ReduxStore {
   private persistedReducer: any;
   private sagaMiddleware: any;
   private sagaRoot: any;
-  store: Store;
+  store: Store<IState, AnyAction>;
   persistor: Persistor;
   
   constructor(reducers: any, sagaRoot: any) {
     const persistConfig = {
       key: 'root',
       storage: Storage,
-      whilelist: ['auth'],
-      blacklist: ['dcpReport']
+      // whilelist: ['auth'],
+      blacklist: ['dcpReport', 'loading']
     };
     this.sagaMiddleware = createSagaMiddleware();
     this.sagaRoot = sagaRoot;

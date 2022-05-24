@@ -81,6 +81,14 @@ const getPreviousMonday = (input: Date) => {
     return prevMonday;
 };
 
+const getLatestMonday = () => {
+  return moment().startOf('isoWeek').toDate();
+};
+
+const getNextMonday = (index: number = 1) => {
+  return moment().startOf('isoWeek').add(7 * index, 'days').toDate();
+};
+
 export {
   formatDate, 
   formatTime, 
@@ -90,4 +98,6 @@ export {
   addDays,
   getPreviousMonday,
   formatFullDateTime,
+  getLatestMonday,
+  getNextMonday,
 };

@@ -1,7 +1,5 @@
 import getAppConfig from './getAppConfig';
 
-const AppConfigService = {
+export const AppConfigService = {
   getAppConfig
 };
-
-export default AppConfigService;

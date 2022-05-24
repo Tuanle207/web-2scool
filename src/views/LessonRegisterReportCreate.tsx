@@ -1,8 +1,8 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { Grid, Button, Typography, Tooltip, TextField, Paper } from '@material-ui/core';
-import React from 'react';
+import { useState, useEffect, useRef, ChangeEvent } from 'react';
+import { useHistory } from 'react-router';
 import Header from '../components/Header';
-import Sidebar from '../components/Sidebar';
 import { Alarm as AlarmIcon  } from '@material-ui/icons';
 import BxBxsBookReaderIcon from '@material-ui/icons/LocalLibrary';
 import PhotoIcon from '@material-ui/icons/Photo';
@@ -11,13 +11,12 @@ import RemoveCircleOutlineIcon from '@material-ui/icons/RemoveCircleOutline';
 import AddAPhotoIcon from '@material-ui/icons/AddAPhoto';
 import SendIcon from '@material-ui/icons/Send';
 import PlaceholderImage from '../assets/img/placeholder-img.png';
-import { useHistory } from 'react-router';
 import { formatTime, getDayOfWeek } from '../utils/TimeHelper';
 import { toast } from 'react-toastify';
 import { LrReportsService, TaskAssignmentService } from '../api';
-import ActionModal from '../components/Modal';
 import { taskType } from '../appConsts';
 import { Class } from '../interfaces';
+import { busyService, dialogService } from '../services';
 import useStyles from '../assets/jss/views/LessonRegisterReportCreate';
 
 
@@ -26,32 +25,41 @@ const LessonRegisterReportCreate = () => {
   const classes = useStyles();
   const history = useHistory();
 
-  const inputRef = React.useRef(null);
+  const inputRef = useRef(null);
 
-  const [file, setFile] = React.useState<File | null>(null);
-  const [fileUrl, setFileUrl] = React.useState<string>(PlaceholderImage);
-  const [noPoint, setNoPoint] = React.useState(0);
-  const [noAbsence, setNoAbsence] = React.useState(0);
-  const [reportClass, setReportClass] = React.useState<Class.ClassForSimpleListDto>();
+  const [file, setFile] = useState<File | null>(null);
+  const [fileUrl, setFileUrl] = useState<string>(PlaceholderImage);
+  const [noPoint, setNoPoint] = useState(0);
+  const [noAbsence, setNoAbsence] = useState(0);
+  const [reportClass, setReportClass] = useState<Class.ClassForSimpleListDto>();
 
-  React.useEffect(() => {
+  useEffect(() => {
     document.title = '2Scool | Nộp sổ đầu bài';
+
+    const initData = async () => {
+      const { items } = await TaskAssignmentService.getAssignedClassesForDcpReport(taskType.LessonRegisterReport);
+      if (items.length > 0) {
+        setReportClass(items[0]);
+      }
+    }
+    
+    initData();
+    console.log('mounting');
+
+    return () => {
+      console.log('unmounting...');
+    }
+
   }, []);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (file != null) {
       const url = URL.createObjectURL(file);
       setFileUrl(url);
     }
-    TaskAssignmentService.getAssignedClassesForDcpReport(taskType.LessonRegisterReport)
-      .then(classRes => {
-        if (classRes.items.length > 0) {
-          setReportClass(classRes.items[0])
-        }
-      })
   }, [file]);
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files || [];
     if (files.length > 0) {
       setFile(files[0]);
@@ -65,7 +73,7 @@ const LessonRegisterReportCreate = () => {
     }
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!reportClass) {
       return toast.error('Bạn không được phân công giữ sổ đầu bài!');
     }
@@ -76,122 +84,122 @@ const LessonRegisterReportCreate = () => {
       return toast.error('Vui lòng đính kèm ảnh Sổ Đầu Bài');
     }
     
-    ActionModal.show({
+    const { result } = await dialogService.show(null, {
       title: 'Xác nhận gửi sổ đầu bài',
-      onAccept: async () => {
-        try {
-          await LrReportsService.createLrReport({
-            classId: reportClass.id,
-            absenceNo: noAbsence,
-            totalPoint: noPoint,
-            photo: file,
-          });
-          toast.success('Thành công!');
-          history.goBack();
-        } catch (e) {
-          console.log(e);
-          toast.error('Đã có lỗi xảy ra!')
-        }
-      },
-    })
+    });
+
+    if (result !== 'Ok') {
+      return;
+    }
+
+    try {
+      busyService.busy(true);
+      await LrReportsService.createLrReport({
+        classId: reportClass.id,
+        absenceNo: noAbsence,
+        totalPoint: noPoint,
+        photo: file,
+      });
+      toast.success('Thành công!');
+      history.goBack();
+    } catch (e) {
+      console.log(e);
+      toast.error('Đã có lỗi xảy ra!')
+    } finally {
+      busyService.busy(false);
+    }
   };
 
   return (
-    <div style={{ height: '100%' }}>
-      <Grid container style={{ height: '100%' }}>
-        <Grid item xs={4} sm={3} md={2}>
-          <Sidebar activeKey={'my-lr-report'} />
-        </Grid>
-        <Grid style={{ height: '100%' }} item container xs={8} sm={9} md={10} direction='column'>
-          <Header pageName="Nộp sổ đầu bài" />
-          <Grid item container direction='column' style={{ flex: 1, minHeight: 0, flexWrap: 'nowrap' }}>   
-            <Grid item container direction='column' justify='center' alignItems='center' style={{ flex: 1, background: "#e8e8e8" }}>
-              {
-                reportClass ? (
-                  <Paper style={{ margin: "0 24px" }}>
-                    <form className={classes.formContainer}>
-                      <Grid item container direction='column' justify='space-between' style={{width: 'auto'}} >
-                        <Grid item container alignItems='center' style={{ width: 'auto' }}>
-                            <BxBxsBookReaderIcon />
-                            <Typography variant={'body1'} style={{marginLeft: 8}}>{reportClass?.name || 'Bạn không được phân công giữ sổ đầu bài'}</Typography>
-                        </Grid>
-                        <Grid item container alignItems='center' style={{ width: 'auto'}} >
-                            <AlarmIcon />
-                            <Typography variant={'body1'} style={{marginLeft: 8}} > {`${getDayOfWeek(new Date().toLocaleString())} - ${formatTime(new Date().toLocaleString())}`} </Typography>
-                        </Grid>
-                        <Grid item container alignItems='center' style={{ width: 'auto' }} >
-                          <ControlPointIcon style={{marginTop: 16, marginRight: 8}} />
-                          <TextField
-                            label='Tổng điểm'
-                            type='number'
-                            value={noPoint}
-                            onChange={e => setNoPoint(parseInt(e.target.value))}
-                          />
-                        </Grid>
-                        <Grid item container alignItems='center' style={{ width: 'auto' }} >
-                          <RemoveCircleOutlineIcon style={{marginTop: 16, marginRight: 8}} />
-                          <TextField
-                            label='Số lượt vắng'
-                            type='number'
-                            value={noAbsence}
-                            onChange={e => setNoAbsence(parseInt(e.target.value))}
-                          />
-                        </Grid>
+    <Grid style={{ flexGrow: 1 }} item container direction='column'>
+      <Grid item >
+        <Header pageName="Nộp sổ đầu bài" />
+      </Grid>
+      <Grid item container direction='column' style={{ flex: 1, minHeight: 0, flexWrap: 'nowrap' }}>   
+        <Grid item container direction='column' justify='center' alignItems='center' style={{ flex: 1, background: "#e8e8e8" }}>
+          {
+            !!reportClass ? (
+              <Paper style={{ margin: "0 24px" }}>
+                <form className={classes.formContainer}>
+                  <Grid item container direction='column' justify='space-between' style={{width: 'auto'}} >
+                    <Grid item container alignItems='center' style={{ width: 'auto' }}>
+                        <BxBxsBookReaderIcon />
+                        <Typography variant={'body1'} style={{marginLeft: 8}}>{reportClass.name}</Typography>
+                    </Grid>
+                    <Grid item container alignItems='center' style={{ width: 'auto'}} >
+                        <AlarmIcon />
+                        <Typography variant={'body1'} style={{marginLeft: 8}} > {`${getDayOfWeek(new Date().toLocaleString())} - ${formatTime(new Date().toLocaleString())}`} </Typography>
+                    </Grid>
+                    <Grid item container alignItems='center' style={{ width: 'auto' }} >
+                      <ControlPointIcon style={{marginTop: 16, marginRight: 8}} />
+                      <TextField
+                        label='Tổng điểm'
+                        type='number'
+                        value={noPoint}
+                        onChange={e => setNoPoint(parseInt(e.target.value))}
+                      />
+                    </Grid>
+                    <Grid item container alignItems='center' style={{ width: 'auto' }} >
+                      <RemoveCircleOutlineIcon style={{marginTop: 16, marginRight: 8}} />
+                      <TextField
+                        label='Số lượt vắng'
+                        type='number'
+                        value={noAbsence}
+                        onChange={e => setNoAbsence(parseInt(e.target.value))}
+                      />
+                    </Grid>
+                  </Grid>
+                  <Grid item container 
+                    direction='column'
+                    justify='center'
+                    alignItems='center'
+                    style={{width: 'auto', flex: 1}}
+                  > 
+                    <Button
+                      startIcon={<AddAPhotoIcon/>}
+                      onClick={handleOpenFileDialog}
+                    >
+                      Chọn ảnh sổ đầu bài
+                      <input ref={inputRef} type='file' hidden onChange={handleFileChange} accept="image/*" />
+                    </Button>
+                    {
+                      fileUrl && (
+                      <Grid item container className={classes.imgContainer}>
+                        <Tooltip title='Ảnh chụp sổ đầu bài'>
+                          <PhotoIcon className={classes.imgIcon} />
+                        </Tooltip>
+                        <img 
+                          src={fileUrl}
+                          alt='Lesson report'
+                        />
                       </Grid>
-                      <Grid item container 
-                        direction='column'
-                        justify='center'
-                        alignItems='center'
-                        style={{width: 'auto', flex: 1}}
-                      > 
-                        <Button
-                          startIcon={<AddAPhotoIcon/>}
-                          onClick={handleOpenFileDialog}
-                        >
-                          Chọn ảnh sổ đầu bài
-                          <input ref={inputRef} type='file' hidden onChange={handleFileChange} accept="image/*" />
-                        </Button>
-                        {
-                          fileUrl !== null && (
-                          <Grid item container className={classes.imgContainer}>
-                            <Tooltip title='Ảnh chụp sổ đầu bài'>
-                              <PhotoIcon className={classes.imgIcon} />
-                            </Tooltip>
-                            <img 
-                              src={fileUrl}
-                              alt='test img'
-                            />
-                          </Grid>
-                          )
-                        }
-                      </Grid>
-                      <Grid item container justify='flex-end' style={{ paddingTop: 40 }}>
-                        <Button
-                          variant={'contained'} 
-                          color={'primary'} 
-                          endIcon={<SendIcon />} 
-                          onClick={handleSubmit}
-                          style={{marginRight: 200}}
-                          >
-                          Gửi sổ đầu bài
-                        </Button>
-                      </Grid>
-                    </form>
-                  </Paper>
-                ) : (
-                  <>
-                    <Typography variant={'body1'} style={{marginLeft: 8}}>Bạn không được phân công giữ sổ đầu bài!</Typography>
-                    <Button color="primary" onClick={() => history.goBack()}>Quay lại trang trước</Button>
-                  </>
-                )
-              }
-            </Grid>
-          </Grid>
+                      )
+                    }
+                  </Grid>
+                  <Grid item container justify='flex-end' style={{ paddingTop: 40 }}>
+                    <Button
+                      variant={'contained'} 
+                      color={'primary'} 
+                      endIcon={<SendIcon />} 
+                      onClick={handleSubmit}
+                      style={{marginRight: 200}}
+                      >
+                      Gửi sổ đầu bài
+                    </Button>
+                  </Grid>
+                </form>
+              </Paper>
+            ) : (
+              <>
+                <Typography variant={'body1'} style={{marginLeft: 8}}>Bạn không được phân công giữ sổ đầu bài!</Typography>
+                <Button color="primary" onClick={() => history.goBack()}>Quay lại trang trước</Button>
+              </>
+            )
+          }
         </Grid>
       </Grid>
-    </div>
+    </Grid>
   );
-
 };
 
 export default LessonRegisterReportCreate;

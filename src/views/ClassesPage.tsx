@@ -5,7 +5,6 @@ import { DataGrid, GridApi, GridColDef, GridPageChangeParams, GridRowId, GridVal
 import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@material-ui/icons/Edit';
 import PublishIcon from '@material-ui/icons/Publish';
-import Sidebar from '../components/Sidebar';
 import Header from '../components/Header';
 import { toast } from 'react-toastify';
 import PageTitleBar from '../components/PageTitleBar';
@@ -14,7 +13,6 @@ import { ClassesService, GradesService, DataImportService, CoursesService, Teach
 import { useDialog, useFetchV2 } from '../hooks';
 import CreateOrUpdateClassRequest, { CreateOrUpdateClassRequestProps } from '../components/Modal/CreateOrUpdateClassRequest';
 import { comparers, dataGridLocale } from '../appConsts';
-import { routes } from '../routers/routesDictionary';
 import FilterButton, { IFilterOption } from '../components/FilterButton';
 import { busyService } from '../services';
 import useStyles from '../assets/jss/views/ClassesPage';
@@ -323,79 +321,71 @@ const ClassesPage = () => {
   };
 
   return (
-    <div style={{ flexGrow: 1 }}>
-      <Grid container style={{ flex: 1 }}>
-        <Grid item xs={4} sm={3} md={2}>
-          <Sidebar activeKey={routes.ClassesManager} />
-        </Grid>
-        <Grid style={{ background: '#fff', flexGrow: 1 }} item container xs={8} sm={9} md={10} direction='column'>
-          <Grid item >
-            <Header
-              onTextChange={(value) => setFilter({key: 'Name', comparison: comparers.Contains, value: value })}
-              searchBarPlaceholder="Tìm kiếm lớp học..."
-              pageName="Quản lý lớp học"
+    <Grid style={{ background: '#fff', flexGrow: 1 }} item container direction='column'>
+      <Grid item >
+        <Header
+          onTextChange={(value) => setFilter({key: 'Name', comparison: comparers.Contains, value: value })}
+          searchBarPlaceholder="Tìm kiếm lớp học..."
+          pageName="Quản lý lớp học"
+        />
+      </Grid>
+      <Grid item container direction='column' style={{ flexGrow: 1 }}>
+        <Grid item style={{ 
+          backgroundColor: "#e8e8e8", 
+          paddingTop: 16, 
+          paddingRight: 24, 
+          paddingLeft: 24 
+        }}
+        >
+          <Paper variant="outlined" elevation={1}>
+            <PageTitleBar 
+              title={`Học sinh`} 
+              onMainButtonClick={onRequestCreate}
+              filterCount={getFilterCount()}
+              filterComponent={(
+                <>
+                  <FilterButton
+                    title="Khối"
+                    options={gradeOptions}
+                    onSelectedOptionsChange={onGradeFilterChange}
+                  />
+                </>
+              )}
+              actionComponent={(
+                <Fragment>
+                  <Tooltip title="Nhập từ excel">
+                    <IconButton style={{ marginRight: 16 }} size="small" onClick={onImportFromExcel}>
+                      <PublishIcon color="primary" />
+                    </IconButton>
+                  </Tooltip>
+                </Fragment>
+              )}
             />
-          </Grid>
-          <Grid item container direction='column' style={{ flexGrow: 1 }}>
-            <Grid item style={{ 
-              backgroundColor: "#e8e8e8", 
-              paddingTop: 16, 
-              paddingRight: 24, 
-              paddingLeft: 24 
-            }}
-            >
-              <Paper variant="outlined" elevation={1}>
-                <PageTitleBar 
-                  title={`Học sinh`} 
-                  onMainButtonClick={onRequestCreate}
-                  filterCount={getFilterCount()}
-                  filterComponent={(
-                    <>
-                      <FilterButton
-                        title="Khối"
-                        options={gradeOptions}
-                        onSelectedOptionsChange={onGradeFilterChange}
-                      />
-                    </>
-                  )}
-                  actionComponent={(
-                    <Fragment>
-                      <Tooltip title="Nhập từ excel">
-                        <IconButton style={{ marginRight: 16 }} size="small" onClick={onImportFromExcel}>
-                          <PublishIcon color="primary" />
-                        </IconButton>
-                      </Tooltip>
-                    </Fragment>
-                  )}
-                />
-              </Paper>
-            </Grid>
-            <Grid item style={{ flexGrow: 1, paddingTop: 16, paddingBottom: 16, backgroundColor: '#e8e8e8' }}>
-              <Container className={classes.root}>
-                <input ref={fileRef} hidden type="file" onChange={onFileChange} /> 
-                <DataGrid
-                  columns={cols}
-                  rows={data.items}
-                  pageSize={pagingInfo.pageSize} 
-                  rowCount={data.totalCount}
-                  onPageChange={onPageChange}
-                  loading={loading}
-                  page={pagingInfo.pageIndex && pagingInfo.pageIndex - 1}
-                  error={error}
-                  paginationMode='server'
-                  hideFooterSelectedRowCount
-                  rowsPerPageOptions={[5, 15, 30, 50]}
-                  onPageSizeChange={onPageSizeChange}
-                  pagination
-                  localeText={dataGridLocale}
-                />
-              </Container>
-            </Grid>
-          </Grid>
+          </Paper>
+        </Grid>
+        <Grid item style={{ flexGrow: 1, paddingTop: 16, paddingBottom: 16, backgroundColor: '#e8e8e8' }}>
+          <Container className={classes.root}>
+            <input ref={fileRef} hidden type="file" onChange={onFileChange} /> 
+            <DataGrid
+              columns={cols}
+              rows={data.items}
+              pageSize={pagingInfo.pageSize} 
+              rowCount={data.totalCount}
+              onPageChange={onPageChange}
+              loading={loading}
+              page={pagingInfo.pageIndex && pagingInfo.pageIndex - 1}
+              error={error}
+              paginationMode='server'
+              hideFooterSelectedRowCount
+              rowsPerPageOptions={[5, 15, 30, 50]}
+              onPageSizeChange={onPageSizeChange}
+              pagination
+              localeText={dataGridLocale}
+            />
+          </Container>
         </Grid>
       </Grid>
-    </div>
-    
+    </Grid>
   );
 };
 

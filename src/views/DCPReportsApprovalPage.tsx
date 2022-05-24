@@ -8,10 +8,9 @@ import DateFnsUtils from '@date-io/date-fns';
 import React, { useEffect, useState } from 'react';
 import AwesomeDebouncePromise from 'awesome-debounce-promise';
 import Header from '../components/Header';
-import Sidebar from '../components/Sidebar';
 import { DcpReportsService } from '../api';
 import { useFetchV2 } from '../hooks';
-import { DcpReport, User } from '../interfaces';
+import { Account, DcpReport } from '../interfaces';
 import { formatFullDateTime } from '../utils/TimeHelper';
 import { comparers, dataGridLocale, dcpReportStatus, dcpReportStatusDic } from '../appConsts';
 import { routes, routeWithParams } from '../routers/routesDictionary';
@@ -24,8 +23,9 @@ import DoneIcon from '@material-ui/icons/Done';
 import WarningIcon from '@material-ui/icons/Warning';
 import PageviewIcon from '@material-ui/icons/Pageview';
 import MoreHorizIcon from '@material-ui/icons/MoreHoriz';
-import useStyles from '../assets/jss/views/DCPReportHistoryPage';
 import moment from 'moment';
+import ContactCard from '../components/ContactCard';
+import useStyles from '../assets/jss/views/DCPReportHistoryPage';
 
 
 const DetailCell = (props: GridCellParams) => {
@@ -181,9 +181,15 @@ const cols: GridColDef[] =  [
     field: 'creator',
     headerName: 'Người chấm',
     width: 200,
-    valueFormatter: (params: GridValueFormatterParams) => {
-      const value = params.value as User.UserForSimpleListDto;
-      return value ? value.name : '';
+    renderCell: (params: GridCellParams) => {
+      const account = params.value as Account.SimpleAccountDto;
+      const value = account?.name;
+      return (
+        <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+          <ContactCard contact={account}/>
+          <span style={{ marginLeft: 8, cursor: 'default' }}>{value}</span>
+        </div>
+      )
     }
   },
   {
@@ -365,96 +371,89 @@ const DCPReportsApprovalPage = () => {
   };
 
   return (
-    <div style={{ height: '100%' }}>
-      <Grid container style={{ height: '100%' }}>
-        <Grid item xs={4} sm={3} md={2}>
-          <Sidebar activeKey={routes.DCPReportApproval} />
-        </Grid>
-        <Grid style={{ background: '#fff', flexGrow: 1 }} item container xs={8} sm={9} md={10} direction="column">
-          <Grid item >
-            <Header
-              pageName="Duyệt chấm điểm nề nếp"
-            />
-          </Grid>
-          <Grid item container direction="column" style={{ flex: 1, minHeight: 0, flexWrap: 'nowrap', background: "#e8e8e8" }}>
-            <Grid item container
-              style={{
-                paddingTop: 16, 
-                paddingRight: 24, 
-                paddingLeft: 24,
-                background: "#e8e8e8"
-              }}
-            >
-              <Paper variant="outlined" elevation={1} style={{ width: "100%" }}>
-                <Grid item container direction='row' alignItems='center' style={{ padding: "5px 32px", height: 54 }}>
-                  <Tooltip title="Bộ lọc" style={{ marginRight: 16 }}>
-                      <Badge badgeContent={getFilterCount()} color="primary" >
-                        <FilterIcon fontSize="small" />
-                      </Badge>
-                  </Tooltip>
-                  <MuiPickersUtilsProvider utils={DateFnsUtils}>
-                    <Box>
-                      <KeyboardDatePicker
-                        disableToolbar
-                        size="small"
-                        variant="inline"
-                        format="dd/MM/yyyy"
-                        margin="dense"
-                        id="get-discipline-report-filter"
-                        value={dateFilter}
-                        onChange={handleOnDateChange}
-                        KeyboardButtonProps={{
-                          'aria-label': 'change date',
-                        }}
-                        style={{ width: 160 }}
-                      />
-                    </Box>
-                  </MuiPickersUtilsProvider>
-                  <Chip 
-                      clickable label='Hôm nay' 
-                      onClick={handleTodayFilterClick}
-                      variant={dateFilterType === 'today' ? 'default' : 'outlined'} 
-                      color={dateFilterType === 'today' ? 'primary' : 'default'} style={{marginLeft: 16}}
-                      />
-                  <Chip clickable label='Tuần này' 
-                    onClick={handleWeekFilterClick}
-                    variant={dateFilterType === 'week' ? 'default' : 'outlined'} 
-                    color={dateFilterType === 'week' ? 'primary' : 'default'}
-                    style={{marginLeft: 8, marginRight: 16}}
+    <Grid style={{ background: '#fff', flexGrow: 1 }} item container direction="column">
+      <Grid item >
+        <Header
+          pageName="Duyệt chấm điểm nề nếp"
+        />
+      </Grid>
+      <Grid item container direction="column" style={{ flex: 1, minHeight: 0, flexWrap: 'nowrap', background: "#e8e8e8" }}>
+        <Grid item container
+          style={{
+            paddingTop: 16, 
+            paddingRight: 24, 
+            paddingLeft: 24,
+            background: "#e8e8e8"
+          }}
+        >
+          <Paper variant="outlined" elevation={1} style={{ width: "100%" }}>
+            <Grid item container direction='row' alignItems='center' style={{ padding: "5px 32px", height: 54 }}>
+              <Tooltip title="Bộ lọc" style={{ marginRight: 16 }}>
+                  <Badge badgeContent={getFilterCount()} color="primary" >
+                    <FilterIcon fontSize="small" />
+                  </Badge>
+              </Tooltip>
+              <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                <Box>
+                  <KeyboardDatePicker
+                    disableToolbar
+                    size="small"
+                    variant="inline"
+                    format="dd/MM/yyyy"
+                    margin="dense"
+                    id="get-discipline-report-filter"
+                    value={dateFilter}
+                    onChange={handleOnDateChange}
+                    KeyboardButtonProps={{
+                      'aria-label': 'change date',
+                    }}
+                    style={{ width: 160 }}
                   />
-                  <FilterButton
-                    title="Trạng thái"
-                    options={statusOptions}
-                    defaultSelectedOptions={[statusOptions[0]]}
-                    onSelectedOptionsChange={onStatusFilterChange}
+                </Box>
+              </MuiPickersUtilsProvider>
+              <Chip 
+                  clickable label='Hôm nay' 
+                  onClick={handleTodayFilterClick}
+                  variant={dateFilterType === 'today' ? 'default' : 'outlined'} 
+                  color={dateFilterType === 'today' ? 'primary' : 'default'} style={{marginLeft: 16}}
                   />
-                </Grid>
-              </Paper>
-            </Grid>              
-            <Grid item style={{ flexGrow: 1, paddingTop: 16, paddingBottom: 16, backgroundColor: '#e8e8e8'}}>
-              <Container className={classes.root}>
-                <DataGrid
-                  columns={cols}
-                  rows={data.items}
-                  pageSize={pagingInfo.pageSize} 
-                  rowCount={data.totalCount}
-                  onPageChange={onPageChange}
-                  loading={loading}
-                  page={pagingInfo.pageIndex && pagingInfo.pageIndex - 1}
-                  error={error}
-                  paginationMode='server'
-                  hideFooterSelectedRowCount
-                  rowsPerPageOptions={[5, 15, 30, 50]}
-                  onPageSizeChange={onPageSizeChange}
-                  pagination
-                  localeText={dataGridLocale}
-                />
-              </Container>
+              <Chip clickable label='Tuần này' 
+                onClick={handleWeekFilterClick}
+                variant={dateFilterType === 'week' ? 'default' : 'outlined'} 
+                color={dateFilterType === 'week' ? 'primary' : 'default'}
+                style={{marginLeft: 8, marginRight: 16}}
+              />
+              <FilterButton
+                title="Trạng thái"
+                options={statusOptions}
+                defaultSelectedOptions={[statusOptions[0]]}
+                onSelectedOptionsChange={onStatusFilterChange}
+              />
             </Grid>
-          </Grid>
+          </Paper>
+        </Grid>              
+        <Grid item style={{ flexGrow: 1, paddingTop: 16, paddingBottom: 16, backgroundColor: '#e8e8e8'}}>
+          <Container className={classes.root}>
+            <DataGrid
+              columns={cols}
+              rows={data.items}
+              pageSize={pagingInfo.pageSize} 
+              rowCount={data.totalCount}
+              onPageChange={onPageChange}
+              loading={loading}
+              page={pagingInfo.pageIndex && pagingInfo.pageIndex - 1}
+              error={error}
+              paginationMode='server'
+              hideFooterSelectedRowCount
+              rowsPerPageOptions={[5, 15, 30, 50]}
+              onPageSizeChange={onPageSizeChange}
+              pagination
+              localeText={dataGridLocale}
+            />
+          </Container>
         </Grid>
       </Grid>
-    </div>
+    </Grid>
   );
 
 };

@@ -1,34 +1,17 @@
-import AppConfigService from './AppConfigService';
-import AuthService from './AuthService';
-import IdentityService from './IdentityService';
-import CoursesService from './CoursesService';
-import TeachersService from './TeachersService';
-import ClassesService from './ClassesService';
-import GradesService from './GradesService';
-import StudentsService from './StudentsService';
-import RegulationsService from './RegulationsService';
-import DcpReportsService from './DcpReportsService';
-import LrReportsService from './LrReportsService';
-import StatisticsService from './StatisticsService';
-import TaskAssignmentService from './TaskAssignmentService';
-import ProfileService from './ProfileService';
-import DataImportService from './DataImportService';
-
-
-export {
-  AuthService,
-  IdentityService,
-  AppConfigService,
-  CoursesService,
-  TeachersService,
-  ClassesService,
-  GradesService,
-  StudentsService,
-  RegulationsService,
-  DcpReportsService,
-  LrReportsService,
-  StatisticsService,
-  TaskAssignmentService,
-  ProfileService,
-  DataImportService
-};
+export * from './AppConfigService';
+export * from './AuthService';
+export * from './IdentityService';
+export * from './CoursesService';
+export * from './TeachersService';
+export * from './ClassesService';
+export * from './GradesService';
+export * from './StudentsService';
+export * from './RegulationsService';
+export * from './DcpReportsService';
+export * from './LrReportsService';
+export * from './StatisticsService';
+export * from './TaskAssignmentService';
+export * from './ProfileService';
+export * from './DataImportService';
+export * from './MultitenancyService';
+export * from './AccountsService';

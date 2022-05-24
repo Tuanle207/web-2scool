@@ -51,7 +51,7 @@ const removeRegulation = async (id: string) => {
   await apiService.delete(Endpoint.DeleteRegulation(id));
 };
 
-const RegulationsService = {
+export const RegulationsService = {
   getRegulationForSimpleList,
   getCriteriaForSimpleList,
   getAllRegulations,
@@ -60,5 +60,3 @@ const RegulationsService = {
   removeRegulation,
   getRegulationById,
 };
-
-export default RegulationsService
