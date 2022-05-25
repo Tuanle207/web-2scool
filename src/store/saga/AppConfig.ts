@@ -14,6 +14,10 @@ function* getAppConfig() {
     const tenantDisplayName: string = yield call(MultitenancyService.getDisplayNameByTenantName, tenant);
     const invalidTenant = !tenantDisplayName && window.location.origin !== ENV.appUrl; 
     if (invalidTenant) {
+      console.log(window.location.origin);
+      console.log('window.location.origin');
+      console.log(ENV.appUrl);
+      console.log('ENV.appUrl');
       window.location.replace(ENV.appUrl);
     } else {
       // getting appconfig and current account info
