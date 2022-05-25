@@ -5,7 +5,7 @@ import Endpoint from './@endpoint';
 
 const createClass = async (input: Class.CreateUpdateClassDto) => {
   try {
-    const apiService = await getApiService();
+    const apiService = await getApiService({ queryActiveCourse: true });
     const result = await apiService.post(Endpoint.CreateClass(), input);
     return result;
   } catch (error) {
@@ -35,7 +35,7 @@ const getClassById = async (id: string) => {
 
 const getAllClasss = async (pagingInfo: Util.PagingInfo) => {
   try {
-    const apiService = await getApiService();
+    const apiService = await getApiService({ queryActiveCourse: true });
     const result = await apiService.post<Util.PagingModel<Class.ClassDto>>(Endpoint.GetAllClasss(), pagingInfo);
     return result;
   } catch (error) {
@@ -45,7 +45,7 @@ const getAllClasss = async (pagingInfo: Util.PagingInfo) => {
 
 const getClassForSimpleList = async () => {
   try {
-    const apiService = await getApiService();
+    const apiService = await getApiService({ queryActiveCourse: true });
     const result = await apiService.get<Util.PagingModel<Class.ClassForSimpleListDto>>(Endpoint.GetClassForSimpleList());
     return result;
   } catch (error) {
@@ -64,7 +64,7 @@ const removeClass =  async ({id}: {id: string}) => {
 };
 
 const isNameAlreadyUsed = async (id: string, name: string) => {
-  const apiService = await getApiService();
+  const apiService = await getApiService({ queryActiveCourse: true });
   const result = await apiService.get<boolean>(Endpoint.IsNameAlreadyUsed(id, name));
   return result;
 }

@@ -1,3 +1,4 @@
+import { TrendingUpSharp } from '@material-ui/icons';
 import { DcpReport, Util } from '../../interfaces';
 import { getApiService } from '../BaseApiService';
 import Endpoint from './@endpoint';
@@ -5,7 +6,7 @@ import Endpoint from './@endpoint';
 
 const createDcpReport = async (input: DcpReport.CreateUpdateDcpReportDto) => {
   try {
-    const apiService = await getApiService();
+    const apiService = await getApiService({ queryCurrentAccount: true });
     const result = await apiService.post(Endpoint.CreateDcpReport(), input);
     return result;
   } catch (error) {
@@ -15,7 +16,7 @@ const createDcpReport = async (input: DcpReport.CreateUpdateDcpReportDto) => {
 
 const getAllDcpReports = async (input: Util.PagingInfo) => {
   try {
-    const apiService = await getApiService();
+    const apiService = await getApiService({ queryActiveCourse: true });
     const result = await apiService.post<DcpReport.DcpReportDto>(Endpoint.GetAllDcpReports(), input);
     return result;
   } catch (error) {
@@ -35,7 +36,7 @@ const getDcpReportById = async (id: string) => {
 
 const deleteDcpReportById = async (id: string) => {
   try {
-    const apiService = await getApiService();
+    const apiService = await getApiService({ queryCurrentAccount: true });
     const result = await apiService.delete(Endpoint.DeleteDcpReport(id));
     return result;
   } catch (error) {
@@ -92,7 +93,7 @@ const cancelAssessDcpReport = async (id: string) => {
 
 const getMyDcpReports = async (input: Util.PagingInfo) => {
   try {
-    const apiService = await getApiService();
+    const apiService = await getApiService({ queryActiveCourse: true, queryCurrentAccount: true });
     const result = await apiService.post<Util.PagingModel<DcpReport.DcpReportDto>>(Endpoint.GetMyDcpReports(), input);
     return result;
   } catch (error) {
@@ -102,7 +103,7 @@ const getMyDcpReports = async (input: Util.PagingInfo) => {
 
 const getDcpReportsForApproval = async (input: Util.PagingInfo) => {
   try {
-    const apiService = await getApiService();
+    const apiService = await getApiService({ queryActiveCourse: true });
     const result = await apiService.post<Util.PagingModel<DcpReport.DcpReportDto>>(Endpoint.GetDcpReportsForApproval(), input);
     return result;
   } catch (error) {

@@ -154,17 +154,17 @@ const RowMenuCell = (props: RowMenuProps) => {
   return (
     <div>
       <Tooltip title='Cập nhật thông tin vai trò này'>
-        <IconButton onClick={onRequestUpdate}>
+        <IconButton size="small" onClick={onRequestUpdate}>
           <EditIcon />
         </IconButton>
       </Tooltip>
       <Tooltip title='Xóa vai trò này'>
-        <IconButton onClick={onRequestDelete}>
+        <IconButton size="small" onClick={onRequestDelete}>
           <DeleteIcon />
         </IconButton>
       </Tooltip>
       <Tooltip title='Thay đổi quyền cho vai trò này'>
-        <IconButton onClick={onRequestPermissionsUpdate}>
+        <IconButton size="small" onClick={onRequestPermissionsUpdate}>
           <SettingsIcon />
         </IconButton>
       </Tooltip>
@@ -174,25 +174,19 @@ const RowMenuCell = (props: RowMenuProps) => {
 
 const cols: GridColDef[] =  [
   {
+    field: 'name',
+    headerName: 'Tên vai trò',
+    width: 200,
+  },
+  {
     field: 'actions',
     headerName: 'Hành động',
     renderCell: RowMenuCell,
     sortable: false,
-    width: 150,
+    width: 120,
     headerAlign: 'left',
     filterable: false,
-    align: 'center',
     disableColumnMenu: true,
-  },
-  {
-    field: 'id',
-    headerName: 'Mã',
-    width: 200
-  },
-  {
-    field: 'name',
-    headerName: 'Tên vai trò',
-    width: 200,
   },
 ];
 

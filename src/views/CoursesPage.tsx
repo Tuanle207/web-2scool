@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import AwesomeDebouncePromise from 'awesome-debounce-promise';
 import { Container, Grid, IconButton, Paper, Tooltip } from '@material-ui/core';
-import { DataGrid, GridApi, GridColDef, GridPageChangeParams, GridRowId, GridValueFormatterParams } from '@material-ui/data-grid';
+import { DataGrid, GridApi, GridCellParams, GridColDef, GridPageChangeParams, GridRowId, GridValueFormatterParams } from '@material-ui/data-grid';
 import { toast } from 'react-toastify';
 import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@material-ui/icons/Edit';
@@ -12,9 +12,11 @@ import { CoursesService } from '../api';
 import { formatDate } from '../utils/TimeHelper';
 import { useDialog, useFetchV2 } from '../hooks';
 import CreateOrUpdateCourseRequest from '../components/Modal/CreateOrUpdateCourseRequest';
-import useStyles from '../assets/jss/views/CoursesPage';
 import { dataGridLocale } from '../appConsts';
 import { busyService } from '../services';
+import CheckCircleOutlineIcon from '@material-ui/icons/CheckCircleOutline';
+import DoneOutlineIcon from '@material-ui/icons/DoneOutline';
+import useStyles from '../assets/jss/views/CoursesPage';
 
 interface RowMenuProps {
   api: GridApi;
@@ -85,17 +87,57 @@ const RowMenuCell = (props: RowMenuProps) => {
     }
   };
 
+  const onActivate = async () => {
+    try {
+      const courseId = id.toString();
+      const courseName = api.getCellValue(id, 'name')?.toString().toUpperCase();
+      const deleteResult = await showDialog(null, {
+        type: 'default',
+        title: 'Xác nhận',
+        message: `Bạn có chắc muốn kích hoạt khóa học ${courseName}?`,
+        acceptText: 'Xác nhận'
+      });
+      const { result } = deleteResult;
+      if (result === 'Ok') {
+        busyService.busy(true);
+        await CoursesService.markAsActiveCourse(courseId);
+        toast(`Kích hoạt khóa học ${courseName} thành công`, {
+          type: toast.TYPE.SUCCESS
+        });
+        reloadCurrentPageData();
+      }
+    } catch (err) {
+      toast.error('Đã có lỗi xảy ra, không thể kích hoạt khóa học');
+    } finally {
+      busyService.busy(false);
+    }
+  };
+
   return (
     <div>
       <Tooltip title='Cập nhật thông tin khóa học này'>
-          <IconButton  
-            onClick={onRequestUpdate} 
-          >
-            <EditIcon />
-          </IconButton>
-        </Tooltip>
-      <Tooltip title='Xóa học khóa học này'>
         <IconButton
+          size="small"
+          onClick={onRequestUpdate} 
+        >
+          <EditIcon />
+        </IconButton>
+      </Tooltip>
+      {
+        !api.getCellValue(id, 'isActive') && (
+          <Tooltip title='Kích hoạt khóa học' >
+            <IconButton
+              size="small"
+              onClick={onActivate}
+            >
+              <CheckCircleOutlineIcon />
+            </IconButton>
+          </Tooltip>
+        )
+      }
+      <Tooltip title='Xóa học khóa học này' >
+        <IconButton
+          size="small"
           onClick={onRequestDelete}
         >
           <DeleteIcon />
@@ -107,22 +149,6 @@ const RowMenuCell = (props: RowMenuProps) => {
 
 
 const cols: GridColDef[] =  [
-  {
-    field: 'actions',
-    headerName: 'Hành động',
-    renderCell: RowMenuCell,
-    sortable: false,
-    width: 150,
-    headerAlign: 'left',
-    filterable: false,
-    align: 'center',
-    disableColumnMenu: true,
-  },
-  {
-    field: 'id',
-    headerName: 'Mã',
-    width: 150
-  },
   {
     field: 'name',
     headerName: 'Tên khóa học',
@@ -139,7 +165,35 @@ const cols: GridColDef[] =  [
     headerName: 'Ngày kết thúc',
     width: 150,
     valueFormatter: (params: GridValueFormatterParams) => formatDate(params.value as string)
-  }
+  },
+  {
+    field: 'isActive',
+    headerName: 'Hoạt động',
+    align: 'center',
+    headerAlign: 'center',
+    width: 160,
+    renderCell: (params: GridCellParams) => {
+      const isActive = params.value as boolean;
+      if (isActive) {
+        return (
+          <Tooltip title="Khóa học này đang hoạt động">
+            <DoneOutlineIcon color="primary"></DoneOutlineIcon>
+          </Tooltip>
+        );
+      }
+      return <></>;
+    }
+  },
+  {
+    field: 'actions',
+    headerName: 'Hành động',
+    width: 120,
+    renderCell: RowMenuCell,
+    sortable: false,
+    headerAlign: 'left',
+    filterable: false,
+    disableColumnMenu: true,
+  },
 ];
 
 const fetchAPIDebounced = AwesomeDebouncePromise(CoursesService.getAllCourses, 100);

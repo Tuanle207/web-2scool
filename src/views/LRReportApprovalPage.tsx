@@ -220,7 +220,8 @@ const cols: GridColDef[] =  [
   {
     field: 'class',
     headerName: 'Lớp',
-    width: 100,
+    width: 200,
+    flex: 1,
     valueFormatter: (params: GridValueFormatterParams) => {
       const value = params.value as Class.ClassForSimpleListDto;
       return value.name;

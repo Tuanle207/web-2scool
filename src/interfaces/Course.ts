@@ -6,6 +6,7 @@ export namespace Course {
     description: string;
     startTime: Date;
     finishTime: Date;
+    isActive: boolean;
   }
   
   export interface CreateUpdateCourseDto {

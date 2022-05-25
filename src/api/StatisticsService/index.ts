@@ -10,7 +10,7 @@ const formatQueryDate = (date: Date) => {
 
 const getOverallRanking = async (input: Util.DateFilterDto) => {
   try {
-    const apiService = await getApiService();
+    const apiService = await getApiService({ queryActiveCourse: true });
     const query = `?StartTime=${formatQueryDate(input.startTime)}&EndTime=${formatQueryDate(input.endTime)}`;
     const result = await apiService.get<Util.PagingModel<Stats.OverallClassRanking>>(Endpoint.GetOverallRanking(query));
     return result;
@@ -21,7 +21,7 @@ const getOverallRanking = async (input: Util.DateFilterDto) => {
 
 const getDcpRanking = async (input: Util.DateFilterDto) => {
   try {
-    const apiService = await getApiService();
+    const apiService = await getApiService({ queryActiveCourse: true });
     const query = `?StartTime=${formatQueryDate(input.startTime)}&EndTime=${formatQueryDate(input.endTime)}`;
     const result = await apiService.get<Util.PagingModel<Stats.DcpClassRanking>>(Endpoint.GetDcpRanking(query));
     return result;
@@ -32,7 +32,7 @@ const getDcpRanking = async (input: Util.DateFilterDto) => {
 
 const getClassesFaults = async (input: Util.DateFilterDto) => {
   try {
-    const apiService = await getApiService();
+    const apiService = await getApiService({ queryActiveCourse: true });
     const query = `?StartTime=${formatQueryDate(input.startTime)}&EndTime=${formatQueryDate(input.endTime)}`;
     const result = await apiService.get<Util.PagingModel<Stats.DcpClassFault>>(Endpoint.GetClassesFaults(query));
     return result;
@@ -42,7 +42,7 @@ const getClassesFaults = async (input: Util.DateFilterDto) => {
 };
 const getCommonFaults = async (input: Util.DateFilterDto) => {
   try {
-    const apiService = await getApiService();
+    const apiService = await getApiService({ queryActiveCourse: true });
     const query = `?StartTime=${formatQueryDate(input.startTime)}&EndTime=${formatQueryDate(input.endTime)}`;
     const result = await apiService.get<Util.PagingModel<Stats.CommonDcpFault>>(Endpoint.GetCommonFaults(query));
     return result;
@@ -52,7 +52,7 @@ const getCommonFaults = async (input: Util.DateFilterDto) => {
 };
 const getStudentsWithMostFaults = async (input: Util.DateFilterDto) => {
   try {
-    const apiService = await getApiService();
+    const apiService = await getApiService({ queryActiveCourse: true });
     const query = `?StartTime=${formatQueryDate(input.startTime)}&EndTime=${formatQueryDate(input.endTime)}`;
     const result = await apiService.get<Util.PagingModel<Stats.StudentWithMostFaults>>(Endpoint.GetStudentsWithMostFaults(query));
     return result;
@@ -63,7 +63,7 @@ const getStudentsWithMostFaults = async (input: Util.DateFilterDto) => {
 
 const getStatForLineChart = async (input: Util.DateFilterDto) => {
   try {
-    const apiService = await getApiService();
+    const apiService = await getApiService({ queryActiveCourse: true });
     const query = `?StartTime=${formatQueryDate(input.startTime)}&EndTime=${formatQueryDate(input.endTime)}`;
     const result = await apiService.get<Stats.LineChartStatDto>(Endpoint.GetStatForLineChart(query));
     return result;
@@ -74,7 +74,7 @@ const getStatForLineChart = async (input: Util.DateFilterDto) => {
 
 const getOverallRankingExcel = async (input: Util.DateFilterDto) => {
   try {
-    await getApiService();
+    await getApiService({ queryActiveCourse: true });
     const query = `?StartTime=${formatQueryDate(input.startTime)}&EndTime=${formatQueryDate(input.endTime)}`;
     window.open(ENV.host + Endpoint.GetOverallRankingExcel(query), '_blank');
   } catch (error) {
@@ -84,7 +84,7 @@ const getOverallRankingExcel = async (input: Util.DateFilterDto) => {
 
 const getDcpRankingExcel = async (input: Util.DateFilterDto) => {
   try {
-    await getApiService();
+    await getApiService({ queryActiveCourse: true });
     const query = `?StartTime=${formatQueryDate(input.startTime)}&EndTime=${formatQueryDate(input.endTime)}`;
     window.open(ENV.host + Endpoint.GetDcpRankingExcel(query), '_blank');
   } catch (error) {
@@ -94,7 +94,7 @@ const getDcpRankingExcel = async (input: Util.DateFilterDto) => {
 
 const getClassesFaultsExcel = async (input: Util.DateFilterDto) => {
   try {
-    await getApiService();
+    await getApiService({ queryActiveCourse: true });
     const query = `?StartTime=${formatQueryDate(input.startTime)}&EndTime=${formatQueryDate(input.endTime)}`;
     window.open(ENV.host + Endpoint.GetClassesFaultsExcel(query), '_blank');
   } catch (error) {
@@ -104,7 +104,7 @@ const getClassesFaultsExcel = async (input: Util.DateFilterDto) => {
 
 const getCommonFaultsExcel = async (input: Util.DateFilterDto) => {
   try {
-    await getApiService();
+    await getApiService({ queryActiveCourse: true });
     const query = `?StartTime=${formatQueryDate(input.startTime)}&EndTime=${formatQueryDate(input.endTime)}`;
     window.open(ENV.host + Endpoint.GetCommonFaultsExcel(query), '_blank');
   } catch (error) {
@@ -114,7 +114,7 @@ const getCommonFaultsExcel = async (input: Util.DateFilterDto) => {
 
 const getStudentsWithMostFaultsExcel = async (input: Util.DateFilterDto) => {
   try {
-    await getApiService();
+    await getApiService({ queryActiveCourse: true });
     const query = `?StartTime=${formatQueryDate(input.startTime)}&EndTime=${formatQueryDate(input.endTime)}`;
     window.open(ENV.host + Endpoint.GetStudentsWithMostFaultsExcel(query), '_blank');
   } catch (error) {

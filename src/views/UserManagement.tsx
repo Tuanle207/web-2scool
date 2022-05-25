@@ -106,12 +106,12 @@ const RowMenuCell = (props: RowMenuProps) => {
   return (
     <div>
       <Tooltip title='Cập nhật thông tin người dùng này'>
-        <IconButton onClick={onRequestUpdate}>
+        <IconButton size="small" onClick={onRequestUpdate}>
           <EditIcon />
         </IconButton>
       </Tooltip>
       <Tooltip title='Xóa người dùng này'>
-        <IconButton onClick={onRequestDelete}>
+        <IconButton size="small" onClick={onRequestDelete}>
           <DeleteIcon />
         </IconButton>
       </Tooltip>
@@ -120,22 +120,6 @@ const RowMenuCell = (props: RowMenuProps) => {
 };
 
 const cols: GridColDef[] =  [
-  {
-    field: 'actions',
-    headerName: 'Hành động',
-    renderCell: RowMenuCell,
-    sortable: false,
-    width: 150,
-    headerAlign: 'left',
-    filterable: false,
-    align: 'center',
-    disableColumnMenu: true,
-  },
-  {
-    field: 'id',
-    headerName: 'Mã',
-    width: 150
-  },
   {
     field: 'name',
     headerName: 'Họ tên',
@@ -155,20 +139,25 @@ const cols: GridColDef[] =  [
     }
   },
   {
-    field: 'userName',
-    headerName: 'Tên đăng nhập',
-    width: 150
-  },
-  {
     field: 'email',
     headerName: 'Email đăng nhập',
-    width: 150,
+    width: 200,
   },
   {
     field: 'phoneNumber',
     headerName: 'Số điện thoại',
     width: 150,
-  }
+  },
+  {
+    field: 'actions',
+    headerName: 'Hành động',
+    renderCell: RowMenuCell,
+    sortable: false,
+    width: 130,
+    headerAlign: 'left',
+    filterable: false,
+    disableColumnMenu: true,
+  },
 ];
 
 const fetchAPIDebounced = AwesomeDebouncePromise(IdentityService.getUsers, 100);

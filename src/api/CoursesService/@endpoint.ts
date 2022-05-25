@@ -11,6 +11,10 @@ const Endpoint = {
     `/api/app/courses/${id}`,
   IsNameAlreadyUsed: (id: string, name: string) =>
     `/api/app/courses/is-name-already-used?id=${id}&name=${name}`,
+  MarkAsActiveCourse: (id: string) =>
+    `/api/app/courses/activate/${id}`,
+  HasActiveCourse: () =>
+    `/api/app/courses/has-active-course`
 };
 
 export default Endpoint;

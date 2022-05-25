@@ -5,7 +5,7 @@ import Endpoint from './@endpoint';
 
 const createStudent = async (input: Student.CreateUpdateStudentDto) => {
   try {
-    const apiService = await getApiService();
+    const apiService = await getApiService({ queryActiveCourse: true });
     const result = await apiService.post(Endpoint.CreateStudent(), input);
     return result;
   } catch (error) {
@@ -35,7 +35,7 @@ const getStudentById = async (id: string) => {
 
 const getAllStudents = async (pagingInfo: Util.PagingInfo) => {
   try {
-    const apiService = await getApiService();
+    const apiService = await getApiService({ queryActiveCourse: true });
     const result = await apiService.post<Util.PagingModel<Student.StudentDto>>(Endpoint.GetAllStudents(), pagingInfo);
     return result;
   } catch (error) {
@@ -45,7 +45,7 @@ const getAllStudents = async (pagingInfo: Util.PagingInfo) => {
 
 const getStudentForSimpleList = async (classId?: string) => {
   try {
-    const apiService = await getApiService();
+    const apiService = await getApiService({ queryActiveCourse: true });
     const result = await apiService.get<Util.PagingModel<Student.StudentForSimpleListDto>>(Endpoint.GetStudentForSimpleList() + (classId ? `?classId=${classId}` : ''));
     return result;
   } catch (error) {

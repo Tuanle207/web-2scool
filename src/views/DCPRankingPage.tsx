@@ -37,36 +37,42 @@ const cols: GridColDef[] = [
   {
     field: 'formTeacherName',
     headerName: 'Giáo viên chủ nhiệm',
-    width: 120
+    width: 200
   },
   {
     field: 'totalAbsence',
     headerName: 'Lượt vắng',
-    width: 120
+    width: 120,
+    align: 'center',
+    headerAlign: 'center'
   },
   {
     field: 'faults',
     headerName: 'Lượt vi phạm',
     width: 150,
     align: 'center',
-    headerAlign: 'right'
+    headerAlign: 'center'
   },
   {
     field: 'penaltyPoints',
     headerName: 'Điểm trừ',
     width: 150,
     align: 'center',
-    headerAlign: 'right'
+    headerAlign: 'center'
   },
   {
     field: 'lrPoints',
     headerName: 'Điểm sổ đầu bài',
-    width: 120
+    width: 180,
+    align: 'center',
+    headerAlign: 'center'
   },
   {
     field: 'dcpPoints',
     headerName: 'Điểm nề nếp',
-    width: 120
+    width: 150,
+    align: 'center',
+    headerAlign: 'center'
   },
   {
     field: 'rankingPoints',

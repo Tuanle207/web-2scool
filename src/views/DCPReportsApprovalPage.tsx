@@ -195,6 +195,7 @@ const cols: GridColDef[] =  [
   {
     field: 'dcpClassReports',
     headerName: 'Lớp được chấm',
+    width: 300,
     flex: 1,
     valueFormatter: (params: GridValueFormatterParams) => {
       const value = params.value as DcpReport.DcpClassReportDto[];

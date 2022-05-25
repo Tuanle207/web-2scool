@@ -5,7 +5,7 @@ import Endpoint from './@endpoint';
 
 const createCourse = async (input: Course.CreateUpdateCourseDto) => {
   try {
-    const apiService = await getApiService();
+    const apiService = await getApiService({ queryActiveCourse: true });
     const result = await apiService.post(Endpoint.CreateCourse(), input);
     return result;
   } catch (error) {
@@ -15,7 +15,7 @@ const createCourse = async (input: Course.CreateUpdateCourseDto) => {
 
 const updateCourse = async ({id, data}: {id: string, data: Course.CreateUpdateCourseDto}) => {
   try {
-    const apiService = await getApiService();
+    const apiService = await getApiService({ queryActiveCourse: true });
     const result = await apiService.put(Endpoint.UpdateCourse(id), data);
     return result;
   } catch (error) {
@@ -57,7 +57,19 @@ const isNameAlreadyUsed = async (id: string, name: string) => {
   const apiService = await getApiService();
   const result = await apiService.get<boolean>(Endpoint.IsNameAlreadyUsed(id, name));
   return result;
-}
+};
+
+const markAsActiveCourse = async (id: string) => {
+  const apiService = await getApiService();
+  const result = await apiService.get<boolean>(Endpoint.MarkAsActiveCourse(id));
+  return result;
+};
+
+const hasActiveCourse = async (id: string) => {
+  const apiService = await getApiService();
+  const result = await apiService.get<boolean>(Endpoint.HasActiveCourse());
+  return result;
+};
 
 export const CoursesService = {
   createCourse,
@@ -66,4 +78,6 @@ export const CoursesService = {
   removeCourse,
   updateCourse,
   isNameAlreadyUsed,
+  markAsActiveCourse,
+  hasActiveCourse,
 };

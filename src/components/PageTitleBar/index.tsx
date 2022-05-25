@@ -40,12 +40,16 @@ const PageTitleBar: FC<Props> = ({
         actionComponent
       }
       </Box>
-      <Button variant="contained"
-        color={'primary'}
-        onClick={onMainButtonClick}
-      >
-        Thêm
-      </Button>
+      {
+        onMainButtonClick && (
+          <Button variant="contained"
+            color={'primary'}
+            onClick={onMainButtonClick}
+          >
+            Thêm
+          </Button>
+        )
+      }
     </Grid>
   );
 };

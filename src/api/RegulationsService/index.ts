@@ -4,7 +4,7 @@ import { Regulation, Util } from '../../interfaces';
 
 const getRegulationForSimpleList = async () => {
   try {
-    const apiService = await getApiService();
+    const apiService = await getApiService({ queryActiveCourse: true });
     const result = await apiService.get<Util.PagingModel<Regulation.RegulationForSimpleListDto>>(Endpoint.GetRegulationSimpleList());
     return result;
   } catch (error) {
@@ -23,7 +23,7 @@ const getCriteriaForSimpleList = async () => {
 };
 
 const getAllRegulations = async (pagingInfo: Util.PagingInfo) => {
-  const apiService = await getApiService();
+  const apiService = await getApiService({ queryActiveCourse: true });
   const result = await apiService.post<Util.PagingModel<Regulation.RegulationDto>>(Endpoint.GetAllRegulations(), pagingInfo);
   return result;
 };
@@ -35,7 +35,7 @@ const getRegulationById = async (id: string) => {
 };
 
 const createRegulation = async (input: Regulation.CreateUpdateRegulationDto) => {
-  const apiService = await getApiService();
+  const apiService = await getApiService({ queryActiveCourse: true });
   const result = await apiService.post<Regulation.RegulationDto>(Endpoint.CreateRegulation(), input);
   return result;
 };

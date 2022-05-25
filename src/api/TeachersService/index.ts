@@ -2,9 +2,8 @@ import { Teacher, Util } from '../../interfaces';
 import { getApiService } from '../BaseApiService';
 import Endpoint from './@endpoint';
 
-
 const createTeacher = async (input: Teacher.CreateUpdateTeacherDto) => {
-  const apiService = await getApiService();
+  const apiService = await getApiService({ queryActiveCourse: true });
   const result = await apiService.post(Endpoint.CreateTeacher(), input);
   return result;
 };
@@ -22,13 +21,13 @@ const getTeacherById = async (id: string) => {
 };
 
 const getAllTeachers =  async (pagingInfo: Util.PagingInfo) => {
-  const apiService = await getApiService();
+  const apiService = await getApiService({ queryActiveCourse: true });
   const result = await apiService.post<Util.PagingModel<Teacher.TeacherDto>>(Endpoint.GetAllTeachers(), pagingInfo);
   return result;
 };
 
 const getAllTeachersSimpleList = async () =>  {
-  const apiService = await getApiService();
+  const apiService = await getApiService({ queryActiveCourse: true });
   const result = await apiService.get<Util.PagingModel<Teacher.TeacherForSimpleListDto>>(Endpoint.getAllTeachersSimpleList());
   return result;
 };

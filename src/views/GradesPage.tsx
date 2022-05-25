@@ -102,12 +102,12 @@ const RowMenuCell = (props: RowMenuProps) => {
   return (
     <div>
       <Tooltip title='Cập nhật thông tin khối này'>
-        <IconButton onClick={onRequestUpdate}>
+        <IconButton size="small" onClick={onRequestUpdate}>
           <EditIcon />
         </IconButton>
       </Tooltip>
       <Tooltip title='Xóa khối này'>
-        <IconButton onClick={onRequestDelete}>
+        <IconButton size="small" onClick={onRequestDelete}>
           <DeleteIcon />
         </IconButton>
       </Tooltip>
@@ -117,22 +117,6 @@ const RowMenuCell = (props: RowMenuProps) => {
 
 const cols: GridColDef[] =  [
   {
-    field: 'actions',
-    headerName: 'Hành động',
-    renderCell: RowMenuCell,
-    sortable: false,
-    width: 150,
-    headerAlign: 'left',
-    filterable: false,
-    align: 'center',
-    disableColumnMenu: true,
-  },
-  {
-    field: 'id',
-    headerName: 'Mã',
-    width: 150
-  },
-  {
     field: 'displayName',
     headerName: 'Tên',
     width: 200
@@ -140,8 +124,19 @@ const cols: GridColDef[] =  [
   {
     field: 'description',
     headerName: 'Mô tả',
-    width: 200
-  }
+    width: 400
+  },
+  {
+    field: 'actions',
+    headerName: 'Hành động',
+    renderCell: RowMenuCell,
+    sortable: false,
+    width: 120,
+    headerAlign: 'left',
+    filterable: false,
+    disableColumnMenu: true,
+    hide: true,
+  },
 ];
 
 const fetchAPIDebounced = AwesomeDebouncePromise(GradesService.getAllGrades, 100);
@@ -215,8 +210,7 @@ const GradesPage = () => {
         >
           <Paper variant="outlined" elevation={1}>
             <PageTitleBar 
-              title={`Giáo viên`} 
-              onMainButtonClick={onRequestCreate}
+              title={`Giáo viên`}
             />
           </Paper>
         </Grid>

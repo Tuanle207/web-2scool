@@ -19,11 +19,6 @@ import { dataGridLocale } from '../appConsts';
 
 const classFaultsStatsCols: GridColDef[] = [
   {
-    field: 'classId',
-    headerName: 'Mã lớp',
-    hide: true
-  },
-  {
     field: 'className',
     headerName: 'Lớp',
     width: 150,
@@ -66,19 +61,16 @@ const classFaultsStatsCols: GridColDef[] = [
 
 const commonFaultsStasCols: GridColDef[] = [
   {
-    field: 'id',
-    headerName: 'Mã quy định',
-    width: 150
-  },
-  {
     field: 'name',
     headerName: 'Tên Vi phạm',
-    flex: 1
+    width: 300,
+    flex: 2,
   },
   {
     field: 'criteriaName',
     headerName: 'Tiêu chí',
-    width: 200
+    width: 200,
+    flex: 1,
   },
   {
     field: 'faults',
@@ -91,6 +83,7 @@ const commonFaultsStasCols: GridColDef[] = [
     field: 'Chi tiết',
     disableClickEventBubbling: true,
     hideSortIcons: true,
+    sortable: false,
     align: 'center',
     renderCell: (params) => {
       return (
@@ -105,11 +98,6 @@ const commonFaultsStasCols: GridColDef[] = [
 ];
 
 const studentsWithMostFaultsStasCols: GridColDef[] = [
-  {
-    field: 'id',
-    headerName: 'Mã học sinh',
-    width: 150
-  },
   {
     field: 'studentName',
     headerName: 'Tên học sinh',

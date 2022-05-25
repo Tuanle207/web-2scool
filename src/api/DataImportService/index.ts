@@ -3,7 +3,7 @@ import Endpoint from './@endpoint';
 
 
 const importStudentsData = async (excel: File) => {
-  const apiService = await getApiService();
+  const apiService = await getApiService({ queryActiveCourse: true });
   const formData = new FormData();
   formData.append('file', excel);
   const result = await apiService.postFormData(Endpoint.ImportStudentsData(), formData);
@@ -11,7 +11,7 @@ const importStudentsData = async (excel: File) => {
 };
 
 const importTeachersData = async (excel: File) => {
-  const apiService = await getApiService();
+  const apiService = await getApiService({ queryActiveCourse: true });
   const formData = new FormData();
   formData.append('file', excel);
   const result = await apiService.postFormData(Endpoint.ImportTeachersData(), formData);
@@ -19,7 +19,7 @@ const importTeachersData = async (excel: File) => {
 };
 
 const importClassesData = async (excel: File) => {
-  const apiService = await getApiService();
+  const apiService = await getApiService({ queryActiveCourse: true });
   const formData = new FormData();
   formData.append('file', excel);
   const result = await apiService.postFormData(Endpoint.ImportClassesData(), formData);
@@ -27,7 +27,7 @@ const importClassesData = async (excel: File) => {
 };
 
 const importRegulationsData = async (excel: File) => {
-  const apiService = await getApiService();
+  const apiService = await getApiService({ queryActiveCourse: true });
   const formData = new FormData();
   formData.append('file', excel);
   const result = await apiService.postFormData(Endpoint.ImportRegulationsData(), formData);

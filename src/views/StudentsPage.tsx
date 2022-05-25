@@ -167,17 +167,17 @@ const RowMenuCell = (props: RowMenuProps) => {
   return (
     <div>
       <Tooltip title='Cập nhật thông tin học sinh này'>
-          <IconButton onClick={onRequestUpdate}>
-            <EditIcon />
-          </IconButton>
+        <IconButton size="small" onClick={onRequestUpdate}>
+          <EditIcon />
+        </IconButton>
         </Tooltip>
       <Tooltip title='Cấp tài khoản cho học sinh này'>
-        <IconButton onClick={onRequestAccountCreate}>
+        <IconButton size="small" onClick={onRequestAccountCreate}>
           <PersonAddIcon />
         </IconButton>
       </Tooltip>
       <Tooltip title='Xóa học sinh này'>
-        <IconButton onClick={onRequestDelete}>
+        <IconButton size="small" onClick={onRequestDelete}>
           <DeleteIcon />
         </IconButton>
       </Tooltip>
@@ -187,24 +187,8 @@ const RowMenuCell = (props: RowMenuProps) => {
 
 const cols: GridColDef[] =  [
   {
-    field: 'actions',
-    headerName: 'Hành động',
-    renderCell: RowMenuCell,
-    sortable: false,
-    width: 150,
-    headerAlign: 'left',
-    filterable: false,
-    align: 'center',
-    disableColumnMenu: true,
-  },
-  {
-    field: 'id',
-    headerName: 'Mã',
-    width: 120
-  },
-  {
     field: 'name',
-    headerName: 'Tên',
+    headerName: 'Tên học sinh',
     width: 200
   },
   {
@@ -223,6 +207,17 @@ const cols: GridColDef[] =  [
     field: 'parentPhoneNumber',
     headerName: 'SĐT phụ huynh',
     width: 150
+  },
+  {
+    field: 'actions',
+    headerName: 'Hành động',
+    renderCell: RowMenuCell,
+    sortable: false,
+    width: 120,
+    headerAlign: 'left',
+    filterable: false,
+    align: 'center',
+    disableColumnMenu: true,
   },
 ];
 

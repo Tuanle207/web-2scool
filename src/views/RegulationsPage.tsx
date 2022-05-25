@@ -112,12 +112,12 @@ const RowMenuCell = (props: RowMenuProps) => {
   return (
     <div>
       <Tooltip title='Cập nhật quy định này'>
-        <IconButton onClick={onRequestUpdate}>
+        <IconButton size="small" onClick={onRequestUpdate}>
           <EditIcon />
         </IconButton>
       </Tooltip>
       <Tooltip title='Xóa quy định này'>
-        <IconButton onClick={onRequestDelete}>
+        <IconButton size="small" onClick={onRequestDelete}>
           <DeleteIcon />
         </IconButton>
       </Tooltip>
@@ -126,22 +126,6 @@ const RowMenuCell = (props: RowMenuProps) => {
 };
 
 const cols: GridColDef[] =  [
-  {
-    field: 'actions',
-    headerName: 'Hành động',
-    renderCell: RowMenuCell,
-    sortable: false,
-    width: 150,
-    headerAlign: 'left',
-    filterable: false,
-    align: 'center',
-    disableColumnMenu: true,
-  },
-  {
-    field: 'id',
-    headerName: 'Mã',
-    width: 120
-  },
   {
     field: 'displayName',
     headerName: 'Tên',
@@ -157,7 +141,7 @@ const cols: GridColDef[] =  [
   {
     field: 'type',
     headerName: 'Loại quy định',
-    width: 130,
+    width: 150,
     valueFormatter: (params: GridValueFormatterParams) => {
       const value = params.value as string;
       switch (value) {
@@ -174,6 +158,16 @@ const cols: GridColDef[] =  [
     field: 'point',
     headerName: 'Điểm trừ',
     width: 120
+  },
+  {
+    field: 'actions',
+    headerName: 'Hành động',
+    renderCell: RowMenuCell,
+    sortable: false,
+    width: 120,
+    headerAlign: 'left',
+    filterable: false,
+    disableColumnMenu: true,
   },
 ];
 

@@ -5,7 +5,7 @@ import Endpoint from './@endpoint';
 
 const createLrReport = async (input: LrReport.CreateUpdateLRReportDto) => {
   try {
-    const apiService = await getApiService();
+    const apiService = await getApiService({ queryCurrentAccount: true });
     
     var body = new FormData();
     body.append('ClassId', input.classId);
@@ -24,7 +24,7 @@ const createLrReport = async (input: LrReport.CreateUpdateLRReportDto) => {
 
 const getAllLrReports = async (input: Util.PagingInfo) => {
   try {
-    const apiService = await getApiService();
+    const apiService = await getApiService({ queryActiveCourse: true });
     const result = await apiService.post<LrReport.LRReportDto>(Endpoint.GetAllLrReports(), input);
     return result;
   } catch (error) {
@@ -44,7 +44,7 @@ const getLrReportById = async (id: string) => {
 
 const deleteLrReportById = async (id: string) => {
   try {
-    const apiService = await getApiService();
+    const apiService = await getApiService({ queryCurrentAccount: true });
     const result = await apiService.delete(Endpoint.DeleteLrReport(id));
     return result;
   } catch (error) {
@@ -100,7 +100,7 @@ const cancelAssessLrReport = async (id: string) => {
 
 const getMyLrReports = async (input: Util.PagingInfo) => {
   try {
-    const apiService = await getApiService();
+    const apiService = await getApiService({ queryActiveCourse: true, queryCurrentAccount: true });
     const result = await apiService.post<Util.PagingModel<LrReport.LRReportDto>>(Endpoint.GetMyLrReports(), input);
     return result;
   } catch (error) {
@@ -110,7 +110,7 @@ const getMyLrReports = async (input: Util.PagingInfo) => {
 
 const getLrReportsForApproval = async (input: Util.PagingInfo) => {
   try {
-    const apiService = await getApiService();
+    const apiService = await getApiService({ queryActiveCourse: true });
     const result = await apiService.post<Util.PagingModel<LrReport.LRReportDto>>(Endpoint.GetLrReportsForApproval(), input);
     return result;
   } catch (error) {
