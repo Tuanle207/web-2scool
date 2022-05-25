@@ -160,9 +160,9 @@ const CreateTenantRequest = () => {
           )}
         />
       </Box>
-      <Box style={{marginBottom: 16}}>
+      {/* <Box style={{marginBottom: 16}}>
         <div>
-        {/* className={classes.button} */}
+        className={classes.button}
 
         <Button
           variant="contained"
@@ -172,7 +172,7 @@ const CreateTenantRequest = () => {
           Upload
         </Button>
         </div>
-      </Box>
+      </Box> */}
     </Container>
   );
 };

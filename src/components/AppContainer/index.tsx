@@ -29,23 +29,7 @@ const AppContainer: React.FC<IAppContainerProps> = () => {
   const isValid = useMemo(() => issuedAt && !isTokenExpired(issuedAt, expiresIn), [issuedAt, expiresIn]);
 
   useEffect(() => {
-    
     dispatch(AppConfigsActions.getAppConfigAsync());
-    // if (isValid) {
-    //   signalrService.startAsync().then(() => {
-    //     console.log('signalr connection started');
-
-    //     signalrService.listen('ReceiveNotification', (message) => {
-    //       console.log({message});
-    //     })
-    //   });
-
-    //   return () => {
-    //     signalrService.closeAsync().then(() => {
-    //       console.log('signalr connection closed.')
-    //     });
-    //   };
-    // }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isValid]);
 

@@ -47,6 +47,9 @@ const useHeaderStyles = makeStyles((theme: Theme) => ({
     paddingLeft: `calc(1em + ${theme.spacing(4)}px)`,
     transition: theme.transitions.create('width'),
     width: '100%',
+    '&::-webkit-search-cancel-button': {
+      '-webkit-appearance': 'none',
+    },
     [theme.breakpoints.up('md')]: {
       width: '20rem',
       '&:focus': {
