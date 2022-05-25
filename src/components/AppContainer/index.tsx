@@ -11,7 +11,6 @@ import { AppConfigsActions } from '../../store/actions';
 import { isTokenExpired } from '../../config/axios/util';
 import Dialog from '../Modal/Dialog';
 import { BusyBackdrop } from '../BusyBackdrop';
-import { signalrService } from '../../services/signal-r-service';
 import 'react-toastify/dist/ReactToastify.css';
 
 interface IAppContainerProps {

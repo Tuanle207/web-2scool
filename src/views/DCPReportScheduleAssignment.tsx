@@ -3,7 +3,7 @@ import { Grid, Button, List, ListItem, Typography, IconButton,
   Tooltip, TextField, Paper, FormControlLabel, Checkbox, Box } from '@material-ui/core';
 import { MuiPickersUtilsProvider, KeyboardDatePicker, KeyboardDateTimePicker } from '@material-ui/pickers';
 import DateFnsUtils from '@date-io/date-fns';
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import Header from '../components/Header';
 import { TaskAssignment, Class, Util, Account, Grade } from '../interfaces';
@@ -257,9 +257,10 @@ const DCPReportScheduleAssignment = () => {
     }
   };
 
-  const getDisabled = (assignedUserId?: string) => {
-    return selectedAccountId === null || (!!assignedUserId && selectedAccountId !== assignedUserId);
-  };
+
+  //???WHAT IS THIS const getDisabled = (assignedUserId?: string) => {
+  //   return selectedAccountId === null || (!!assignedUserId && selectedAccountId !== assignedUserId);
+  // };
 
   const renderGradeBlock = (grade: Grade.GradeForSimpleListDto) => {
     return (

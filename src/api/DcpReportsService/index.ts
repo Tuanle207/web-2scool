@@ -1,4 +1,3 @@
-import { TrendingUpSharp } from '@material-ui/icons';
 import { DcpReport, Util } from '../../interfaces';
 import { getApiService } from '../BaseApiService';
 import Endpoint from './@endpoint';

@@ -7,7 +7,6 @@ import EditIcon from '@material-ui/icons/Edit';
 import { toast } from 'react-toastify';
 import Header from '../components/Header';
 import PageTitleBar from '../components/PageTitleBar';
-import { Grade } from '../interfaces';
 import { GradesService } from '../api';
 import { useDialog, useFetchV2 } from '../hooks';
 import CreateOrUpdateGradeRequest,  { CreateOrUpdateGradeRequestProps } from '../components/Modal/CreateOrUpdateGradeRequest';
@@ -145,13 +144,13 @@ const GradesPage = () => {
 
   const classes = useStyles();
 
-  const { showDialog } = useDialog<Grade.CreateUpdateGradeDto>({
-    type: 'data',
-    title: 'Thêm khối mới',
-    acceptText: 'Lưu',
-    cancelText: 'Hủy',
-    renderFormComponent: CreateOrUpdateGradeRequest
-  });
+  // const { showDialog } = useDialog<Grade.CreateUpdateGradeDto>({
+  //   type: 'data',
+  //   title: 'Thêm khối mới',
+  //   acceptText: 'Lưu',
+  //   cancelText: 'Hủy',
+  //   renderFormComponent: CreateOrUpdateGradeRequest
+  // });
 
   const { 
     pagingInfo,
@@ -160,7 +159,6 @@ const GradesPage = () => {
     data,
     loading,
     error,
-    resetFilter
   } = useFetchV2({ fetchFn: fetchAPIDebounced });
 
   useEffect(() => {
@@ -175,22 +173,22 @@ const GradesPage = () => {
     setPageSize(param.pageSize);
   };
 
-  const onRequestCreate = async () => {
-    const { result, data } = await showDialog();
-    if (result !== 'Ok' || !data) {
-      return;
-    }
-    try {
-      busyService.busy(true);
-      await GradesService.createGrade(data);
-      toast.success('Thêm khối thành công');
-      resetFilter();
-    } catch {
-      toast.error('Đã có lỗi xảy ra. Không thể tạo khối mới');
-    } finally {
-      busyService.busy(false);
-    }
-  };
+  // const onRequestCreate = async () => {
+  //   const { result, data } = await showDialog();
+  //   if (result !== 'Ok' || !data) {
+  //     return;
+  //   }
+  //   try {
+  //     busyService.busy(true);
+  //     await GradesService.createGrade(data);
+  //     toast.success('Thêm khối thành công');
+  //     resetFilter();
+  //   } catch {
+  //     toast.error('Đã có lỗi xảy ra. Không thể tạo khối mới');
+  //   } finally {
+  //     busyService.busy(false);
+  //   }
+  // };
 
   return (
     <Grid style={{ background: '#fff', flexGrow: 1 }} item container direction='column'>

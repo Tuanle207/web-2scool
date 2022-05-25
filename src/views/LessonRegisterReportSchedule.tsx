@@ -29,7 +29,6 @@ import {
   Class, 
   Account, 
   TaskAssignment, 
-  User, 
   Util
  } from '../interfaces';
 import { 

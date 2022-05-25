@@ -22,12 +22,10 @@ import {
 } from '@material-ui/pickers';
 import { Controller, useForm } from 'react-hook-form';
 import { useDialogController } from '../../hooks';
-import { MaterialUiPickersDate } from '@material-ui/pickers/typings/date';
 import DateFnsUtils from '@date-io/date-fns';
 import moment from 'moment';
 import { Account } from '../../interfaces';
 import { AccountsService } from '../../api';
-import ActionModal from '.';
 import { withoutVNSign } from '../../utils/StringHelper';
 
 const useStyles = makeStyles({
@@ -107,7 +105,7 @@ const UpdateLRKeeperRequest: FC<UpdateLRKeeperRequestProps> = ({
   initEndTime
 }) => {
 
-  const { control, getValues, setValue, reset, handleSubmit } = useForm<UpdateLRKeeperFormData>({
+  const { control, getValues, setValue, handleSubmit } = useForm<UpdateLRKeeperFormData>({
     defaultValues: {
       classId: classId,
       accountId: assignedAccountId,
@@ -119,7 +117,6 @@ const UpdateLRKeeperRequest: FC<UpdateLRKeeperRequestProps> = ({
   useDialogController({ control, handleSubmit });
 
   const [ studentAccounts, setStudentAccounts ] = useState<Account.SimpleAccountDto[]>([]);
-  const [ selectedAccountId, setSelectedAccountId] = useState<string | null>(null);
   const [ studentName, setStudentName ] = useState<string>('');
   const [ loadingData, setLoadingData ] = useState(true);
 
@@ -137,11 +134,8 @@ const UpdateLRKeeperRequest: FC<UpdateLRKeeperRequestProps> = ({
 
     initData();
 
+  // eslint-disable-next-line
   }, [classId, assignedAccountId]);
-
-  const handleRadioChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSelectedAccountId((event.target as HTMLInputElement).value);
-  };
 
   const filteredUsers = useMemo(() => {
     return studentAccounts.filter(item => withoutVNSign(item.name).toLowerCase().includes(studentName));

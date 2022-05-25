@@ -1,7 +1,6 @@
-import { Box, Button, Container, TextField } from '@material-ui/core';
+import { Box, Container, TextField } from '@material-ui/core';
 import { Controller, useForm } from 'react-hook-form';
 import AwesomeDebouncePromise from 'awesome-debounce-promise';
-import CloudUploadIcon from '@material-ui/icons/CloudUpload';
 import { useDialogController } from '../../hooks';
 import { MultitenancyService } from '../../api';
 import { EMAIL_PATTERN, PASSWORD_PATTERN } from '../../utils/regex-pattern';

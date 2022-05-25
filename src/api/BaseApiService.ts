@@ -3,7 +3,6 @@ import { HttpClient } from '../config/axios/HttpClient';
 import { configHttpRequest, configHttpResponse } from '../config/axios/interceptors';
 import { isTokenExpired } from '../config/axios/util';
 import ENV from '../config/env';
-import { Util } from '../interfaces';
 import redux from '../store';
 import { AuthActions } from '../store/actions';
 import { IState } from '../store/reducers';

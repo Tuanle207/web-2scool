@@ -1,5 +1,4 @@
 import { makeStyles } from '@material-ui/core';
-import bgImage from '../../img/login-bg.jpg';
 
 const useStyles = makeStyles(theme => ({
   container: {

@@ -23,7 +23,6 @@ import { ReactComponent as RoleIcon } from '../../assets/img/permission.svg';
 import { ReactComponent as UserIcon } from '../../assets/img/user.svg';
 import { ReactComponent as RegulationIcon } from '../../assets/img/regulation.svg';
 import { ReactComponent as LrBookIcon } from '../../assets/img/lesson-register.svg';
-import { ReactComponent as IdentityIcon } from '../../assets/img/identity.svg';
 import { ReactComponent as MultitenancyIcon } from '../../assets/img/multitenancy.svg';
 import { routes } from '../../routers/routesDictionary';
 import { AppConfigSelector } from '../../store/selectors';
@@ -126,16 +125,6 @@ const menuItems: IMenuItem[] = [
     route: routes.DCPStatistics,
     policyName: policies.Statistics
   },
-  // {
-  //   key: 'quan-ly-khoa-hoc',
-  //   Icon: FlagIcon,
-  //   title: 'Khóa học',
-  //   showSeparator: true,
-  //   policyName: policies.Courses,
-  //   subItems: [
-      
-  //   ]
-  // },
   {
     key: routes.CoursesManager,
     title: 'Khóa học',
@@ -179,28 +168,6 @@ const menuItems: IMenuItem[] = [
     route: routes.RegulationManager,
     policyName: policies.Courses
   },
-  // {
-  //   key: 'identity',
-  //   Icon: IdentityIcon,
-  //   title: 'Danh tính',
-  //   policyName: (p) => p[policies.AbpIdentityUsers] || p[policies.AbpIdentityRoles], 
-  //   subItems: [
-  //     {
-  //       key: routes.UsersManager,
-  //       Icon: UserIcon,
-  //       title: 'Người dùng',
-  //       route: routes.UsersManager,
-  //       policyName: policies.AbpIdentityUsers
-  //     },
-  //     {
-  //       key: routes.RolesManager,
-  //       Icon: RoleIcon,
-  //       title: 'Vai trò',
-  //       route: routes.RolesManager,
-  //       policyName: policies.AbpIdentityRoles
-  //     },
-  //   ],
-  // },
   {
     key: routes.UsersManager,
     Icon: UserIcon,

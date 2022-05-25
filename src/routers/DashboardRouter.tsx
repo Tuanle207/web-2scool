@@ -30,7 +30,7 @@ import TenantManagement from '../views/TenantManagement';
 import Sidebar from '../components/Sidebar';
 import { policies } from '../appConsts';
 import { routes } from './routesDictionary';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { signalrService } from '../services/signal-r-service';
 
 const DashboardRouteDictionary = () => {
