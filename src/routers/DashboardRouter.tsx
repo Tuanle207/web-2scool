@@ -31,7 +31,6 @@ import Sidebar from '../components/Sidebar';
 import { policies } from '../appConsts';
 import { routes } from './routesDictionary';
 import { useEffect } from 'react';
-import { signalrService } from '../services/signal-r-service';
 
 const DashboardRouteDictionary = () => {
   return (
@@ -187,12 +186,12 @@ const DashboardRouteDictionary = () => {
 
 const DashboardRouter = () => {
   useEffect(() => {
-    return () => {
-      // clean signalr connection on component unmount
-      signalrService.closeAsync().then(() => {
-        console.log('signalr connection closed.')
-      });
-    };
+    // return () => {
+    //   // clean signalr connection on component unmount
+    //   signalrService.closeAsync().then(() => {
+    //     console.log('signalr connection closed.')
+    //   });
+    // };
   }, []);
 
   return (

@@ -2,7 +2,7 @@ import { all, call, put, takeLatest } from '@redux-saga/core/effects';
 import { AccountsService, AppConfigService, MultitenancyService } from '../../api';
 import ENV from '../../config/env';
 import { Account, Util } from '../../interfaces';
-import { signalrService } from '../../services/signal-r-service';
+// import { signalrService } from '../../services/signal-r-service';
 import { getTenantNameFromCurrentLocation } from '../../utils/UrlHelper';
 import { AppConfigsActions, TenantSettingActions, LoadingActions } from '../actions';
 
@@ -26,7 +26,7 @@ function* getAppConfig() {
       yield put(TenantSettingActions.setTenantNameAsync(tenantDisplayName));
       
       // restart signalr connection
-      yield call(signalrService.restartAsync.bind(signalrService));
+      // yield call(signalrService.restartAsync.bind(signalrService));
     }
   } catch (err) {
     console.log('ERROR', err)

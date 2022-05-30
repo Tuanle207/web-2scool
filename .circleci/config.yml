@@ -32,7 +32,7 @@ jobs:
 
             #Fill deployment.ts and replace in env config file
             sed -i "s%<API_URL>%$API_URL%g" src/config/env/deployment.ts
-            sed -i "s%<APP_URL>%$AUTH_URL%g" src/config/env/deployment.ts
+            sed -i "s%<APP_URL>%$APP_URL%g" src/config/env/deployment.ts
             sed -i "s%<AUTH_URL>%$AUTH_URL%g" src/config/env/deployment.ts
             sed -i "s%<CLIENT_ID>%$CLIENT_ID%g" src/config/env/deployment.ts
             sed -i "s%<CLIENT_SECRET>%$CLIENT_SECRET%g" src/config/env/deployment.ts
