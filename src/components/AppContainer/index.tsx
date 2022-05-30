@@ -37,8 +37,6 @@ const AppContainer: React.FC<IAppContainerProps> = () => {
       <StylesProvider jss={jss} >
         <CssBaseline>
           {
-            fetchingAppConfig === undefined || fetchingAppConfig === true ? 
-            <div>Đang tải...</div> :
             isValid ? <DashboardRouter /> : <AuthRouter />
           }
           <ToastContainer 
