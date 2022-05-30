@@ -42,7 +42,7 @@ const getForUpdate = async (input: TaskAssignment.TaskAssignmentFilterDto ) => {
 
 const getAssignedClassesForDcpReport = async (taskType: string) => {
   try {
-    const apiService = await getApiService({ queryActiveCourse: true });
+    const apiService = await getApiService({ queryCurrentAccount: true, queryActiveCourse: true });
     const result = await apiService.get<Util.PagingModel<Class.ClassForSimpleListDto>>(Endpoint.GetAssignedClassesForDcpReport(taskType));
     return result;
   } catch (error) {
