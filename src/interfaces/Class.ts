@@ -39,13 +39,12 @@ export namespace Class {
   export interface ClassForStudentDto {
     id: string;
     name: string;
-    courseId: string;
+    courseId?: string;
     formTeacherId: string;
   }
 
   export interface CreateUpdateClassDto {
     name: string;
-    courseId: string;
     gradeId: string;
     formTeacherId: string;
   }

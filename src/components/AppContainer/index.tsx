@@ -6,7 +6,7 @@ import DashboardRouter from '../../routers/DashboardRouter';
 import AuthRouter from '../../routers/AuthRouter';
 import { theme, jss } from '../../assets/themes/theme';
 import ActionModal from '../Modal';
-import { AuthSelector, LoadingSelector } from '../../store/selectors';
+import { AuthSelector } from '../../store/selectors';
 import { AppConfigsActions } from '../../store/actions';
 import { isTokenExpired } from '../../config/axios/util';
 import Dialog from '../Modal/Dialog';
@@ -21,7 +21,6 @@ const AppContainer: React.FC<IAppContainerProps> = () => {
 
   const issuedAt = useSelector(AuthSelector.issuedAt);
   const expiresIn = useSelector(AuthSelector.expiresIn);
-  const fetchingAppConfig = useSelector(LoadingSelector.fetchingAppConfig);
   
   const dispatch = useDispatch();
 

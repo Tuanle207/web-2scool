@@ -14,12 +14,6 @@ export namespace Regulation {
     criteria: CriteriaForSimpleList;
   }
 
-  export interface CriteriaDto {
-    id: string;
-    displayName: string;
-    description: string;
-  }
-
   export interface RegulationDto {
     id: string;
     name: string;
@@ -37,5 +31,16 @@ export namespace Regulation {
     point: number;
     criteriaId: string;
     type: string;
+  }
+
+  export interface CriteriaDto {
+    id: string;
+    displayName: string;
+    description: string;
+  }
+
+  export interface CreateUpdateCriteriaDto {
+    displayName: string;
+    description: string;
   }
 }

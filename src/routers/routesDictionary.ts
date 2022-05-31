@@ -27,6 +27,7 @@ export const routes = {
   TenansManager: '/quan-ly-khach-thue',
   Profile: '/tai-khoan-cua-toi',
   RegulationManager: '/quan-ly-quy-dinh',
+  CriteriaManager: '/quan-ly-tieu-chi',
 
   //
   Login: '/dang-nhap'

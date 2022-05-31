@@ -14,6 +14,7 @@ export namespace Course {
     description: string;
     startTime: Date;
     finishTime: Date;
+    fromActiveCourse: boolean;
   }
 }
 

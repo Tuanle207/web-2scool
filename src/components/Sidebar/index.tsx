@@ -17,6 +17,7 @@ import AssignmentTurnedInIcon from '@material-ui/icons/AssignmentTurnedIn';
 import FlagIcon from '@material-ui/icons/Flag';
 import LocalLibraryIcon from '@material-ui/icons/LocalLibrary';
 import BookIcon from '@material-ui/icons/Book';
+import CategoryIcon from '@material-ui/icons/Category';
 import { ReactComponent as TeacherIcon } from '../../assets/img/teacher.svg';
 import { ReactComponent as StudentIcon } from '../../assets/img/student.svg';
 import { ReactComponent as RoleIcon } from '../../assets/img/permission.svg';
@@ -166,6 +167,13 @@ const menuItems: IMenuItem[] = [
     Icon: RegulationIcon,
     title: 'Quy định nề nếp',
     route: routes.RegulationManager,
+    policyName: policies.Courses
+  },
+  {
+    key: routes.CriteriaManager,
+    Icon: CategoryIcon,
+    title: 'Tiêu chí nề nếp',
+    route: routes.CriteriaManager,
     policyName: policies.Courses
   },
   {

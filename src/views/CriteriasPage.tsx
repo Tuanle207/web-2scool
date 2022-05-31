@@ -1,24 +1,22 @@
-import { ChangeEvent, Fragment, useEffect, useRef, useState } from 'react';
+import { ChangeEvent, Fragment, useEffect, useRef } from 'react';
 import AwesomeDebouncePromise from 'awesome-debounce-promise';
 import { Container, Grid, IconButton, Paper, Tooltip } from '@material-ui/core';
 import Header from '../components/Header';
-import FilterButton, { IFilterOption } from '../components/FilterButton';
 import PageTitleBar from '../components/PageTitleBar';
-import { DataGrid, GridColDef, GridPageChangeParams, GridValueFormatterParams,
+import { DataGrid, GridColDef, GridPageChangeParams,
   GridApi, GridRowId } from '@material-ui/data-grid';
-import { Regulation } from '../interfaces';
 import { DataImportService, RegulationsService } from '../api';
 import { useFetchV2 } from '../hooks/useFetchV2';
 import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@material-ui/icons/Edit';
 import PublishIcon from '@material-ui/icons/Publish';
 import ActionModal from '../components/Modal';
-import { comparers, regulationType, dataGridLocale } from '../appConsts';
+import { comparers, dataGridLocale } from '../appConsts';
 import { toast } from 'react-toastify';
 import { useDialog } from '../hooks';
-import CreateOrUpdateRegulationRequest, { CreateOrUpdateRegulationRequestProps } from '../components/Modal/CreateOrUpdateRegulationRequest';
 import { busyService } from '../services';
 import useStyles from '../assets/jss/views/StudentsPage';
+import CreateOrUpdateCriteriaRequest from '../components/Modal/CreateOrUpdateCriteriaRequest';
 
 interface RowMenuProps {
   api: GridApi;
@@ -30,10 +28,10 @@ const RowMenuCell = (props: RowMenuProps) => {
 
   const { showDialog } = useDialog({
     type: 'data',
-    title: 'Cập nhật thông tin quy định',
+    title: 'Cập nhật thông tin tiêu chí',
     acceptText: 'Lưu',
     cancelText: 'Hủy',
-    renderFormComponent: CreateOrUpdateRegulationRequest,
+    renderFormComponent: CreateOrUpdateCriteriaRequest,
   });
 
   const reloadCurrentPageData = () => {
@@ -42,45 +40,45 @@ const RowMenuCell = (props: RowMenuProps) => {
 
   const onRequestDelete = async () => {
     try {
-      const regulationId = id.toString();
-      const regulationName = api.getCellValue(regulationId, 'displayName')?.toString().toUpperCase();
+      const criteriaId = id.toString();
+      const criteriaName = api.getCellValue(criteriaId, 'displayName')?.toString().toUpperCase();
       const deleteResult = await showDialog(null, {
         type: 'default',
         title: 'Xác nhận',
-        message: `Bạn có chắc muốn xóa quy định ${regulationName}?`,
+        message: `Bạn có chắc muốn xóa tiêu chí ${criteriaName}?`,
         acceptText: 'Xác nhận'
       });
       const { result } = deleteResult;
       if (result === 'Ok') {
         busyService.busy(true);
-        await RegulationsService.removeRegulation(regulationId);
-        toast.success(`Xóa quy định ${regulationName} thành công`);
+        await RegulationsService.removeCriteria(criteriaId);
+        toast.success(`Xóa tiêu chí ${criteriaName} thành công`);
         reloadCurrentPageData();
       }
     } catch (err) {
-      toast.error('Đã có lỗi xảy ra, không thể xóa quy định');
+      toast.error('Đã có lỗi xảy ra, không thể xóa tiêu chí');
     } finally {
       busyService.busy(false);
     }
   };
 
   const onRequestUpdate = async () => {
-    const regulationId = id.toString();
-    const input = await initUpdateData(regulationId);
+    const criteriaId = id.toString();
+    const input = await initUpdateData(criteriaId);
     if (!input) {
       return;
     }
-    const { result, data } = await showDialog(input);
+    const { result, data } = await showDialog({editItem: input});
     if (result !== 'Ok' || !data) {
       return;
     }
     try {
       busyService.busy(true);
-      await RegulationsService.updateRegulation(regulationId, data);
-      toast.success('Cập nhật quy định thành công');
+      await RegulationsService.updateCriteria(criteriaId, data);
+      toast.success('Cập nhật tiêu chí thành công');
       reloadCurrentPageData();
     } catch {
-      toast.error('Đã có lỗi xảy ra. Không thể lưu quy định');
+      toast.error('Đã có lỗi xảy ra. Không thể lưu tiêu chí');
     } finally {
       busyService.busy(false);
     }
@@ -89,18 +87,8 @@ const RowMenuCell = (props: RowMenuProps) => {
   const initUpdateData = async (editId: string) =>  {
     try {
       busyService.busy(true);
-      
-      const { items } = await RegulationsService.getCriteriaForSimpleList();
-      const regulationTypeOptions: IFilterOption[] = [
-        { id: regulationType.Student, label: "Học sinh", value: regulationType.Student },
-        { id: regulationType.Class, label: "Lớp", value: regulationType.Class },
-      ];
-      const result: CreateOrUpdateRegulationRequestProps = {
-        criterias: items,
-        regulationTypes: regulationTypeOptions,
-      };
-      result.editItem = await RegulationsService.getRegulationById(editId);
-      return result;
+      const editItem = await RegulationsService.getCriteriaById(editId);
+      return editItem;
     } catch {
       toast.error('Đã có lỗi xảy ra. Không thể khởi tạo dữ liệu.');
       return null;
@@ -111,12 +99,12 @@ const RowMenuCell = (props: RowMenuProps) => {
 
   return (
     <div>
-      <Tooltip title='Cập nhật quy định này'>
+      <Tooltip title='Cập nhật tiêu chí này'>
         <IconButton size="small" onClick={onRequestUpdate}>
           <EditIcon />
         </IconButton>
       </Tooltip>
-      <Tooltip title='Xóa quy định này'>
+      <Tooltip title='Xóa tiêu chí này'>
         <IconButton size="small" onClick={onRequestDelete}>
           <DeleteIcon />
         </IconButton>
@@ -128,36 +116,14 @@ const RowMenuCell = (props: RowMenuProps) => {
 const cols: GridColDef[] =  [
   {
     field: 'displayName',
-    headerName: 'Tên quy định',
-    width: 300
-  },
- 
-  {
-    field: 'criteria',
-    headerName: 'Tiêu chí',
-    width: 220,
-    valueFormatter: (params: GridValueFormatterParams) => (params.value as Regulation.CriteriaDto).displayName
+    headerName: 'Tên tiêu chí',
+    width: 400,
+    flex: 1,
   },
   {
-    field: 'type',
-    headerName: 'Loại quy định',
-    width: 150,
-    valueFormatter: (params: GridValueFormatterParams) => {
-      const value = params.value as string;
-      switch (value) {
-        case regulationType.Student:
-          return "Học sinh";
-        case regulationType.Class:
-          return "Lớp";
-        default:
-          return "Không XĐ";
-      }
-    }
-  },
-  {
-    field: 'point',
-    headerName: 'Điểm trừ',
-    width: 120
+    field: 'description',
+    headerName: 'Mô tả',
+    width: 600,
   },
   {
     field: 'actions',
@@ -171,25 +137,19 @@ const cols: GridColDef[] =  [
   },
 ];
 
-const fetchAPIDebounced = AwesomeDebouncePromise(RegulationsService.getAllRegulations, 100);
+const fetchAPIDebounced = AwesomeDebouncePromise(RegulationsService.getAllCriterias, 100);
 
-const RegulationsPage = () => {
+const CriteriasPage = () => {
 
   const classes = useStyles();
   const fileRef = useRef<HTMLInputElement>(null);
 
-  const [ criteriaOptions, setCriteriaOptions ] = useState<IFilterOption[]>([]);
-  const [ regulationTypeOptions ] = useState<IFilterOption[]>([
-    { id: regulationType.Student, label: "Học sinh", value: regulationType.Student },
-    { id: regulationType.Class, label: "Lớp", value: regulationType.Class },
-  ]);
-
   const { showDialog } = useDialog({
     type: 'data',
-    title: 'Thêm quy định nề nếp mới',
+    title: 'Thêm tiêu chí nề nếp mới',
     acceptText: 'Lưu',
     cancelText: 'Hủy',
-    renderFormComponent: CreateOrUpdateRegulationRequest
+    renderFormComponent: CreateOrUpdateCriteriaRequest
   });
 
   const { 
@@ -205,20 +165,7 @@ const RegulationsPage = () => {
   } = useFetchV2({ fetchFn: fetchAPIDebounced });
 
   useEffect(() => {
-
-    const initFilterData = async () => {
-      const { items } = await RegulationsService.getCriteriaForSimpleList();
-      const options: IFilterOption[] = items.map((el) => ({
-        id: el.id,
-        label: el.name,
-        value: el.id
-      }));
-      setCriteriaOptions(options);
-    };
-
-    initFilterData();
-
-    document.title = '2Scool | Quản lý quy định nề nếp';
+    document.title = '2Scool | Quản lý tiêu chí nề nếp';
   }, []);
 
   const onPageChange = (param: GridPageChangeParams) => {
@@ -229,63 +176,18 @@ const RegulationsPage = () => {
     setPageSize(param.pageSize);
   };
 
-  const onCriteriaFilterChange = (options: IFilterOption[]) => {
-    const criteriaIdList = options.map((x) => x.id);
-    setFilter({
-      key: "CriteriaId",
-      comparison: comparers.In,
-      value: criteriaIdList.join(',')
-    });
-  };
-
-  const onRegulationTypeFilterChange = (options: IFilterOption[]) => {
-    const regulationTypeList = options.map((x) => x.id);
-    setFilter({
-      key: "Type",
-      comparison: comparers.In,
-      value: regulationTypeList.join(',')
-    });
-  };
-
   const onCreateRequest = async () => {
-    const input = await initCreationData();
-    if (!input) {
-      return;
-    }
-    const { result, data } = await showDialog(input);
+    const { result, data } = await showDialog();
     if (result !== 'Ok' || !data) {
       return;
     }
     try {
       busyService.busy(true);
-      await RegulationsService.createRegulation(data);
-      toast.success('Thêm quy định thành công');
+      await RegulationsService.createCriteria(data);
+      toast.success('Thêm tiêu chí thành công');
       resetFilter();
     } catch {
-      toast.error('Đã có lỗi xảy ra. Không thể lưu quy định');
-    } finally {
-      busyService.busy(false);
-    }
-  };
-
-  const initCreationData = async (editId?: string) =>  {
-    try {
-      busyService.busy(true);
-      
-      const { items } = await RegulationsService.getCriteriaForSimpleList();
-      const result: CreateOrUpdateRegulationRequestProps = {
-        criterias: items,
-        regulationTypes: regulationTypeOptions,
-      };
-      if (editId) {
-        const editItem = await RegulationsService.getRegulationById(editId);
-        result.editItem = editItem;
-      }
-      
-      return result;
-    } catch {
-      toast.error('Đã có lỗi xảy ra. Không thể khởi tạo dữ liệu.');
-      return null;
+      toast.error('Đã có lỗi xảy ra. Không thể lưu tiêu chí');
     } finally {
       busyService.busy(false);
     }
@@ -310,7 +212,7 @@ const RegulationsPage = () => {
 
   const importFromExcel = async (file: File) => {
     try {
-      await DataImportService.importRegulationsData(file);
+      await DataImportService.importCriteriasData(file);
       toast.success("Nhập từ excel thành công!");
       resetFilter();
     } catch (err) {
@@ -328,9 +230,9 @@ const RegulationsPage = () => {
     <Grid style={{ background: '#fff', flexGrow: 1 }} item container direction='column'>
       <Grid item >
         <Header
-          searchBarPlaceholder="Tìm kiếm quy định..."
+          searchBarPlaceholder="Tìm kiếm tiêu chí..."
           onTextChange={(value) => setFilter({key: 'DisplayName', comparison: comparers.Contains, value: value })}
-          pageName="Quản lý quy định nề nếp" 
+          pageName="Quản lý tiêu chí nề nếp" 
         />
       </Grid>
       <Grid item container direction='column' style={{ flexGrow: 1 }}>
@@ -343,23 +245,9 @@ const RegulationsPage = () => {
         >
           <Paper variant="outlined" elevation={1}>
             <PageTitleBar
-              title={`Quy định nề nếp`} 
+              title={`tiêu chí nề nếp`} 
               onMainButtonClick={onCreateRequest}
               filterCount={getFilterCount()}
-              filterComponent={(
-                <>
-                  <FilterButton
-                    title="Tiêu chí"
-                    options={criteriaOptions}
-                    onSelectedOptionsChange={onCriteriaFilterChange}
-                  />
-                  <FilterButton
-                    title="Loại quy định"
-                    options={regulationTypeOptions}
-                    onSelectedOptionsChange={onRegulationTypeFilterChange}
-                  />
-                </>
-              )}
               actionComponent={(
                 <Fragment>
                   <Tooltip title="Nhập từ excel">
@@ -398,4 +286,4 @@ const RegulationsPage = () => {
   );
 };
 
-export default RegulationsPage;
+export default CriteriasPage;

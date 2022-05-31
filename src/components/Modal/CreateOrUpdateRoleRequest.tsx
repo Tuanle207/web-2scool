@@ -29,7 +29,6 @@ const CreateOrUpdateRoleRequest: FC<CreateOrUpdateRoleRequestProps> = ({
 
   useEffect(() => {
     if (editItem) {
-      console.log(editItem);
       const { name, isDefault, isPublic, concurrencyStamp } = editItem;
       reset({ name, isDefault, isPublic, concurrencyStamp });
     }

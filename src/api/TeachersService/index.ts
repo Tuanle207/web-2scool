@@ -32,6 +32,12 @@ const getAllTeachersSimpleList = async () =>  {
   return result;
 };
 
+const getFormableTeachers = async () =>  {
+  const apiService = await getApiService({ queryActiveCourse: true });
+  const result = await apiService.get<Util.PagingModel<Teacher.TeacherForSimpleListDto>>(Endpoint.getFormableTeachers());
+  return result;
+};
+
 const removeTeacher = async ({id}: {id: string}) => {
   const apiService = await getApiService();
   const result = await apiService.delete(Endpoint.RemoveTeacher(id));
@@ -48,6 +54,7 @@ export const TeachersService = {
   createTeacher,
   getAllTeachers,
   getAllTeachersSimpleList,
+  getFormableTeachers,
   getTeacherById,
   removeTeacher,
   updateTeacher,

@@ -168,7 +168,7 @@ const cols: GridColDef[] =  [
   },
   {
     field: 'isActive',
-    headerName: 'Hoạt động',
+    headerName: 'Kích hoạt',
     align: 'center',
     headerAlign: 'center',
     width: 160,
@@ -176,7 +176,7 @@ const cols: GridColDef[] =  [
       const isActive = params.value as boolean;
       if (isActive) {
         return (
-          <Tooltip title="Khóa học này đang hoạt động">
+          <Tooltip title="Khóa học này đang được kích hoạt">
             <DoneOutlineIcon color="primary"></DoneOutlineIcon>
           </Tooltip>
         );

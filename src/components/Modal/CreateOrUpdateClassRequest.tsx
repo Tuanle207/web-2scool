@@ -10,14 +10,13 @@ import {
   FormHelperText 
 } from '@material-ui/core';
 import AwesomeDebouncePromise from 'awesome-debounce-promise';
-import { Class, Course, Grade, Teacher } from '../../interfaces';
+import { Class, Grade, Teacher } from '../../interfaces';
 import { useDialogController } from '../../hooks';
 import { Controller, useForm } from 'react-hook-form';
 import { ClassesService, TeachersService } from '../../api';
 
 export interface CreateOrUpdateClassRequestProps {
   editItem?: Class.ClassDto;
-  courses: Course.CourseDto[];
   grades: Grade.GradeDto[];
   teachers: Teacher.TeacherForSimpleListDto[];
 }
@@ -26,7 +25,6 @@ const isNameAlreadyUsedDebounced = AwesomeDebouncePromise(ClassesService.isNameA
 
 const CreateOrUpdateClassRequest: FC<CreateOrUpdateClassRequestProps> = ({
   editItem,
-  courses,
   grades,
   teachers,
 }) => {
@@ -34,9 +32,8 @@ const CreateOrUpdateClassRequest: FC<CreateOrUpdateClassRequestProps> = ({
   const { control, reset, handleSubmit } = useForm<Class.CreateUpdateClassDto>({
     defaultValues: {
       name: '',
-      courseId: '',
       gradeId: '',
-      formTeacherId: '',
+      formTeacherId: undefined,
     }
   });
 
@@ -44,8 +41,8 @@ const CreateOrUpdateClassRequest: FC<CreateOrUpdateClassRequestProps> = ({
 
   useEffect(() => {
     if (!!editItem) {
-      const { name, courseId, gradeId, formTeacherId } = editItem;
-      reset({ name, courseId, gradeId, formTeacherId });
+      const { name, gradeId, formTeacherId } = editItem;
+      reset({ name, gradeId, formTeacherId });
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editItem]);
@@ -118,35 +115,6 @@ const CreateOrUpdateClassRequest: FC<CreateOrUpdateClassRequestProps> = ({
       <Box style={{marginBottom: 16}}>
         <Controller
           control={control}
-          name="courseId"
-          rules={{
-            required: {
-              value: true,
-              message: 'Khóa học là bắt buộc'
-            },
-          }}
-          render={({field, fieldState: { error }}) => (
-            <FormControl fullWidth error={!!error}>
-              <InputLabel required htmlFor="create-class-course">Khóa học</InputLabel>
-              <Select
-                {...field}
-                inputProps={{
-                  name: 'class-course',
-                  id: 'create-class-course',
-                }}
-              >
-              {
-                courses.map(el => (<MenuItem value={el.id}>{el.name}</MenuItem>))
-              }
-              </Select>
-              <FormHelperText>{error?.message}</FormHelperText>
-            </FormControl>
-          )}
-        />
-      </Box>
-      <Box style={{marginBottom: 16}}>
-        <Controller
-          control={control}
           name="gradeId"
           rules={{
             required: {
@@ -178,15 +146,11 @@ const CreateOrUpdateClassRequest: FC<CreateOrUpdateClassRequestProps> = ({
           control={control}
           name="formTeacherId"
           rules={{
-            required: {
-              value: true,
-              message: 'Giáo viên chủ nhiệm là bắt buộc'
-            },
             validate: validateNotAFormTeacher
           }}
-          render={({field, fieldState: { error }}) => (
+          render={({field, fieldState: { error }})   => (
             <FormControl fullWidth error={!!error}>
-              <InputLabel required htmlFor="create-class-teacher">Giáo viên</InputLabel>
+              <InputLabel htmlFor="create-class-teacher">Giáo viên chủ nhiệm</InputLabel>
               <Select
                 {...field}
                 inputProps={{

@@ -1,5 +1,5 @@
 import { FC, useEffect } from 'react';
-import { Box, Container, TextField } from '@material-ui/core';
+import { Box, Checkbox, Container, FormControl, FormControlLabel, Tooltip, TextField } from '@material-ui/core';
 import AwesomeDebouncePromise from 'awesome-debounce-promise';
 import DateFnsUtils from '@date-io/date-fns';
 import { MuiPickersUtilsProvider, KeyboardDatePicker } from '@material-ui/pickers';
@@ -8,7 +8,6 @@ import moment from 'moment';
 import { Course } from '../../interfaces';
 import { CoursesService } from '../../api';
 import { useDialogController } from '../../hooks';
-
 export interface CreateOrUpdateCourseRequestProps {
   editItem?: Course.CourseDto;
 }
@@ -24,7 +23,8 @@ const CreateOrUpdateCourseRequest: FC<CreateOrUpdateCourseRequestProps> = ({
       name: '',
       description: '',
       startTime: new Date(),
-      finishTime: moment().add(1, 'year').toDate()
+      finishTime: moment().add(1, 'year').toDate(),
+      fromActiveCourse: false
     },
   });
 
@@ -184,6 +184,29 @@ const CreateOrUpdateCourseRequest: FC<CreateOrUpdateCourseRequestProps> = ({
             />
           </Box>
         </MuiPickersUtilsProvider>
+        {
+          !editItem && (
+            <Box style={{marginBottom: 16}}>
+              <Controller
+                control={control}
+                name="fromActiveCourse"
+                rules={{
+                  required: "Bạn cần chọn loại vi phạm",
+                }}
+                render={({field: { value, onChange }, fieldState: { error },},) => (
+                  <Tooltip title="Dữ liệu sẽ được sao chép từ khóa học đang hoạt động.">
+                    <FormControl fullWidth variant="standard"  error={!!error} >
+                      <FormControlLabel
+                        control={<Checkbox color="primary" checked={value} onChange={(e) => onChange(e.target.checked)} />}
+                        label="Tạo từ khóa học hiện tại"
+                      />
+                    </FormControl>
+                  </Tooltip>
+                )}
+              />
+            </Box>
+          )
+        }
       </Container>
   );
 };

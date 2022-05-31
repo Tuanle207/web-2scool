@@ -30,7 +30,7 @@ import TenantManagement from '../views/TenantManagement';
 import Sidebar from '../components/Sidebar';
 import { policies } from '../appConsts';
 import { routes } from './routesDictionary';
-import { useEffect } from 'react';
+import CriteriasPage from '../views/CriteriasPage';
 
 const DashboardRouteDictionary = () => {
   return (
@@ -160,6 +160,11 @@ const DashboardRouteDictionary = () => {
         policyName={policies.Courses}
         component={RegulationsPage}
       />
+      <ProtectedRoute
+        path={routes.CriteriaManager}
+        policyName={policies.Courses}
+        component={CriteriasPage}
+      />
       <ProtectedRoute 
         path={routes.UsersManager}
         policyName={policies.AbpIdentityUsers}
@@ -185,15 +190,6 @@ const DashboardRouteDictionary = () => {
 };
 
 const DashboardRouter = () => {
-  useEffect(() => {
-    // return () => {
-    //   // clean signalr connection on component unmount
-    //   signalrService.closeAsync().then(() => {
-    //     console.log('signalr connection closed.')
-    //   });
-    // };
-  }, []);
-
   return (
     <Router>
       <div style={{ height: '100%' }}>

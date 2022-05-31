@@ -9,7 +9,7 @@ import Header from '../components/Header';
 import { toast } from 'react-toastify';
 import PageTitleBar from '../components/PageTitleBar';
 import { Class, Grade, Teacher } from '../interfaces';
-import { ClassesService, GradesService, DataImportService, CoursesService, TeachersService } from '../api';
+import { ClassesService, GradesService, DataImportService, TeachersService } from '../api';
 import { useDialog, useFetchV2 } from '../hooks';
 import CreateOrUpdateClassRequest, { CreateOrUpdateClassRequestProps } from '../components/Modal/CreateOrUpdateClassRequest';
 import { comparers, dataGridLocale } from '../appConsts';
@@ -78,14 +78,12 @@ const RowMenuCell = (props: RowMenuProps) => {
   const initUpdateData = async (): Promise<CreateOrUpdateClassRequestProps | null> => {
     try {
       busyService.busy(true);
-      const { items: courses } = await CoursesService.getAllCourses({});
       const { items: grades } = await GradesService.getAllGrades({});
-      const { items: teachers } = await TeachersService.getAllTeachersSimpleList();
+      const { items: teachers } = await TeachersService.getFormableTeachers();
       const classId = id.toString();
       const editItem = await ClassesService.getClassById(classId);
       busyService.busy(false);
       const data: CreateOrUpdateClassRequestProps = {
-        courses,
         grades,
         teachers,
         editItem
@@ -254,12 +252,10 @@ const ClassesPage = () => {
   const initCreationData = async (): Promise<CreateOrUpdateClassRequestProps | null> => {
     try {
       busyService.busy(true);
-      const { items: courses } = await CoursesService.getAllCourses({});
       const { items: grades } = await GradesService.getAllGrades({});
-      const { items: teachers } = await TeachersService.getAllTeachersSimpleList();
+      const { items: teachers } = await TeachersService.getFormableTeachers();
       busyService.busy(false);
       const data: CreateOrUpdateClassRequestProps = {
-        courses,
         grades,
         teachers,
       };
