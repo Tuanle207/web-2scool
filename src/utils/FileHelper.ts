@@ -23,4 +23,5 @@ export const saveBlobAsFile = (data: Blob, filename: string) => {
   link.setAttribute('download', `${filename}.${ext || 'txt'}`);
   document.body.appendChild(link);
   link.click();
+  document.body.removeChild(link);
 };

@@ -50,6 +50,7 @@ const initialState: ModalState = {
   visible: false,
   formControl: undefined,
   handleSubmit: undefined,
+  height: undefined,
   accept: () => {},
   cancel: () => {},
 };
