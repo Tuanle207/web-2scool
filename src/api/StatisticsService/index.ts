@@ -40,6 +40,7 @@ const getClassesFaults = async (input: Util.DateFilterDto) => {
   const result = await apiService.get<Util.PagingModel<Stats.DcpClassFault>>(Endpoint.GetClassesFaults(query));
   return result;
 };
+
 const getCommonFaults = async (input: Util.DateFilterDto) => {
   const apiService = await getApiService({ queryActiveCourse: true });
   const query = `?StartTime=${formatQueryDate(input.startTime)}&EndTime=${formatQueryDate(input.endTime)}`;
@@ -47,6 +48,7 @@ const getCommonFaults = async (input: Util.DateFilterDto) => {
   return result;
   
 };
+
 const getStudentsWithMostFaults = async (input: Util.DateFilterDto) => {
   const apiService = await getApiService({ queryActiveCourse: true });
   const query = `?StartTime=${formatQueryDate(input.startTime)}&EndTime=${formatQueryDate(input.endTime)}`;
@@ -109,6 +111,27 @@ const getStudentsWithMostFaultsExcel = async (input: Util.DateFilterDto) => {
   saveBlobAsFile(blob, `thong-ke-hoc-sinh-vi-pham-${getCurrentTimeString()}`);
 };
 
+const getClassFaultDetails = async (classId: string, input: Util.DateFilterDto) => {
+  const apiService = await getApiService({ queryActiveCourse: true });
+  const query = `?StartTime=${formatQueryDate(input.startTime)}&EndTime=${formatQueryDate(input.endTime)}`;
+  const result = await apiService.get<Util.PagingModel<Stats.ClassFaultDetail>>(Endpoint.GetClassFaultDetails(classId, query));
+  return result;
+};
+
+const getRegulationFaultDetails = async (regulationId: string, input: Util.DateFilterDto) => {
+  const apiService = await getApiService({ queryActiveCourse: true });
+  const query = `?StartTime=${formatQueryDate(input.startTime)}&EndTime=${formatQueryDate(input.endTime)}`;
+  const result = await apiService.get<Util.PagingModel<Stats.ClassFaultDetail>>(Endpoint.GetRegulationFaultDetails(regulationId, query));
+  return result;
+};
+
+const getStudentFaultDetails = async (studentId: string, input: Util.DateFilterDto) => {
+  const apiService = await getApiService({ queryActiveCourse: true });
+  const query = `?StartTime=${formatQueryDate(input.startTime)}&EndTime=${formatQueryDate(input.endTime)}`;
+  const result = await apiService.get<Util.PagingModel<Stats.ClassFaultDetail>>(Endpoint.GetStudentFaultDetails(studentId, query));
+  return result;
+};
+
 export const StatisticsService = {
   getOverallRanking,
   getDcpRanking,
@@ -123,4 +146,7 @@ export const StatisticsService = {
   getClassesFaultsExcel,
   getCommonFaultsExcel,
   getStudentsWithMostFaultsExcel,
+  getClassFaultDetails,
+  getRegulationFaultDetails,
+  getStudentFaultDetails,
 };

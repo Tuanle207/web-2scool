@@ -127,6 +127,8 @@ const DCPReportSchedule = () => {
   const [updatedTime, setUpdatedTime] = useState<Date>();
   const [creatorInfo, setCreatorInfo] = useState<Account.SimpleAccountDto>();
 
+  const [classFilter, setClassFilter] = useState('');
+
   useEffect(() => {
     
     document.title = '2Cool | Phân công trực cờ đỏ';
@@ -168,6 +170,8 @@ const DCPReportSchedule = () => {
       <Grid item >
         <Header
           pageName="Phân công trực cờ đỏ"
+          searchBarPlaceholder="Tìm kiếm lớp..."
+          onTextChange={(text) => setClassFilter(text)}
         />
       </Grid>
       <Grid item container direction='column' style={{ flexGrow: 1 }}>
@@ -203,7 +207,7 @@ const DCPReportSchedule = () => {
           <Container className={classes.root}>
             <DataGrid
               columns={cols}
-              rows={data}
+              rows={data.filter(x => x.classAssigned.name.includes(classFilter))}
               loading={loading}
               error={error}
               paginationMode='server'

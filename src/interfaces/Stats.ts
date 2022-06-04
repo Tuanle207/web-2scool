@@ -64,4 +64,34 @@ export namespace Stats {
   export interface LineChartStatDto {
     items: Util.IObject<LineChartStat[]>;
   }
+
+  export interface ClassFaultDetail {
+    id: string;
+    regulationId: string;
+    regulationName: string;
+    criteriaName: string;
+    penaltyPoints: number;
+    creationTime: Date;
+    studentNames: string;
+  }
+
+  export interface FaultDetail {
+    id: string;
+    penaltyPoints: number;
+    creationTime: string;
+    studentNames: string;
+    className: string;
+  }
+
+  export interface StudentFaultDetail {
+    id: string;
+    regulationName: string;
+    criteriaName: string;
+    penaltyPoints: number;
+    count: number;
+    creationTime: string | null;
+    className: string;
+  }
+
+
 }

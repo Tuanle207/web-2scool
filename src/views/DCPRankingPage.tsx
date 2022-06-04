@@ -539,7 +539,6 @@ const DCPRankingPage = () => {
             />
             )
           }
-            
           </Container>
         </Grid>
       </Grid>

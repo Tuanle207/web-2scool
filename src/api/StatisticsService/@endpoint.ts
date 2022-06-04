@@ -25,6 +25,13 @@ const Endpoint = {
     `/api/app/statistics/common-faults-excel${query}`,
   GetStudentsWithMostFaultsExcel: (query: string) =>
     `/api/app/statistics/students-with-most-faults-excel${query}`,
+
+  GetClassFaultDetails: (classId: string, query: string) =>
+    `/api/app/statistics/class-fault-details/${classId}?${query}`,
+  GetRegulationFaultDetails: (regulationId: string, query: string) =>
+    `/api/app/statistics/regulation-fault-details/${regulationId}?${query}`,
+  GetStudentFaultDetails: (studentId: string, query: string) =>
+    `/api/app/statistics/student-fault-details/${studentId}?${query}`,
 };
 
 export default Endpoint;

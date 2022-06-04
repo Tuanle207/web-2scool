@@ -397,7 +397,7 @@ const DCPReportPage = () => {
             </Grid>
             <Grid item container justify="flex-end" className={classes.dcpReportAction} >
               {
-                haveDcpRemovePermission &&(data.creatorId === currentAccount.id &&  data.status === dcpReportStatus.Created) && (
+                haveDcpRemovePermission &&(data.creatorId === currentAccount?.id &&  data.status === dcpReportStatus.Created) && (
                   <Button 
                     className={`${classes.rejectBtn} ${classes.acceptBtn}`} 
                     style={{ marginRight: 16 }}
@@ -408,7 +408,7 @@ const DCPReportPage = () => {
                 )
               }
               {
-                haveDcpUpdatePermission &&(data.creatorId === currentAccount.id &&  data.status === dcpReportStatus.Created) && (
+                haveDcpUpdatePermission &&(data.creatorId === currentAccount?.id &&  data.status === dcpReportStatus.Created) && (
                   <Button
                     style={{ marginRight: 16 }}
                     variant={'contained'} 

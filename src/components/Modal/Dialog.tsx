@@ -20,6 +20,7 @@ import styles from '../../assets/jss/components/Modal';
 export interface ModalOptions {
   component?: JSX.Element;
   title?: string;
+  height?: string | number;
   message?: string;
   acceptText?: string;
   cancelText?: string;
@@ -158,8 +159,9 @@ class Dialog extends Component<{}, ModalState> {
         >
           <Box style={{ marginBottom: 20 }}>
             <Grid item container direction='row' justify='space-between' alignItems='center' style={styles.titleBar}>
-              <Typography variant='h6'>{this.state.title}</Typography>
+              <Typography style={{ marginRight: '2.4rem' }} variant='h6'>{this.state.title}</Typography>
               <IconButton
+                style={styles.closeButton}
                 onClick={() => this.onCancel()}
               >
                 <CloseIcon />
@@ -181,7 +183,7 @@ class Dialog extends Component<{}, ModalState> {
             }
           </Box>
           <Box>
-            <Grid item container style={styles.content}>
+            <Grid item container style={this.state.height ? {...styles.content, height: this.state.height }: styles.content}>
             {
               !!this.state.message ? (
                 <p>{this.state.message}</p>
@@ -200,14 +202,15 @@ class Dialog extends Component<{}, ModalState> {
               {
                 !this.state.noCancelButton && (
                   <Grid item>
-                    <Button onClick={() => this.onCancel()}>
+                    <Button disableRipple disableTouchRipple disableFocusRipple 
+                      onClick={() => this.onCancel()}>
                       {this.state.cancelText || 'Hủy'}
                     </Button>
                   </Grid>
                 )
               }
               {
-                !this.state.noCancelButton && (
+                !this.state.noAcceptButton && (
                   <Grid item>
                     <Button
                       variant='contained' 

@@ -13,8 +13,13 @@ const modalStyles: {[key: string]: CSSProperties} = {
     minWidth: 400,
   },
   titleBar: {
+    position: 'relative',
     borderBottom: `1px solid ${theme.palette.divider}`,
     marginBottom: theme.spacing(1),
+  },
+  closeButton: {
+    position: 'absolute',
+    right: 0,
   },
   buttonGroup: {
     marginTop: theme.spacing(2),

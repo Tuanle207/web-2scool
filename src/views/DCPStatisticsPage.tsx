@@ -3,11 +3,11 @@ import { Container, Grid, Box, Select,
   IconButton, Chip, Tooltip, FormControl, MenuItem, Paper, Badge } from '@material-ui/core';
 import { MuiPickersUtilsProvider, KeyboardDatePicker } from '@material-ui/pickers';
 import DateFnsUtils from '@date-io/date-fns';
-import React, { ChangeEvent } from 'react';
+import React, { ChangeEvent, useEffect, useMemo, useState } from 'react';
 import Header from '../components/Header';
-import { DataGrid, GridColDef, GridRowData } from '@material-ui/data-grid';
+import { DataGrid, GridApi, GridCellParams, GridColDef, GridRowData, GridRowId } from '@material-ui/data-grid';
 import { StatisticsService } from '../api';
-import { getPreviousMonday } from '../utils/TimeHelper';
+import { formatFullDateTime, getPreviousMonday } from '../utils/TimeHelper';
 import { FindInPage } from '@material-ui/icons';
 import GetAppIcon from '@material-ui/icons/GetApp';
 import { ReactComponent as FilterIcon } from '../assets/img/filter.svg';
@@ -15,7 +15,145 @@ import { sleep } from '../utils/SetTimeOut';
 import { Stats } from '../interfaces';
 import useStyles from '../assets/jss/views/DCPStatisticsPage';
 import { dataGridLocale } from '../appConsts';
+import { busyService, dialogService } from '../services';
+import StatsDetailView, { StatsDetailViewProps } from '../components/Modal/StatsDetailView';
+import { toast } from 'react-toastify';
 
+interface RowMenuProps {
+  api: GridApi;
+  id: GridRowId;
+}
+
+const ClassRowMenuCell = (props: RowMenuProps) => {
+  const { api, id } = props;
+
+  const onDetailClick = async () => {
+
+    try {
+      busyService.busy(true);
+      const classId = id.toString();
+      const className = (api as GridApi).getCellValue(id, 'className');
+      const startTime = (api as GridApi).getCellValue(id, 'startTime') as Date;
+      const endTime = (api as GridApi).getCellValue(id, 'endTime') as Date;
+  
+      const input: StatsDetailViewProps = {
+        dataType: 'ClassFaultDetail',
+        data: (await StatisticsService.getClassFaultDetails(classId, {
+          startTime,
+          endTime,
+        })).items,
+      };
+  
+      dialogService.show(input, {
+        title: `Chi tiết vi phạm ${className} từ ${formatFullDateTime(startTime.toLocaleString())} đến ${formatFullDateTime(endTime.toLocaleString())}`,
+        renderFormComponent: StatsDetailView,
+        noCancelButton: true,
+        acceptText: 'Đóng',
+        type: 'data',
+        height: '50vh'
+      });
+    } catch {
+      toast.error('Đã có lỗi xảy ra, vui lòng thử lại sau');
+    } finally {
+      busyService.busy(false);
+    }
+  };
+
+  return (
+    <Tooltip title='Xem chi tiết'>
+      <IconButton color="primary" size="small" onClick={onDetailClick}>
+        <FindInPage fontSize="small" />
+      </IconButton>
+    </Tooltip>
+  );
+};
+
+const RegulationRowMenuCell = (props: RowMenuProps) => {
+  const { api, id } = props;
+
+  const onDetailClick = async () => {
+    try {
+      busyService.busy(true);
+      const regulationId = id.toString();
+      const regulationName = (api as GridApi).getCellValue(id, 'name');
+      const startTime = (api as GridApi).getCellValue(id, 'startTime') as Date;
+      const endTime = (api as GridApi).getCellValue(id, 'endTime') as Date;
+
+      const input: StatsDetailViewProps = {
+        dataType: 'RegulationFaultDetail',
+        data: (await StatisticsService.getRegulationFaultDetails(regulationId, {
+          startTime,
+          endTime,
+        })).items,
+      };
+
+      dialogService.show(input, {
+        title: `Chi tiết vi phạm ${regulationName} từ ${formatFullDateTime(startTime.toLocaleString())} đến ${formatFullDateTime(endTime.toLocaleString())}`,
+        renderFormComponent: StatsDetailView,
+        noCancelButton: true,
+        acceptText: 'Đóng',
+        type: 'data',
+        height: '50vh'
+      });
+    } catch {
+      toast.error('Đã có lỗi xảy ra, vui lòng thử lại sau');
+    } finally {
+      busyService.busy(false);
+    }
+  };
+
+  return (
+    <Tooltip title='Xem chi tiết'>
+      <IconButton color="primary" size="small" onClick={onDetailClick}>
+        <FindInPage fontSize="small" />
+      </IconButton>
+    </Tooltip>
+  );
+};
+
+const StudentRowMenuCell = (props: RowMenuProps) => {
+  const { api, id } = props;
+
+  const onDetailClick = async () => {
+    try {
+      busyService.busy(true);
+      const studentId = id.toString();
+      const studentName = (api as GridApi).getCellValue(id, 'studentName');
+      const className = (api as GridApi).getCellValue(id, 'className');
+      const startTime = (api as GridApi).getCellValue(id, 'startTime') as Date;
+      const endTime = (api as GridApi).getCellValue(id, 'endTime') as Date;
+
+      const input: StatsDetailViewProps = {
+        dataType: 'StudentFaultDetail',
+        data: (await StatisticsService.getStudentFaultDetails(studentId, {
+          startTime,
+          endTime,
+        })).items,
+      };
+
+      dialogService.show(input, {
+        title: `Chi tiết vi phạm của học sinh ${studentName} - ${className} từ ${formatFullDateTime(startTime.toLocaleString())} đến ${formatFullDateTime(endTime.toLocaleString())}`,
+        renderFormComponent: StatsDetailView,
+        noCancelButton: true,
+        acceptText: 'Đóng',
+        type: 'data',
+        height: '50vh'
+      });
+    } catch {
+      toast.error('Đã có lỗi xảy ra, vui lòng thử lại sau');
+    } finally {
+      busyService.busy(false);
+    }
+  };
+
+  return (
+    <Tooltip title='Xem chi tiết'>
+      <IconButton color="primary" size="small" onClick={onDetailClick}>
+        <FindInPage fontSize="small" />
+      </IconButton>
+    </Tooltip>
+  );
+};
 
 const classFaultsStatsCols: GridColDef[] = [
   {
@@ -47,15 +185,7 @@ const classFaultsStatsCols: GridColDef[] = [
     disableClickEventBubbling: true,
     hideSortIcons: true,
     align: 'center',
-    renderCell: (params) => {
-      return (
-        <Tooltip title='Xem chi tiết'>
-          <IconButton color='primary'>
-            <FindInPage />
-          </IconButton>
-        </Tooltip>
-      )
-    }
+    renderCell: ClassRowMenuCell,
   }
 ];
 
@@ -85,15 +215,7 @@ const commonFaultsStasCols: GridColDef[] = [
     hideSortIcons: true,
     sortable: false,
     align: 'center',
-    renderCell: (params) => {
-      return (
-        <Tooltip title='Xem chi tiết'>
-          <IconButton color='primary'>
-            <FindInPage />
-          </IconButton>
-        </Tooltip>
-      )
-    }
+    renderCell: RegulationRowMenuCell,
   }
 ];
 
@@ -120,48 +242,53 @@ const studentsWithMostFaultsStasCols: GridColDef[] = [
     disableClickEventBubbling: true,
     hideSortIcons: true,
     align: 'center',
-    renderCell: (params) => {
-      return (
-        <Tooltip title='Xem chi tiết'>
-          <IconButton color='primary'>
-            <FindInPage />
-          </IconButton>
-        </Tooltip>
-      )
-    }
+    renderCell: StudentRowMenuCell,
   }
 ];
 
 type StatsType = 'ClassFaults' | 'CommonFaults' | 'StudentWithMostFaults';
-type ViewType = 'ByWeek' | 'ByMonth' | 'BySemester';
+type ViewType = 'ByWeek' | 'ByMonth' | 'BySemester' | 'Custom';
+
+interface DcpClassFaultExtension extends Stats.DcpClassRanking {
+  startTime: Date;
+  endTime: Date;
+}
+
+interface DcpClassFaultExtension extends Stats.CommonDcpFault {
+  startTime: Date;
+  endTime: Date;
+}
+
+interface DcpClassFaultExtension extends Stats.StudentWithMostFaults {
+  startTime: Date;
+  endTime: Date;
+}
 
 const DCPStatisticsPage = () => {
 
   const classes = useStyles();
 
-  const [dateFilter, setDateFilter] = React.useState<{
+  const [dateFilter, setDateFilter] = useState<{
     startTime: Date | null,
     endTime: Date | null
   }>({startTime: getPreviousMonday(new Date()), endTime: new Date()})
 
 
-  const [classFaultsStats, setClassFaultsStats] 
-    = React.useState<Stats.DcpClassFault[]>([]);
-  const [commonFaultsStats, setCommonFaultsStats] 
-    = React.useState<Stats.CommonDcpFault[]>([]);
-  const [studentsWithMostFaultsStats, setStudentsWithMostFaultsStats] 
-    = React.useState<Stats.StudentWithMostFaults[]>([]);
-  const [loading, setLoading] = React.useState(false);
+  const [classFaultsStats, setClassFaultsStats] = useState<DcpClassFaultExtension[]>([]);
+  const [commonFaultsStats, setCommonFaultsStats] = useState<DcpClassFaultExtension[]>([]);
+  const [studentsWithMostFaultsStats, setStudentsWithMostFaultsStats] = useState<DcpClassFaultExtension[]>([]);
+  const [loading, setLoading] = useState(false);
 
+  const [textFilter, setTextFilter] = useState('');
   
-  const [statsType, setStatsType] = React.useState<StatsType>('ClassFaults');
-  const [viewType, setViewType] = React.useState<ViewType>('ByWeek');
+  const [statsType, setStatsType] = useState<StatsType>('ClassFaults');
+  const [viewType, setViewType] = useState<ViewType>('ByWeek');
 
-  React.useEffect(() => {
+  useEffect(() => {
     document.title = '2Scool | Thống kê nề nếp';
   }, []);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (dateFilter && dateFilter.startTime && dateFilter.endTime)  {
       fetchData();
     }
@@ -267,7 +394,11 @@ const DCPStatisticsPage = () => {
         endTime: dateFilter.endTime!
       });
 
-      fns.setState(res.items);  
+      fns.setState(res.items.map((x: any) => ({
+        ...x,
+        startTime: dateFilter.startTime,
+        endTime: dateFilter.endTime,
+      })));  
     } catch (err) {
       console.log(err);
     } finally {
@@ -297,13 +428,36 @@ const DCPStatisticsPage = () => {
         endTime: dateFilter.endTime!
       });
     }
-  }
+  };
+
+  const filterByCustomDates = (dateField: string, date: Date | null) => {
+    setDateFilter((prev) => ({
+      ...dateFilter,
+      [dateField]: date
+    }));
+    setViewType('Custom');
+  };
+
+  const searchPlaceholder = useMemo(() => {
+    switch (statsType) {
+      case 'ClassFaults':
+        return 'Tìm kiếm lớp...';
+      case 'CommonFaults':
+        return 'Tìm kiếm quy định...';
+      case 'StudentWithMostFaults':
+        return 'Tìm kiếm học sinh...';
+      default:
+      return 'Tìm kiếm...';
+    }
+  }, [statsType]);
 
   return (
     <Grid style={{ background: '#fff', flexGrow: 1 }} item container direction="column" >
       <Grid item >
         <Header
           pageName="Thống kê nề nếp"
+          searchBarPlaceholder={searchPlaceholder}
+          onTextChange={(text) => setTextFilter(text)}
         />
       </Grid>
       <Grid item container direction="column" style={{ flex: 1, minHeight: 0, flexWrap: 'nowrap', background: "#e8e8e8" }}>
@@ -366,7 +520,7 @@ const DCPStatisticsPage = () => {
                     id='get-stats-report-start'
                     placeholder='Bắt đầu từ'
                     value={dateFilter.startTime}
-                    onChange={() => {}}
+                    onChange={(date) => filterByCustomDates('startTime', date)}
                     KeyboardButtonProps={{
                       'aria-label': 'dcp - rankings - start end date',
                     }}
@@ -384,7 +538,7 @@ const DCPStatisticsPage = () => {
                     id='get-stats-report-end'
                     placeholder='Đến ngày'
                     value={dateFilter.endTime}
-                    onChange={() => {}}
+                    onChange={(date) => filterByCustomDates('endTime', date)}
                     KeyboardButtonProps={{
                       'aria-label': 'dcp - rankings - change end date',
                     }}
@@ -406,8 +560,8 @@ const DCPStatisticsPage = () => {
               statsType === 'ClassFaults' && (
                 <DataGrid
                   columns={classFaultsStatsCols}
-                  rows={classFaultsStats}
-                  getRowId={(row: GridRowData) => (row as any).classId}
+                  rows={classFaultsStats.filter(x => x.className.includes(textFilter))}
+                  getRowId={(row: GridRowData) => (row as Stats.DcpClassFault).classId}
                   paginationMode='server'
                   hideFooterPagination
                   loading={loading}
@@ -420,7 +574,8 @@ const DCPStatisticsPage = () => {
               statsType === 'CommonFaults' && (
                 <DataGrid
                   columns={commonFaultsStasCols}
-                  rows={commonFaultsStats}
+                  rows={commonFaultsStats.filter(x => x.name.includes(textFilter))}
+                  getRowId={(row: GridRowData) => (row as Stats.CommonDcpFault).id}
                   paginationMode='server'
                   hideFooterPagination
                   loading={loading}
@@ -433,7 +588,8 @@ const DCPStatisticsPage = () => {
               statsType === 'StudentWithMostFaults' && (
                 <DataGrid
                   columns={studentsWithMostFaultsStasCols}
-                  rows={studentsWithMostFaultsStats}
+                  rows={studentsWithMostFaultsStats.filter(x => x.studentName.includes(textFilter))}
+                  getRowId={(row: GridRowData) => (row as Stats.StudentWithMostFaults).id}
                   paginationMode='server'
                   hideFooterPagination
                   loading={loading}

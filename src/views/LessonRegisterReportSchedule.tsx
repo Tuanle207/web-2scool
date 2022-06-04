@@ -161,6 +161,8 @@ const LessonRegisterReportSchedule = () => {
   const [ classData, setClassData ] = useState<Class.ClassForSimpleListDto[]>([]);
   const [ assignClasses, setAssignClasses ] = useState<IAssignClass[]>([]);
 
+  const [classFilter, setClassFilter] = useState('');
+
   const [ data, setData ] = useState<TaskAssignment.TaskAssignmentDto[]>([]);
   const [ loading, setLoading ] = useState(true);
 
@@ -331,6 +333,8 @@ const LessonRegisterReportSchedule = () => {
       <Grid item >
         <Header
           pageName="Phân công giữ sổ đầu bài"
+          searchBarPlaceholder="Tìm kiếm lớp..."
+          onTextChange={(text) => setClassFilter(text)}
         />
       </Grid>
       <Grid item container direction='column' style={{ flex: 1, minHeight: 0, flexWrap: 'nowrap', background: "#e8e8e8" }}>
@@ -359,7 +363,7 @@ const LessonRegisterReportSchedule = () => {
           <Container className={classes.datagridContainer}>
             <DataGrid
               columns={cols}
-              rows={data}
+              rows={data.filter(x => x.classAssigned.name.includes(classFilter))}
               hideFooter
               hideFooterPagination
               loading={loading}
