@@ -29,9 +29,6 @@ const useStyles = makeStyles(theme => ({
         height: 8
       }
     },
-    '& .MuiDataGrid-row.Mui-selected': {
-      backgroundColor: theme.palette.primary.light,
-    },
     '& .MuiDataGrid-iconSeparator': {
       color: theme.palette.divider,
       

@@ -143,7 +143,7 @@ const cols: GridColDef[] =  [
     field: 'formTeacher',
     headerName: 'Giáo viên chủ nhiệm',
     width: 200,
-    valueFormatter: (params: GridValueFormatterParams) => (params.value as Teacher.TeacherDto).name as string
+    valueFormatter: (params: GridValueFormatterParams) => (params.value as Teacher.TeacherDto)?.name as string || 'Chưa được phân công'
   },
   {
     field: 'noStudents',

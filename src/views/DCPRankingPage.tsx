@@ -1,12 +1,15 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useState, useEffect } from 'react';
+import { useState, useEffect, ChangeEvent } from 'react';
 import { Container, Grid, Box, IconButton, Chip, Tooltip, Paper,
-  Badge } from '@material-ui/core';
+  Badge, 
+  FormControl,
+  Select,
+  MenuItem} from '@material-ui/core';
 import { MuiPickersUtilsProvider, KeyboardDatePicker } from '@material-ui/pickers';
 import DateFnsUtils from '@date-io/date-fns';
 import Header from '../components/Header';
 import { Stats } from '../interfaces';
-import { DataGrid, GridColDef, GridRowParams } from '@material-ui/data-grid';
+import { DataGrid, GridCellParams, GridColDef, GridRowParams } from '@material-ui/data-grid';
 import { StatisticsService } from '../api';
 import { getPreviousMonday } from '../utils/TimeHelper';
 import { FindInPage } from '@material-ui/icons';
@@ -14,9 +17,11 @@ import GetAppIcon from '@material-ui/icons/GetApp';
 import { ReactComponent as FilterIcon } from '../assets/img/filter.svg';
 import useStyles from '../assets/jss/views/DCPRankingPage';
 import { dataGridLocale } from '../appConsts';
+import { ReactComponent as Top1Icon } from '../assets/img/top-1.svg';
+import { ReactComponent as Top2Icon } from '../assets/img/top-2.svg';
+import { ReactComponent as Top3Icon } from '../assets/img/top-3.svg';
 
-
-const cols: GridColDef[] = [
+const overallCols: GridColDef[] = [
   {
     field: 'classId',
     headerName: 'Mã lớp',
@@ -27,7 +32,24 @@ const cols: GridColDef[] = [
     headerName: 'Thứ hạng',
     width: 120,
     align: 'center',
-    headerAlign: 'right'
+    headerAlign: 'right',
+    renderCell: (params: GridCellParams) => {
+      const topIcons = {
+        1: Top1Icon,
+        2: Top2Icon,
+        3: Top3Icon
+      } as any;
+      const value = params.value;
+      if (typeof value === 'number' && [1,2,3].includes(value)) {
+        const Icon = topIcons[value];
+        return (
+          <Grid container justify="center" alignItems="center">
+            <Icon />
+          </Grid>
+        );
+      }
+      return <div>{value}</div>
+    }
   },
   {
     field: 'className',
@@ -80,39 +102,149 @@ const cols: GridColDef[] = [
     width: 150,
     align: 'center',
     headerAlign: 'right'
-  },
-  {
-    field: '',
-    headerName: 'Chi tiết',
-    // disableClickEventBubbling: true,
-    hideSortIcons: true,
-    align: 'center',
-    renderCell: (params) => {
-      return (
-        <Tooltip title='Xem chi tiết'>
-          <IconButton color='primary'>
-            <FindInPage />
-          </IconButton>
-        </Tooltip>
-      )
-    }
   }
 ];
 
-type ViewType = 'ByWeek' | 'ByMonth' | 'BySemester';
+const dcpCols: GridColDef[] = [
+  {
+    field: 'classId',
+    headerName: 'Mã lớp',
+    hide: true
+  },
+  {
+    field: 'ranking',
+    headerName: 'Thứ hạng',
+    width: 120,
+    align: 'center',
+    headerAlign: 'right',
+    renderCell: (params: GridCellParams) => {
+      const topIcons = {
+        1: Top1Icon,
+        2: Top2Icon,
+        3: Top3Icon
+      } as any;
+      const value = params.value;
+      if (typeof value === 'number' && [1,2,3].includes(value)) {
+        const Icon = topIcons[value];
+        return (
+          <Grid container justify="center" alignItems="center">
+            <Icon />
+          </Grid>
+        );
+      }
+      return <div>{value}</div>
+    }
+  },
+  {
+    field: 'className',
+    headerName: 'Lớp',
+    width: 120,
+  },
+  {
+    field: 'formTeacherName',
+    headerName: 'Giáo viên chủ nhiệm',
+    width: 200
+  },
+  {
+    field: 'faults',
+    headerName: 'Lượt vi phạm',
+    width: 150,
+    align: 'center',
+    headerAlign: 'center'
+  },
+  {
+    field: 'penaltyPoints',
+    headerName: 'Điểm trừ',
+    width: 150,
+    align: 'center',
+    headerAlign: 'center'
+  },
+  {
+    field: 'dcpPoints',
+    headerName: 'Điểm nề nếp',
+    width: 150,
+    align: 'center',
+    headerAlign: 'center'
+  },
+];
+
+const lrCols: GridColDef[] = [
+  {
+    field: 'classId',
+    headerName: 'Mã lớp',
+    hide: true
+  },
+  {
+    field: 'ranking',
+    headerName: 'Thứ hạng',
+    width: 120,
+    align: 'center',
+    headerAlign: 'right',
+    renderCell: (params: GridCellParams) => {
+      const topIcons = {
+        1: Top1Icon,
+        2: Top2Icon,
+        3: Top3Icon
+      } as any;
+      const value = params.value;
+      if (typeof value === 'number' && [1,2,3].includes(value)) {
+        const Icon = topIcons[value];
+        return (
+          <Grid container justify="center" alignItems="center">
+            <Icon />
+          </Grid>
+        );
+      }
+      return <div>{value}</div>
+    }
+  },
+  {
+    field: 'className',
+    headerName: 'Lớp',
+    width: 120,
+  },
+  {
+    field: 'formTeacherName',
+    headerName: 'Giáo viên chủ nhiệm',
+    width: 200
+  },
+  {
+    field: 'totalAbsence',
+    headerName: 'Lượt vắng',
+    width: 120,
+    align: 'center',
+    headerAlign: 'center'
+  },
+  {
+    field: 'lrPoints',
+    headerName: 'Điểm sổ đầu bài',
+    width: 180,
+    align: 'center',
+    headerAlign: 'center'
+  },
+];
+
+interface DateFilter {
+  startTime: Date | null,
+  endTime: Date | null
+}
+
+type ViewType = 'ByWeek' | 'ByMonth' | 'BySemester' | 'Custom';
+type RankingType = 'DCP' | 'LR' | 'OVERALL';
 
 const DCPRankingPage = () => {
 
   const classes = useStyles();
 
-  const [dateFilter, setDateFilter] = useState<{
-    startTime: Date | null,
-    endTime: Date | null
-  }>({startTime: getPreviousMonday(new Date()), endTime: new Date()})
+  const [dateFilter, setDateFilter] = useState<DateFilter>({startTime: getPreviousMonday(new Date()), endTime: new Date()})
 
-  const [data, setData] = useState<Stats.OverallClassRanking[]>([]);
+  const [overalRankings, setOveralRankings] = useState<Stats.OverallClassRanking[]>([]);
+  const [dcpRankings, setDcpRankings] = useState<Stats.DcpClassRanking[]>([]);
+  const [lrRankings, setLrRankings] = useState<Stats.LrClassRanking[]>([]);
   const [loading, setLoading] = useState(false);
   
+  const [classFilter, setClassFilter] = useState<string>('');
+  const [rankingType, setRankingType] = useState<RankingType>('OVERALL');
   const [viewType, setViewType] = useState<ViewType>('ByWeek');
 
   useEffect(() => {
@@ -164,17 +296,43 @@ const DCPRankingPage = () => {
     }
   };
 
+  const handleRankingTypeChange = (e: ChangeEvent<any>) => {
+    const value = e.target.value as RankingType;
+    if (value !== rankingType) {
+      setRankingType(value);
+      setViewType('ByWeek');
+      handleWeekFilter();
+    }
+  };
+
   const fetchData = async () => {
     setLoading(true);
-
     try {
+      const fns: {fetchFn: Function; setState: Function;} = {
+        fetchFn: StatisticsService.getOverallRanking,
+        setState: setOveralRankings,
+      };
+      switch (rankingType) {
+        case 'DCP':
+          fns.fetchFn = StatisticsService.getDcpRanking;
+          fns.setState = setDcpRankings;
+          break;
+        case 'LR':
+          fns.fetchFn = StatisticsService.getLrRanking;
+          fns.setState = setLrRankings;
+          break;
+        case 'OVERALL':
+          fns.fetchFn = StatisticsService.getOverallRanking;
+          fns.setState = setOveralRankings;
+          break;
+      }
 
-      const res = await StatisticsService.getOverallRanking({
+      const res = await fns.fetchFn({
         startTime: dateFilter.startTime!,
         endTime: dateFilter.endTime!
       });
 
-      setData(res.items);  
+      fns.setState(res.items);  
     } catch (err) {
       console.log(err);
     } finally {
@@ -183,23 +341,27 @@ const DCPRankingPage = () => {
   };
 
   const handleDownloadFile = () => {
-    StatisticsService.getOverallRankingExcel({
-      startTime: dateFilter.startTime!,
-      endTime: dateFilter.endTime!
-    });
-  };
-
-
-  const getRowClass = (param: GridRowParams): string => {
-    const ranking = param.getValue('ranking') as number;
-    if (ranking === 1) {
-      return classes.top1Item;
-    } else if (ranking === 2){
-      return classes.top2Item;
-    } else if  (ranking === 3){
-      return classes.top3Item;
+    if (rankingType === 'OVERALL') {
+      StatisticsService.getOverallRankingExcel({
+        startTime: dateFilter.startTime!,
+        endTime: dateFilter.endTime!
+      });
+    } else if (rankingType === 'DCP') {
+      StatisticsService.getDcpRankingExcel({
+        startTime: dateFilter.startTime!,
+        endTime: dateFilter.endTime!
+      });
+    } else if (rankingType === 'LR') {
+      StatisticsService.getLrRankingExcel({
+        startTime: dateFilter.startTime!,
+        endTime: dateFilter.endTime!
+      });
+    } else {
+      StatisticsService.getOverallRankingExcel({
+        startTime: dateFilter.startTime!,
+        endTime: dateFilter.endTime!
+      });
     }
-    return "";
   };
 
   const handleViewTypeChange = (mode: ViewType) => {
@@ -222,11 +384,21 @@ const DCPRankingPage = () => {
     }
   };
 
+  const filterByCustomDates = (dateField: string, date: Date | null) => {
+    setDateFilter((prev) => ({
+      ...dateFilter,
+      [dateField]: date
+    }));
+    setViewType('Custom');
+  };
+
   return (
     <Grid style={{ background: '#fff', flexGrow: 1 }} item container direction="column" >
       <Grid item >
         <Header
           pageName="Xếp hạng thi đua nề nếp"
+          searchBarPlaceholder="Tìm kiếm lớp..."
+          onTextChange={(text) => setClassFilter(text)}
         />
       </Grid>
       <Grid item container direction="column" style={{ flex: 1, minHeight: 0, flexWrap: 'nowrap', background: "#e8e8e8" }}>
@@ -245,6 +417,19 @@ const DCPRankingPage = () => {
                     <FilterIcon fontSize="small" />
                   </Badge>
               </Tooltip>
+              <FormControl className={classes.rankingTypeSelector}>
+                <Select
+                  labelId="ranking-type-select"
+                  id="simple-select"
+                  value={rankingType}
+                  onChange={handleRankingTypeChange}
+                  placeholder="Loại vi phạm"
+                >
+                  <MenuItem value={'OVERALL'}>Tổng thể</MenuItem>
+                  <MenuItem value={'DCP'}>Nề nếp</MenuItem>
+                  <MenuItem value={'LR'}>Sổ đầu bài</MenuItem>
+                </Select>
+              </FormControl>
               <Chip
                 clickable label='Xếp hạng tuần' 
                 onClick={() => handleViewTypeChange('ByWeek')}
@@ -276,7 +461,7 @@ const DCPRankingPage = () => {
                     id='get-rankings-report-start'
                     placeholder="Bắt đầu từ"
                     value={dateFilter.startTime}
-                    onChange={() => {}}
+                    onChange={(date) => filterByCustomDates('startTime', date)}
                     KeyboardButtonProps={{
                       'aria-label': 'dcp - rankings - change start date',
                     }}
@@ -294,7 +479,7 @@ const DCPRankingPage = () => {
                     id='get-rankings-report-end'
                     placeholder="Đến ngày"
                     value={dateFilter.endTime}
-                    onChange={() => {}}
+                    onChange={(date) => filterByCustomDates('endTime', date)}
                     KeyboardButtonProps={{
                       'aria-label': 'dcp - rankings - change end date',
                     }}
@@ -312,17 +497,49 @@ const DCPRankingPage = () => {
         </Grid>              
         <Grid item style={{ flexGrow: 1, paddingTop: 16, paddingBottom: 16, backgroundColor: '#e8e8e8'}}>
           <Container className={classes.datagridContainer}>
+          {
+            rankingType === 'OVERALL' && (
             <DataGrid
-              columns={cols}
-              rows={data}
+              columns={overallCols}
+              rows={overalRankings.filter(x => x.className.includes(classFilter))}
               paginationMode='server'
               hideFooterPagination
               loading={loading}
               hideFooter
               getRowId={data => data.classId}
-              getRowClassName={getRowClass}
               localeText={dataGridLocale}
             />
+            )
+          }
+          {
+            rankingType === 'DCP' && (
+            <DataGrid
+              columns={dcpCols}
+              rows={dcpRankings.filter(x => x.className.includes(classFilter))}
+              paginationMode='server'
+              hideFooterPagination
+              loading={loading}
+              hideFooter
+              getRowId={data => data.classId}
+              localeText={dataGridLocale}
+            />
+            )
+          }
+          {
+            rankingType === 'LR' && (
+            <DataGrid
+              columns={lrCols}
+              rows={lrRankings.filter(x => x.className.includes(classFilter))}
+              paginationMode='server'
+              hideFooterPagination
+              loading={loading}
+              hideFooter
+              getRowId={data => data.classId}
+              localeText={dataGridLocale}
+            />
+            )
+          }
+            
           </Container>
         </Grid>
       </Grid>

@@ -195,7 +195,7 @@ class Dialog extends Component<{}, ModalState> {
               item
               container
               justify='flex-end'
-              style={!this.state.message ? {...styles.buttonGroup, ...styles.borderTop} : styles.buttonGroup}
+              style={(!!this.state.component || !!this.state.message) ? {...styles.buttonGroup, ...styles.borderTop} : styles.buttonGroup}
             >
               {
                 !this.state.noCancelButton && (

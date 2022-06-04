@@ -5,7 +5,7 @@ import Endpoint from './@endpoint';
 
 const createDcpReport = async (input: DcpReport.CreateUpdateDcpReportDto) => {
   try {
-    const apiService = await getApiService({ queryCurrentAccount: true });
+    const apiService = await getApiService({ queryCurrentAccount: true, queryActiveCourse: true });
     const result = await apiService.post(Endpoint.CreateDcpReport(), input);
     return result;
   } catch (error) {
@@ -55,7 +55,7 @@ const getDcpRerportForUpdate = async (id: string) => {
 
 const updateDcpReport = async (id: string, input: DcpReport.CreateUpdateDcpReportDto) => {
   try {
-    const apiService = await getApiService();
+    const apiService = await getApiService({  queryCurrentAccount: true, queryActiveCourse: true });
     const result = await apiService.put(Endpoint.UpdateDcpReport(id), input);
     return result;
   } catch (error) {

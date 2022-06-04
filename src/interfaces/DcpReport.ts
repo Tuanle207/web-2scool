@@ -12,7 +12,8 @@ export namespace DcpReport {
     creationTime: Date;
     creatorId: string;
     creator: User.UserForSimpleListDto;
-    dcpClassReports: DcpClassReportDto[]
+    dcpClassReports: DcpClassReportDto[];
+    reportedClassDisplayNames: string;
   }
 
   export interface DcpClassReportDto {
@@ -27,6 +28,7 @@ export namespace DcpReport {
   export interface DcpClassReportItemDto {
     id: string;
     dcpClassReportId: string;
+    penaltyPoint: number;
     regulationId: string;
     regulation: Regulation.RegulationForSimpleListDto;
     relatedStudents: DcpStudentReportDto[]

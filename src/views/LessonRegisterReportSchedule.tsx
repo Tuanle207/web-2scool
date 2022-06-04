@@ -52,6 +52,7 @@ import {
 import useStyles from '../assets/jss/views/LessonRegisterReportSchedule';
 import { IDialogOptions } from '../services';
 import usePageTitleBarStyles from '../assets/jss/components/PageTitleBar/usePageTitleBarStyles';
+import ContactCard from '../components/ContactCard';
 
 interface IAssignClass {
   classId: string;
@@ -98,10 +99,18 @@ const cols: GridColDef[] = [
     field: 'assignee',
     headerName: 'Cờ đỏ chấm ',
     flex: 1,
-    valueFormatter: (params: GridValueFormatterParams) => {
-      const value = params.value as Account.SimpleAccountDto;
-      return value.name ?? 'Chưa phân công';
-    },
+    width: 200,
+    renderCell: (params: GridCellParams) => {
+      const account = params.value as Account.SimpleAccountDto;
+      const value = account?.name;
+      console.log({account});
+      return !!account ? (
+        <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+          <ContactCard contact={account}/>
+          <span style={{ marginLeft: 8, cursor: 'default' }}>{value}</span>
+        </div>
+      ) : <div>Chưa được phân công</div>
+    }
   },
   {
     field: 'belongsToClass',
@@ -224,7 +233,6 @@ const LessonRegisterReportSchedule = () => {
         scheData.push({
           id: el.id,
           classAssigned: el,
-          assignee: {} as Account.SimpleAccountDto,
           startTime,
           endTime
         } as TaskAssignment.TaskAssignmentDto);

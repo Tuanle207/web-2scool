@@ -11,10 +11,11 @@ import { getTenantNameFromCurrentLocation } from '../utils/UrlHelper';
 export interface ApiServiceOptions {
   queryCurrentAccount?: boolean;
   queryActiveCourse?: boolean;
+  blobResponseType?: boolean;
 }
 
-export const getApiService = async ({queryActiveCourse, queryCurrentAccount}: ApiServiceOptions = {
-  queryActiveCourse: false, queryCurrentAccount: false
+export const getApiService = async ({queryActiveCourse, queryCurrentAccount, blobResponseType}: ApiServiceOptions = {
+  queryActiveCourse: false, queryCurrentAccount: false, blobResponseType: false
 }) => {
   const baseurl = ENV.host;
 
@@ -37,6 +38,7 @@ export const getApiService = async ({queryActiveCourse, queryCurrentAccount}: Ap
         '2Scool-Active-Course': queryActiveCourse ? 1 : 0,
         '2Scool-Current-Account': queryCurrentAccount ? 1 : 0,
       },
+      responseType: blobResponseType ? 'blob' : undefined,
       // withCredentials: true,
     }
   });

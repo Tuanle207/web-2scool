@@ -29,9 +29,6 @@ const useStyles = makeStyles(theme => ({
         height: 8
       }
     },
-    '& .MuiDataGrid-row.Mui-selected': {
-      backgroundColor: theme.palette.primary.light,
-    },
     '& .MuiDataGrid-iconSeparator': {
       color: theme.palette.divider,
       
@@ -73,16 +70,11 @@ const useStyles = makeStyles(theme => ({
     backgroundColor: theme.palette.primary.main,
     color: theme.palette.common.white
   },
-
-  top1Item: {
-    backgroundColor: '#18a61a',
-    color: theme.palette.common.white
-  },
-  top2Item: {
-    backgroundColor: '#81c2f7'
-  },
-  top3Item: {
-    backgroundColor: '#e6e5fe',
+  rankingTypeSelector: {
+    width: 150,
+    '& .MuiSelect-select:focus': {
+      backgroundColor: 'unset'
+    }
   }
 }));
 

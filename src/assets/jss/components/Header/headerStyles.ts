@@ -39,6 +39,16 @@ const useHeaderStyles = makeStyles((theme: Theme) => ({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  clearIcon: {
+    padding: theme.spacing(0, 2),
+    height: '100%',
+    position: 'absolute',
+    right: 0,
+    top: 0,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   inputRoot: {
     color: 'inherit',
   },

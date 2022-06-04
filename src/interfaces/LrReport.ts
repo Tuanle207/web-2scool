@@ -8,6 +8,7 @@ export namespace LrReport {
     totalPoint: number;
     absenceNo: number;
     class: Class.ClassForSimpleListDto;
+    reportedClassDisplayName: string;
     attachedPhotos: string[];
     status: string;
     creationTime: Date;

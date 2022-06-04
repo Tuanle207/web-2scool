@@ -29,6 +29,8 @@ import AddIcon from '@material-ui/icons/Add';
 import { getFullUrl } from '../utils/ImageHelper';
 import useStyles from '../assets/jss/views/DCPReportHistoryPage';
 import moment from 'moment';
+import { dialogService } from '../services';
+import { toast } from 'react-toastify';
 
 
 const DetailCell = (params: GridCellParams) => {
@@ -97,10 +99,18 @@ const MenuCell = (props: GridCellParams) => {
   const deleteLrReport = async () => {
     try {
       handleClose();
-      await LrReportsService.deleteLrReportById(id.toString());
-      reloadCurrentPageData();
-    } catch {
+      const { result } = await dialogService.show(null, {
+        title: 'Xóa phiếu chấm này?',
+      });
 
+      if (result === 'Ok') {
+        await LrReportsService.deleteLrReportById(id.toString());
+        reloadCurrentPageData();
+      }
+    } catch {
+      toast('Đã có lỗi xảy ra!', {
+        type: 'error'
+      });
     }
   };
 
@@ -192,13 +202,10 @@ const cols: GridColDef[] =  [
     hide: true
   },
   {
-    field: 'class',
+    field: 'reportedClassDisplayName',
     headerName: 'Lớp',
+    width: 200,
     flex: 1,
-    valueFormatter: (params: GridValueFormatterParams) => {
-      const value = params.value as Class.ClassForSimpleListDto;
-      return value.name;
-    }
   },
   {
     field: 'totalPoint',

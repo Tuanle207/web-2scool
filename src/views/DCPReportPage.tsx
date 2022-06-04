@@ -54,7 +54,7 @@ const cols: GridColDef[] = [
     flex: 1,
     valueFormatter: (params: GridValueFormatterParams) => {
       const item = params.value as Regulation.RegulationForSimpleListDto;
-      return item.name;
+      return item?.name;
     }
   },
   {
@@ -63,7 +63,7 @@ const cols: GridColDef[] = [
     width: 150,
     valueFormatter: (params: GridValueFormatterParams) => {
       const item = params.value as Regulation.CriteriaForSimpleList;
-      return item.name;
+      return item?.name;
     }
   },
   {
@@ -176,7 +176,7 @@ const DCPReportPage = () => {
     const result = faults.map(el => ({
       ...el,
       criteria: el.regulation.criteria,
-      points: -el.regulation.point
+      points: -el.penaltyPoint
     }));
     return result;
   };
@@ -188,12 +188,11 @@ const DCPReportPage = () => {
   };
 
   const getFaultsPoint = () => {
-    const faults = getFaults();
-    let count = 0;
-    faults.forEach((x) => {
-      count += x.regulation.point;
-    })
-    return count;
+    if (!data.dcpClassReports) {
+      return '';
+    }
+    const item = data.dcpClassReports.find(x => x.classId === selectedClassId);
+    return item?.penaltyTotal || '';
   };
 
   const getClass = () => {

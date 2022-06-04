@@ -225,11 +225,12 @@ const DCPStatisticsPage = () => {
       }
     }
   };
+
   const handleStatsTypeChange = (e: ChangeEvent<any>) => {
     const value = e.target.value as StatsType;
     if (value !== statsType) {
-      setViewType('ByWeek');
       setStatsType(value);
+      setViewType('ByWeek');
       handleWeekFilter();
     }
   };
@@ -324,7 +325,7 @@ const DCPStatisticsPage = () => {
               <FormControl className={classes.statisticsTypeSelector}>
                 <Select
                   labelId="statistics-type-select"
-                  id="demo-simple-select"
+                  id="simple-select"
                   value={statsType}
                   onChange={handleStatsTypeChange}
                   placeholder="Loại vi phạm"

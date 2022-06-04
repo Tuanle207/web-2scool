@@ -218,14 +218,10 @@ const cols: GridColDef[] =  [
     }
   },
   {
-    field: 'class',
+    field: 'reportedClassDisplayName',
     headerName: 'Lớp',
     width: 200,
     flex: 1,
-    valueFormatter: (params: GridValueFormatterParams) => {
-      const value = params.value as Class.ClassForSimpleListDto;
-      return value.name;
-    }
   },
   {
     field: 'totalPoint',

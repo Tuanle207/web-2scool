@@ -1,6 +1,6 @@
 import { FC, memo, useState } from 'react';
 import { AppBar, IconButton, Badge, Toolbar,
-  InputBase, Menu, MenuItem, ListItemIcon, ListItemText, Typography } from '@material-ui/core';
+  InputBase, Menu, MenuItem, ListItemIcon, ListItemText, Typography, ButtonBase } from '@material-ui/core';
 import { StyledMenu, StyledMenuItem } from './HeaderMenu';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import AccountCircle from '@material-ui/icons/AccountCircle';
@@ -13,6 +13,7 @@ import { routes } from '../../routers/routesDictionary';
 import { useDebouncedCallback } from 'use-debounce/lib';
 import useHeaderStyles from '../../assets/jss/components/Header/headerStyles';
 import { useDispatch } from 'react-redux';
+import ClearIcon from '@material-ui/icons/Clear';
 
 interface Props {
   hiddenSearchBar?: boolean;
@@ -34,12 +35,25 @@ const Header: FC<Props> = ({
   const [anchorEl, setAnchorEl] = useState(null);
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = useState(null);
 
+  const [text, setText] = useState('');
+  const [clearable, setClearable] = useState(false);
+
   const dispatch = useDispatch();
 
   const onSearchChangeDebounced = useDebouncedCallback(
     (value: string) => onTextChange && onTextChange(value),
     200
   );
+
+  const onSearchInput = (value: string) => {
+    if (value && value.length > 0) {
+      setClearable(true);
+    } else {
+      setClearable(false);
+    }
+    setText(value);
+    onSearchChangeDebounced(value);
+  };
 
   const isMenuOpen = Boolean(anchorEl);
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
@@ -147,20 +161,25 @@ const Header: FC<Props> = ({
                 <SearchIcon />
               </div>
               <InputBase
-                name="fcking-name"
+                name="search-bar"
                 disabled={hiddenSearchBar ? true : false}
                 placeholder={searchBarPlaceholder}
                 fullWidth
-                autoComplete="new-search"
-                defaultValue=""
+                autoComplete="off"
                 type="search"
                 classes={{
                   root: classes.inputRoot,
                   input: classes.inputInput,
                 }}
                 inputProps={{ 'aria-label': 'search' }}
-                onChange={(e) => onSearchChangeDebounced(e.target.value)}
+                value={text}
+                onChange={(e) => onSearchInput(e.target.value)}
               />
+              <div className={classes.clearIcon} style={!clearable ? { visibility: 'hidden' } : {}}>
+                <ButtonBase disableTouchRipple disableRipple onClick={() => onSearchInput('')}>
+                  <ClearIcon fontSize="small" />
+                </ButtonBase>
+              </div>
             </div>
           <div className={classes.sectionDesktop}>
             <IconButton aria-label="show 17 new notifications" color="inherit">

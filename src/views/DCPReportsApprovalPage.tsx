@@ -193,14 +193,10 @@ const cols: GridColDef[] =  [
     }
   },
   {
-    field: 'dcpClassReports',
+    field: 'reportedClassDisplayNames',
     headerName: 'Lớp được chấm',
     width: 300,
     flex: 1,
-    valueFormatter: (params: GridValueFormatterParams) => {
-      const value = params.value as DcpReport.DcpClassReportDto[];
-      return value ? value.map(x => x.class.name).join(', ') : '';
-    }
   },
   {
     field: 'status',

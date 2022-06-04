@@ -127,22 +127,6 @@ const RowMenuCell = (props: RowMenuProps) => {
 
 const cols: GridColDef[] =  [
   {
-    field: 'actions',
-    headerName: 'Hành động',
-    renderCell: RowMenuCell,
-    sortable: false,
-    width: 150,
-    headerAlign: 'left',
-    filterable: false,
-    align: 'center',
-    disableColumnMenu: true,
-  },
-  {
-    field: 'id',
-    headerName: 'Mã',
-    width: 150
-  },
-  {
     field: 'name',
     headerName: 'Tên khách thuê',
     width: 250,
@@ -160,6 +144,17 @@ const cols: GridColDef[] =  [
       const value = params.value as string;
       return value ? formatTime(value) : '';
     }
+  },
+  {
+    field: 'actions',
+    headerName: 'Hành động',
+    renderCell: RowMenuCell,
+    sortable: false,
+    width: 150,
+    headerAlign: 'left',
+    filterable: false,
+    align: 'center',
+    disableColumnMenu: true,
   },
 ];
 

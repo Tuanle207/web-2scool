@@ -45,7 +45,7 @@ const getAllStudents = async (pagingInfo: Util.PagingInfo) => {
 
 const getStudentForSimpleList = async (classId?: string) => {
   try {
-    const apiService = await getApiService();
+    const apiService = await getApiService({queryActiveCourse: true});
     const result = await apiService.get<Util.PagingModel<Student.StudentForSimpleListDto>>(Endpoint.GetStudentForSimpleList() + (classId ? `?classId=${classId}` : ''));
     return result;
   } catch (error) {

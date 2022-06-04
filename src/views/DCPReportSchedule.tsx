@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 import Header from '../components/Header';
 import { Class, TaskAssignment, Account } from '../interfaces';
-import { DataGrid, GridColDef, GridValueFormatterParams } from '@material-ui/data-grid';
+import { DataGrid, GridCellParams, GridColDef, GridValueFormatterParams } from '@material-ui/data-grid';
 import { TaskAssignmentService } from '../api';
 import { getDayOfWeek, formatTime, formatDate } from '../utils/TimeHelper';
 import { dataGridLocale, taskType } from '../appConsts';
@@ -13,6 +13,7 @@ import PermContactCalendarIcon from '@material-ui/icons/PermContactCalendar';
 import { routes } from '../routers/routesDictionary';
 import { sleep } from '../utils/SetTimeOut';
 import usePageTitleBarStyles from '../assets/jss/components/PageTitleBar/usePageTitleBarStyles';
+import ContactCard from '../components/ContactCard';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -71,9 +72,16 @@ const cols: GridColDef[] = [
     field: 'assignee',
     headerName: 'Cờ đỏ chấm ',
     flex: 1,
-    valueFormatter: (params: GridValueFormatterParams) => {
-      const value = params.value as Account.SimpleAccountDto;
-      return value.name;
+    width: 200,
+    renderCell: (params: GridCellParams) => {
+      const account = params.value as Account.SimpleAccountDto;
+      const value = account?.name;
+      return (
+        <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+          <ContactCard contact={account}/>
+          <span style={{ marginLeft: 8, cursor: 'default' }}>{value}</span>
+        </div>
+      )
     }
   },
   {

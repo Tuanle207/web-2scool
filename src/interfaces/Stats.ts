@@ -24,6 +24,15 @@ export namespace Stats {
     totalPoints: number;
   }
 
+  export interface LrClassRanking {
+    ranking: number;
+    classId: string;
+    className: string;
+    formTeacherName: string;
+    totalAbsence: number;
+    lrPoints: number;
+  }
+
   export interface DcpClassFault {
     classId: string;
     className: string;

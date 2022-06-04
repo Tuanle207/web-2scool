@@ -29,6 +29,7 @@ import useStyles from '../assets/jss/views/DCPReportHistoryPage';
 import ActionModal from '../components/Modal';
 import { toast } from 'react-toastify';
 import moment from 'moment';
+import { dialogService } from '../services';
 
 
 const DetailCell = (props: GridCellParams) => {
@@ -81,13 +82,14 @@ const MenuCell = (props: GridCellParams) => {
     try {
       handleClose();
 
-      ActionModal.show({
+      const { result } = await dialogService.show(null, {
         title: 'Xóa phiếu chấm này?',
-        onAccept: async () => {
-          await DcpReportsService.deleteDcpReportById(id.toString());
-          reloadCurrentPageData();
-        } 
       });
+
+      if (result === 'Ok') {
+        await DcpReportsService.deleteDcpReportById(id.toString());
+        reloadCurrentPageData();
+      }
 
     } catch (err) {
       console.log(err);
@@ -169,13 +171,10 @@ const cols: GridColDef[] =  [
     hide: true
   },
   {
-    field: 'dcpClassReports',
+    field: 'reportedClassDisplayNames',
     headerName: 'Lớp được chấm',
+    width: 300,
     flex: 1,
-    valueFormatter: (params: GridValueFormatterParams) => {
-      const value = params.value as DcpReport.DcpClassReportDto[];
-      return value ? value.map(x => x.class.name).join(', ') : '';
-    }
   },
   {
     field: 'status',

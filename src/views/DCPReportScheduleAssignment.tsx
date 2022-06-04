@@ -245,7 +245,7 @@ const DCPReportScheduleAssignment = () => {
   };
   const getAccountInfo = (accountId: string) => {
     const account = accountData.find(x => x.id === accountId);
-    return `${account?.class?.name} - ${account?.name}`;
+    return `${account?.classDisplayName} - ${account?.name}`;
   };
 
   const handleSelectUser = (e: React.MouseEvent, id: string) => {
@@ -332,11 +332,11 @@ const DCPReportScheduleAssignment = () => {
               id='task-end-date-selector'
               className={classes.studentsSelector}
               options={
-                accountData.filter(x => selectedClass ? selectedClass.name === x.class.name : true)
+                accountData.filter(x => selectedClass ? selectedClass.name === x.classDisplayName : true)
               }
               getOptionLabel={(option) => option.name}
               getOptionSelected={(option, value) => option.id === value.id}
-              groupBy={(option) => option.class.name}
+              groupBy={(option) => option.classDisplayName}
               value={selectedAccountOption}
               onChange={(e, newValue) => setSelectedAccountOption(newValue)}
               size='small'
@@ -410,6 +410,7 @@ const DCPReportScheduleAssignment = () => {
                         direction='row' 
                         alignItems='center' 
                         className={classes.selectedItem}
+                        style={{ flexWrap: 'nowrap' }}
                         onClick={(e) => handleSelectUser(e, el)}
                       >
                         <Grid item container alignItems='center' direction='row'>

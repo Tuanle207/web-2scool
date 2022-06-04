@@ -5,7 +5,7 @@ import Endpoint from './@endpoint';
 
 const createLrReport = async (input: LrReport.CreateUpdateLRReportDto) => {
   try {
-    const apiService = await getApiService({ queryCurrentAccount: true });
+    const apiService = await getApiService({  queryCurrentAccount: true, queryActiveCourse: true });
     
     var body = new FormData();
     body.append('ClassId', input.classId);
@@ -54,7 +54,7 @@ const deleteLrReportById = async (id: string) => {
 
 const updateLrReport = async (id: string, input: LrReport.CreateUpdateLRReportDto) => {
   try {
-    const apiService = await getApiService();
+    const apiService = await getApiService({  queryCurrentAccount: true, queryActiveCourse: true });
 
     var body = new FormData();
     body.append('ClassId', input.classId);
