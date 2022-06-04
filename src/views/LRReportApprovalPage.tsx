@@ -11,7 +11,7 @@ import AwesomeDebouncePromise from 'awesome-debounce-promise';
 import Header from '../components/Header';
 import { LrReportsService } from '../api';
 import { useFetchV2 } from '../hooks';
-import { LrReport, Class, Account } from '../interfaces';
+import { LrReport, Account } from '../interfaces';
 import { formatFullDateTime } from '../utils/TimeHelper';
 import { comparers, dcpReportStatus, dcpReportStatusDic, dataGridLocale } from '../appConsts';
 import FilterButton, { IFilterOption } from '../components/FilterButton';

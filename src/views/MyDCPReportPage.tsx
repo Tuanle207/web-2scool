@@ -26,7 +26,6 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@material-ui/icons/Edit';
 import AddIcon from '@material-ui/icons/Add';
 import useStyles from '../assets/jss/views/DCPReportHistoryPage';
-import ActionModal from '../components/Modal';
 import { toast } from 'react-toastify';
 import moment from 'moment';
 import { dialogService } from '../services';

@@ -5,7 +5,7 @@ import { MuiPickersUtilsProvider, KeyboardDatePicker } from '@material-ui/picker
 import DateFnsUtils from '@date-io/date-fns';
 import React, { ChangeEvent, useEffect, useMemo, useState } from 'react';
 import Header from '../components/Header';
-import { DataGrid, GridApi, GridCellParams, GridColDef, GridRowData, GridRowId } from '@material-ui/data-grid';
+import { DataGrid, GridApi, GridColDef, GridRowData, GridRowId } from '@material-ui/data-grid';
 import { StatisticsService } from '../api';
 import { formatFullDateTime, getPreviousMonday } from '../utils/TimeHelper';
 import { FindInPage } from '@material-ui/icons';

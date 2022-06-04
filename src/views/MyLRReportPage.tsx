@@ -12,7 +12,7 @@ import AwesomeDebouncePromise from 'awesome-debounce-promise';
 import Header from '../components/Header';
 import { LrReportsService } from '../api';
 import { useFetchV2 } from '../hooks';
-import { LrReport, Class } from '../interfaces';
+import { LrReport } from '../interfaces';
 import { formatFullDateTime } from '../utils/TimeHelper';
 import { comparers, dcpReportStatus, dcpReportStatusDic, dataGridLocale } from '../appConsts';
 import { routes, routeWithParams } from '../routers/routesDictionary';

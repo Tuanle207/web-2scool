@@ -9,10 +9,9 @@ import { MuiPickersUtilsProvider, KeyboardDatePicker } from '@material-ui/picker
 import DateFnsUtils from '@date-io/date-fns';
 import Header from '../components/Header';
 import { Stats } from '../interfaces';
-import { DataGrid, GridCellParams, GridColDef, GridRowParams } from '@material-ui/data-grid';
+import { DataGrid, GridCellParams, GridColDef } from '@material-ui/data-grid';
 import { StatisticsService } from '../api';
 import { getPreviousMonday } from '../utils/TimeHelper';
-import { FindInPage } from '@material-ui/icons';
 import GetAppIcon from '@material-ui/icons/GetApp';
 import { ReactComponent as FilterIcon } from '../assets/img/filter.svg';
 import useStyles from '../assets/jss/views/DCPRankingPage';
