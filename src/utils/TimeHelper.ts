@@ -29,6 +29,9 @@ const formatFullDateTime = (date: string) => {
   return `${getDayOfWeek(date)} ${formatDate(date, 'HH:mm, DD/MM/YYYY')}`;
 };
 
+const formatFullDateTimeWithoutTime = (date: string) => {
+  return `${getDayOfWeek(date)}, ${formatDate(date)}`;
+};
 
 /**
  * 
@@ -98,6 +101,7 @@ export {
   addDays,
   getPreviousMonday,
   formatFullDateTime,
+  formatFullDateTimeWithoutTime,
   getLatestMonday,
   getNextMonday,
 };

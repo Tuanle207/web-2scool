@@ -132,6 +132,46 @@ const getStudentFaultDetails = async (studentId: string, input: Util.DateFilterD
   return result;
 };
 
+const getClassFaultDetailsExcel = async (classId: string, className: string, input: Util.DateFilterDto) => {
+  const apiService = await getApiService({ queryActiveCourse: true, blobResponseType: true });
+  const query = `?StartTime=${formatQueryDate(input.startTime)}&EndTime=${formatQueryDate(input.endTime)}`;
+
+  const blob = await apiService.get<Blob>(Endpoint.GetClassFaultDetailsExcel(classId, query));
+  saveBlobAsFile(blob, `bao-cao-lop-vi-pham-${className}-${getCurrentTimeString()}`);
+};
+
+const getRegulationFaultDetailsExcel = async (regulationId: string, regulationName: string, input: Util.DateFilterDto) => {
+  const apiService = await getApiService({ queryActiveCourse: true, blobResponseType: true });
+  const query = `?StartTime=${formatQueryDate(input.startTime)}&EndTime=${formatQueryDate(input.endTime)}`;
+
+  const blob = await apiService.get<Blob>(Endpoint.GetRegulationFaultDetailsExcel(regulationId, query));
+  saveBlobAsFile(blob, `thong-ke-vi-pham-${regulationName}-${getCurrentTimeString()}`);
+};
+
+const getStudentFaultDetailsExcel = async (studentId: string, studentName: string, input: Util.DateFilterDto) => {
+  const apiService = await getApiService({ queryActiveCourse: true, blobResponseType: true });
+  const query = `?StartTime=${formatQueryDate(input.startTime)}&EndTime=${formatQueryDate(input.endTime)}`;
+  
+  const blob = await apiService.get<Blob>(Endpoint.GetStudentFaultDetailsExcel(studentId, query));
+  saveBlobAsFile(blob, `bao-cao-hoc-sinh-vi-pham-${studentName}-${getCurrentTimeString()}`);
+};
+
+const sendClassFaultsThroughEmail = async (input: Util.DateFilterDto, classId?: string) => {
+  const apiService = await getApiService({ queryActiveCourse: true });
+  
+  const query = `?StartTime=${formatQueryDate(input.startTime)}&EndTime=${formatQueryDate(input.endTime)}`;
+  const result = await apiService.post<void>(Endpoint.SendClassFaultsThroughEmail(classId || '', query));
+  return result;
+};
+
+const sendStudentFaultsThroughEmail = async (input: Util.DateFilterDto, studentId: string) => {
+  const apiService = await getApiService({ queryActiveCourse: true });
+  
+  const query = `?StartTime=${formatQueryDate(input.startTime)}&EndTime=${formatQueryDate(input.endTime)}`;
+  const result = await apiService.post<void>(Endpoint.SendStudentFaultsThroughEmail(studentId, query));
+  return result;
+};
+
 export const StatisticsService = {
   getOverallRanking,
   getDcpRanking,
@@ -149,4 +189,9 @@ export const StatisticsService = {
   getClassFaultDetails,
   getRegulationFaultDetails,
   getStudentFaultDetails,
+  getClassFaultDetailsExcel,
+  getRegulationFaultDetailsExcel,
+  getStudentFaultDetailsExcel,
+  sendClassFaultsThroughEmail,
+  sendStudentFaultsThroughEmail,
 };

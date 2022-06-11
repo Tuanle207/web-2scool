@@ -160,12 +160,13 @@ class Dialog extends Component<{}, ModalState> {
         >
           <Box style={{ marginBottom: 20 }}>
             <Grid item container direction='row' justify='space-between' alignItems='center' style={styles.titleBar}>
-              <Typography style={{ marginRight: '2.4rem' }} variant='h6'>{this.state.title}</Typography>
+              <Typography style={{ marginRight: '3.6rem' }} variant='h6'>{this.state.title}</Typography>
               <IconButton
                 style={styles.closeButton}
+                size="small"
                 onClick={() => this.onCancel()}
               >
-                <CloseIcon />
+                <CloseIcon fontSize="small" />
               </IconButton>
             </Grid>
             {

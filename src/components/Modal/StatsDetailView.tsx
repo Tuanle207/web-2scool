@@ -160,8 +160,6 @@ const StatsDetailView: FC<StatsDetailViewProps> = ({
 
   const classes = useStyles();
 
-  console.log({data});
-
   return (
     <Container className={classes.datagridContainer}>
     {

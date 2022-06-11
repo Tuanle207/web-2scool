@@ -5,7 +5,6 @@ import { toast, ToastContainer } from 'react-toastify';
 import DashboardRouter from '../../routers/DashboardRouter';
 import AuthRouter from '../../routers/AuthRouter';
 import { theme, jss } from '../../assets/themes/theme';
-import ActionModal from '../Modal';
 import { AuthSelector } from '../../store/selectors';
 import { AppConfigsActions } from '../../store/actions';
 import { isTokenExpired } from '../../config/axios/util';
@@ -45,7 +44,6 @@ const AppContainer: React.FC<IAppContainerProps> = () => {
             theme="light"
             limit={6}
           />
-          <ActionModal />
           <Dialog />
           <BusyBackdrop />
         </CssBaseline>

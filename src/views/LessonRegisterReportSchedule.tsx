@@ -103,7 +103,6 @@ const cols: GridColDef[] = [
     renderCell: (params: GridCellParams) => {
       const account = params.value as Account.SimpleAccountDto;
       const value = account?.name;
-      console.log({account});
       return !!account ? (
         <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
           <ContactCard contact={account}/>

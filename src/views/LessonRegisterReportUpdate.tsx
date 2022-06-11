@@ -14,11 +14,11 @@ import PlaceholderImage from '../assets/img/placeholder-img.png';
 import { formatTime, getDayOfWeek } from '../utils/TimeHelper';
 import { toast } from 'react-toastify';
 import { LrReportsService, TaskAssignmentService } from '../api';
-import ActionModal from '../components/Modal';
 import { taskType } from '../appConsts';
 import { Class } from '../interfaces';
 import useStyles from '../assets/jss/views/LessonRegisterReportCreate';
 import { getFullUrl } from '../utils/ImageHelper';
+import { busyService, dialogService } from '../services';
 
 
 const LessonRegisterReportUpdate = () => {
@@ -78,7 +78,7 @@ const LessonRegisterReportUpdate = () => {
     }
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!reportClass) {
       return toast.error('Bạn không được phân công giữ sổ đầu bài!');
     }
@@ -89,25 +89,29 @@ const LessonRegisterReportUpdate = () => {
       return toast.error('Vui lòng đính kèm ảnh Sổ Đầu Bài');
     }
     const { lrReportId } = params;
-    
-    ActionModal.show({
+
+    const { result } = await dialogService.show(null, {
       title: 'Xác nhận cập nhật phiếu nộp sổ đầu bài',
-      onAccept: async () => {
-        try {
-          await LrReportsService.updateLrReport(lrReportId, {
-            classId: reportClass.id,
-            absenceNo: noAbsence,
-            totalPoint: noPoint,
-            photo: file,
-          });
-          toast.success('Thành công!');
-          history.goBack();
-        } catch (e) {
-          console.log(e);
-          toast.error('Đã có lỗi xảy ra!')
-        }
-      },
     });
+
+    if (result === 'Ok') {
+      try {
+        busyService.busy(true);
+        await LrReportsService.updateLrReport(lrReportId, {
+          classId: reportClass.id,
+          absenceNo: noAbsence,
+          totalPoint: noPoint,
+          photo: file,
+        });
+        toast.success('Thành công!');
+        history.goBack();
+      } catch (e) {
+        console.log(e);
+        toast.error('Đã có lỗi xảy ra!')
+      } finally {
+        busyService.busy(false);
+      }
+    }
   };
 
   return (

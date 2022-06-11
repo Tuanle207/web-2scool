@@ -3,13 +3,14 @@ import { Container, Grid, Box, Select,
   IconButton, Chip, Tooltip, FormControl, MenuItem, Paper, Badge } from '@material-ui/core';
 import { MuiPickersUtilsProvider, KeyboardDatePicker } from '@material-ui/pickers';
 import DateFnsUtils from '@date-io/date-fns';
-import React, { ChangeEvent, useEffect, useMemo, useState } from 'react';
+import { ChangeEvent, useEffect, useMemo, useState } from 'react';
 import Header from '../components/Header';
 import { DataGrid, GridApi, GridColDef, GridRowData, GridRowId } from '@material-ui/data-grid';
 import { StatisticsService } from '../api';
-import { formatFullDateTime, getPreviousMonday } from '../utils/TimeHelper';
+import { formatFullDateTimeWithoutTime, getPreviousMonday } from '../utils/TimeHelper';
 import { FindInPage } from '@material-ui/icons';
 import GetAppIcon from '@material-ui/icons/GetApp';
+import MailOutlineIcon from '@material-ui/icons/MailOutline';
 import { ReactComponent as FilterIcon } from '../assets/img/filter.svg';
 import { sleep } from '../utils/SetTimeOut';
 import { Stats } from '../interfaces';
@@ -28,14 +29,13 @@ const ClassRowMenuCell = (props: RowMenuProps) => {
   const { api, id } = props;
 
   const onDetailClick = async () => {
-
     try {
       busyService.busy(true);
       const classId = id.toString();
       const className = (api as GridApi).getCellValue(id, 'className');
       const startTime = (api as GridApi).getCellValue(id, 'startTime') as Date;
       const endTime = (api as GridApi).getCellValue(id, 'endTime') as Date;
-  
+
       const input: StatsDetailViewProps = {
         dataType: 'ClassFaultDetail',
         data: (await StatisticsService.getClassFaultDetails(classId, {
@@ -45,7 +45,7 @@ const ClassRowMenuCell = (props: RowMenuProps) => {
       };
   
       dialogService.show(input, {
-        title: `Chi tiết vi phạm ${className} từ ${formatFullDateTime(startTime.toLocaleString())} đến ${formatFullDateTime(endTime.toLocaleString())}`,
+        title: `Chi tiết vi phạm ${className} từ ${formatFullDateTimeWithoutTime(startTime.toLocaleString())} đến ${formatFullDateTimeWithoutTime(endTime.toLocaleString())}`,
         renderFormComponent: StatsDetailView,
         noCancelButton: true,
         acceptText: 'Đóng',
@@ -59,12 +59,58 @@ const ClassRowMenuCell = (props: RowMenuProps) => {
     }
   };
 
+  const onDownloadClick = async () => {
+    const classId = id.toString();
+    const className = (api as GridApi).getCellValue(id, 'className')?.toString();
+    const startTime = (api as GridApi).getCellValue(id, 'startTime') as Date;
+    const endTime = (api as GridApi).getCellValue(id, 'endTime') as Date;
+    await StatisticsService.getClassFaultDetailsExcel(classId, className || '', { startTime, endTime});
+  };
+
+  const handleSendReportThroughMail = async () => {
+    const classId = id.toString();
+    const className = (api as GridApi).getCellValue(id, 'className');
+    const startTime = (api as GridApi).getCellValue(id, 'startTime') as Date;
+    const endTime = (api as GridApi).getCellValue(id, 'endTime') as Date;
+
+    const { result } = await dialogService.show(null, {
+      title: `Xác nhận gửi email báo cáo tới giáo viên chủ nhiệm ${className}?`
+    });
+    if (result !== 'Ok') {
+      return;
+    }
+    try {
+      busyService.busy(true)
+      await StatisticsService.sendClassFaultsThroughEmail({ startTime, endTime }, classId);
+      toast.info('Email đang được gửi tới các giáo viên chủ nhiệm');
+    } catch {
+      toast.error('Đã có lỗi xảy ra. Không thể gửi email!');
+    } finally {
+      busyService.busy(false);
+    }
+  };
+
   return (
-    <Tooltip title='Xem chi tiết'>
-      <IconButton color="primary" size="small" onClick={onDetailClick}>
-        <FindInPage fontSize="small" />
-      </IconButton>
-    </Tooltip>
+    <>
+      <Tooltip title='Xem chi tiết'>
+        <IconButton color="primary" size="small" onClick={onDetailClick}>
+          <FindInPage fontSize="small" />
+        </IconButton>
+      </Tooltip>
+      <Tooltip title='Tải báo cáo chi tiết'>
+        <IconButton color="primary" size="small" onClick={onDownloadClick}>
+          <GetAppIcon fontSize="small" />
+        </IconButton>
+      </Tooltip>
+      <Tooltip 
+        title='Gửi mail báo cáo cho GVCN'
+        onClick={handleSendReportThroughMail}
+      >
+        <IconButton color='primary' size="small" onClick={handleSendReportThroughMail}>
+          <MailOutlineIcon  fontSize="small"/>
+        </IconButton>
+      </Tooltip>
+    </>
   );
 };
 
@@ -88,7 +134,7 @@ const RegulationRowMenuCell = (props: RowMenuProps) => {
       };
 
       dialogService.show(input, {
-        title: `Chi tiết vi phạm ${regulationName} từ ${formatFullDateTime(startTime.toLocaleString())} đến ${formatFullDateTime(endTime.toLocaleString())}`,
+        title: `Chi tiết vi phạm ${regulationName} từ ${formatFullDateTimeWithoutTime(startTime.toLocaleString())} đến ${formatFullDateTimeWithoutTime(endTime.toLocaleString())}`,
         renderFormComponent: StatsDetailView,
         noCancelButton: true,
         acceptText: 'Đóng',
@@ -102,12 +148,27 @@ const RegulationRowMenuCell = (props: RowMenuProps) => {
     }
   };
 
+  const onDownloadClick = async () => {
+    const regulationId = id.toString();
+    const regulationName = (api as GridApi).getCellValue(id, 'name')?.toString();
+    const startTime = (api as GridApi).getCellValue(id, 'startTime') as Date;
+    const endTime = (api as GridApi).getCellValue(id, 'endTime') as Date;
+    await StatisticsService.getRegulationFaultDetailsExcel(regulationId, regulationName || '', { startTime, endTime});
+  };
+
   return (
-    <Tooltip title='Xem chi tiết'>
-      <IconButton color="primary" size="small" onClick={onDetailClick}>
-        <FindInPage fontSize="small" />
-      </IconButton>
-    </Tooltip>
+    <>
+      <Tooltip title='Xem chi tiết'>
+        <IconButton color="primary" size="small" onClick={onDetailClick}>
+          <FindInPage fontSize="small" />
+        </IconButton>
+      </Tooltip>
+      <Tooltip title='Tải báo cáo chi tiết'>
+        <IconButton color="primary" size="small" onClick={onDownloadClick}>
+          <GetAppIcon fontSize="small" />
+        </IconButton>
+      </Tooltip>
+    </>
   );
 };
 
@@ -132,7 +193,7 @@ const StudentRowMenuCell = (props: RowMenuProps) => {
       };
 
       dialogService.show(input, {
-        title: `Chi tiết vi phạm của học sinh ${studentName} - ${className} từ ${formatFullDateTime(startTime.toLocaleString())} đến ${formatFullDateTime(endTime.toLocaleString())}`,
+        title: `Chi tiết vi phạm của học sinh ${studentName} - ${className} từ ${formatFullDateTimeWithoutTime(startTime.toLocaleString())} đến ${formatFullDateTimeWithoutTime(endTime.toLocaleString())}`,
         renderFormComponent: StatsDetailView,
         noCancelButton: true,
         acceptText: 'Đóng',
@@ -146,12 +207,58 @@ const StudentRowMenuCell = (props: RowMenuProps) => {
     }
   };
 
+  const onDownloadClick = async () => {
+    const studentId = id.toString();
+    const studentName = (api as GridApi).getCellValue(id, 'studentName')?.toString();
+    const startTime = (api as GridApi).getCellValue(id, 'startTime') as Date;
+    const endTime = (api as GridApi).getCellValue(id, 'endTime') as Date;
+    await StatisticsService.getStudentFaultDetailsExcel(studentId, studentName || '', { startTime, endTime});
+  };
+
+  const handleSendReportThroughMail = async () => {
+    const classId = id.toString();
+    const className = (api as GridApi).getCellValue(id, 'className');
+    const startTime = (api as GridApi).getCellValue(id, 'startTime') as Date;
+    const endTime = (api as GridApi).getCellValue(id, 'endTime') as Date;
+
+    const { result } = await dialogService.show(null, {
+      title: `Xác nhận gửi email báo cáo tới giáo viên chủ nhiệm ${className}?`
+    });
+    if (result !== 'Ok') {
+      return;
+    }
+    try {
+      busyService.busy(true)
+      await StatisticsService.sendStudentFaultsThroughEmail({ startTime, endTime }, classId);
+      toast.info('Email đang được gửi tới các giáo viên chủ nhiệm');
+    } catch {
+      toast.error('Đã có lỗi xảy ra. Không thể gửi email!');
+    } finally {
+      busyService.busy(false);
+    }
+  };
+
   return (
-    <Tooltip title='Xem chi tiết'>
-      <IconButton color="primary" size="small" onClick={onDetailClick}>
-        <FindInPage fontSize="small" />
-      </IconButton>
-    </Tooltip>
+    <>
+      <Tooltip title='Xem chi tiết'>
+        <IconButton color="primary" size="small" onClick={onDetailClick}>
+          <FindInPage fontSize="small" />
+        </IconButton>
+      </Tooltip>
+      <Tooltip title='Tải báo cáo chi tiết'>
+        <IconButton color="primary" size="small" onClick={onDownloadClick}>
+          <GetAppIcon fontSize="small" />
+        </IconButton>
+      </Tooltip>
+      <Tooltip 
+        title='Gửi mail báo cáo cho GVCN'
+        onClick={handleSendReportThroughMail}
+      >
+        <IconButton color='primary' size="small" onClick={handleSendReportThroughMail}>
+          <MailOutlineIcon  fontSize="small"/>
+        </IconButton>
+      </Tooltip>
+    </>
   );
 };
 
@@ -179,6 +286,14 @@ const classFaultsStatsCols: GridColDef[] = [
     width: 150,
     align: 'center',
     headerAlign: 'right'
+  },
+  {
+    field: 'startTime',
+    hide: true,
+  },
+  {
+    field: 'endTime',
+    hide: true,
   },
   {
     field: 'Chi tiết',
@@ -254,12 +369,12 @@ interface DcpClassFaultExtension extends Stats.DcpClassRanking {
   endTime: Date;
 }
 
-interface DcpClassFaultExtension extends Stats.CommonDcpFault {
+interface DcpCommonFaultExtension extends Stats.CommonDcpFault {
   startTime: Date;
   endTime: Date;
 }
 
-interface DcpClassFaultExtension extends Stats.StudentWithMostFaults {
+interface DcpStudentFaultExtension extends Stats.StudentWithMostFaults {
   startTime: Date;
   endTime: Date;
 }
@@ -275,8 +390,8 @@ const DCPStatisticsPage = () => {
 
 
   const [classFaultsStats, setClassFaultsStats] = useState<DcpClassFaultExtension[]>([]);
-  const [commonFaultsStats, setCommonFaultsStats] = useState<DcpClassFaultExtension[]>([]);
-  const [studentsWithMostFaultsStats, setStudentsWithMostFaultsStats] = useState<DcpClassFaultExtension[]>([]);
+  const [commonFaultsStats, setCommonFaultsStats] = useState<DcpCommonFaultExtension[]>([]);
+  const [studentsWithMostFaultsStats, setStudentsWithMostFaultsStats] = useState<DcpStudentFaultExtension[]>([]);
   const [loading, setLoading] = useState(false);
 
   const [textFilter, setTextFilter] = useState('');
@@ -430,6 +545,27 @@ const DCPStatisticsPage = () => {
     }
   };
 
+  const handleSendReportThroughMail = async () => {
+    if (statsType !== 'ClassFaults') {
+      return;
+    }
+    const { result } = await dialogService.show(null, {
+      title: `Xác nhận gửi email báo cáo vi phạm các lớp tới các giáo viên chủ nhiệm?`
+    });
+    if (result !== 'Ok') {
+      return;
+    }
+    try {
+      await StatisticsService.sendClassFaultsThroughEmail({
+        startTime: dateFilter.startTime!,
+        endTime: dateFilter.endTime!
+      });
+      toast.info('Email đang được gửi tới các giáo viên chủ nhiệm');
+    } catch {
+      toast.error('Đã có lỗi xảy ra. Không thể gửi email!');
+    }
+  };
+
   const filterByCustomDates = (dateField: string, date: Date | null) => {
     setDateFilter((prev) => ({
       ...dateFilter,
@@ -545,8 +681,16 @@ const DCPStatisticsPage = () => {
                   />
                 </Box>
               </MuiPickersUtilsProvider>
-
-              <Tooltip title='Lưu thành báo cáo' style={{marginLeft: 'auto'}} onClick={handleDownloadFile}>
+              <Tooltip 
+                title='Gửi mail báo cáo cho GVCN các lớp' 
+                style={{marginLeft: 'auto', visibility: statsType === 'ClassFaults' ? 'visible' : 'hidden'}} 
+                onClick={handleSendReportThroughMail}
+              >
+                <IconButton color='primary' aria-label='Gửi mail báo cáo'>
+                  <MailOutlineIcon />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title='Lưu thành báo cáo' onClick={handleDownloadFile}>
                 <IconButton color='primary' aria-label='Tải báo cáo'>
                   <GetAppIcon />
                 </IconButton>

@@ -121,7 +121,6 @@ const ChangePasswordTab: FC<IChangePasswordTabProps> = () => {
   };
 
   const onSubmitClick = (e: any) => {
-    console.log('click roi')
     handleSubmit(onSubmit)(e);
     toast.success('Thay đổi mật khẩu thành công!');
     

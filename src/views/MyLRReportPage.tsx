@@ -303,10 +303,6 @@ const LRReportApprovalPage = () => {
  
   useEffect(() => {
     document.title = '2Cool | Lịch sử nộp sổ đầu bài của tôi';
-
-    return () => {
-      console.log('unmount');
-    }
   }, []);
 
   useEffect(() => {

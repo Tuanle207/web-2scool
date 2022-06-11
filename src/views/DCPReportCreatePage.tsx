@@ -16,12 +16,12 @@ import { Class, Student, Regulation, DcpReport, Util } from '../interfaces';
 import { RegulationsService, StudentsService, TaskAssignmentService } from '../api';
 import { DcpReportActions } from '../store/actions';
 import { formatTime } from '../utils/TimeHelper';
-import ActionModal from '../components/Modal';
 import { taskType } from '../appConsts';
 import { useDispatch, useSelector } from 'react-redux';
 import { DcpReportSelector, LoadingSelector } from '../store/selectors';
 import { toast } from 'react-toastify';
 import useStyles from '../assets/jss/views/DCPReportCreatePage';
+import { dialogService } from '../services';
 
 interface Props {
   
@@ -151,15 +151,18 @@ const DCPReportCreatePage: FC<Props> = () => {
     }
   };
 
-  const handleSend = () => {
+  const handleSend = async () => {
     if (dcpReport.dcpClassReports.length === 0) {
       toast.info("Vui lòng chấm ít nhất 1 lớp!");
       return;
     }
-    ActionModal.show({
+    const { result } = await dialogService.show(null, {
       title: 'Xác nhận tạo phiếu chấm điểm?',
-      onAccept: () => dispatch(DcpReportActions.sendDcpReport())
     });
+
+    if (result === 'Ok') {
+      dispatch(DcpReportActions.sendDcpReport())
+    }
   };
   
   const handleAddStudent = (regulationId: string) => {

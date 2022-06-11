@@ -70,7 +70,6 @@ const CreateOrUpdateUserRequest: FC<CreateOrUpdateUserRequestProps> = ({
       if (fieldName === 'email') {
         setValue('userName', email);
       } else if (fieldName === 'roles') {
-        console.log({roles});
         setValue('roleNames', roles.map(x => x.name));
       }
     })

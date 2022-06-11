@@ -40,8 +40,6 @@ export default createReducer(initialState, build => {
     .addCase(
       DcpReportActions.removeFaultFromClass, 
       (state: DcpReport.CreateUpdateDcpReportDto, action: Util.BaseAction) => {
-        console.log('can you hear me');
-        
         const classReport = state.dcpClassReports.find(el => el.classId === action.payload.classId);
         if (classReport) {
           const index = classReport.faults.findIndex(el => el.regulationId === action.payload.regulationId);

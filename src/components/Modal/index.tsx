@@ -140,9 +140,12 @@ class ActionModal extends React.Component<{}, ModalState> {
         <div style={modalStyles.root}>
           <Box>
             <Grid item container direction='row' justify='space-between' alignItems='center' style={modalStyles.titleBar}>
-              <Typography variant='h6'>{this.state.title}</Typography>
-              <IconButton onClick={this.cancelHandler}>
-                <CloseIcon />
+              <Typography style={{ marginRight: '3.6rem' }} variant='h6'>{this.state.title}</Typography>
+              <IconButton 
+                onClick={this.cancelHandler}  
+                style={modalStyles.closeButton}
+                size="small">
+                <CloseIcon fontSize="small" />
               </IconButton>
             </Grid>
           </Box>

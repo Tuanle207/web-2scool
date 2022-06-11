@@ -44,12 +44,6 @@ const LessonRegisterReportCreate = () => {
     }
     
     initData();
-    console.log('mounting');
-
-    return () => {
-      console.log('unmounting...');
-    }
-
   }, []);
 
   useEffect(() => {

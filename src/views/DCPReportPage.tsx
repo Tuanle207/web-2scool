@@ -8,7 +8,6 @@ import { Alarm, CheckSharp, Clear, FindInPage, PermContactCalendar } from '@mate
 import { DcpReportsService } from '../api';
 import { formatFullDateTime } from '../utils/TimeHelper';
 import StudentList from '../components/Modal/StudentList';
-import ActionModal from '../components/Modal';
 import { toast } from 'react-toastify';
 import CheckCircleIcon from '@material-ui/icons/CheckCircle';
 import PauseCircleOutlineIcon from '@material-ui/icons/PauseCircleOutline';
@@ -22,6 +21,7 @@ import { useSelector } from 'react-redux';
 import { AppConfigSelector } from '../store/selectors';
 import useStyles from '../assets/jss/views/DCPReportPage';
 import { usePermissionChecker } from '../hooks';
+import { dialogService } from '../services';
 
 const classCols: GridColDef[] = [
   {
@@ -203,85 +203,87 @@ const DCPReportPage = () => {
     return item?.class.name || '';
   };
 
-  const handleAccept = () => {
+  const handleAccept = async () => {
     const { dcpReportId } = params;
 
     if (!dcpReportId) {
       return;
     }
 
-    ActionModal.show({
+    const { result } = await dialogService.show(null, {
       title: 'Phê duyệt phiếu chấm này?',
-      onAccept: async () => {
-        try {
-          await DcpReportsService.acceptDcpReport([dcpReportId]);
-          fetchDcpReport();
-          toast('Phê duyệt thành công!', {
-            type: 'success'
-          });
-        } catch (err) {
-          console.log(err);
-          toast('Đã có lỗi xảy ra!', {
-            type: 'error'
-          });
-        }
-      } 
     });
+
+    if (result === 'Ok') {
+      try {
+        await DcpReportsService.acceptDcpReport([dcpReportId]);
+        fetchDcpReport();
+        toast('Phê duyệt thành công!', {
+          type: 'success'
+        });
+      } catch (err) {
+        console.log(err);
+        toast('Đã có lỗi xảy ra!', {
+          type: 'error'
+        });
+      }
+    }
   };
 
-  const handleReject = () => {
+  const handleReject = async () => {
     const { dcpReportId } = params;
 
     if (!dcpReportId) {
       return;
     }
 
-    ActionModal.show({
+    const { result } = await dialogService.show(null, {
       title: 'Từ chối phiếu chấm này?',
-      onAccept: async () => {
-        try {
-          await DcpReportsService.rejectDcpReport(dcpReportId);
-          fetchDcpReport();
-          toast('Từ chối thành công!', {
-            type: 'success'
-          });
-        } catch (err) {
-          console.log(err);
-          toast('Đã có lỗi xảy ra!', {
-            type: 'error'
-          });
-        }
-      } 
-    })
+    });
+
+    if (result === 'Ok') {
+      try {
+        await DcpReportsService.rejectDcpReport(dcpReportId);
+        fetchDcpReport();
+        toast('Từ chối thành công!', {
+          type: 'success'
+        });
+      } catch (err) {
+        console.log(err);
+        toast('Đã có lỗi xảy ra!', {
+          type: 'error'
+        });
+      }
+    }
   };
 
-  const handleCancelReject = () => {
+  const handleCancelReject = async () => {
     const { dcpReportId } = params;
 
     if (!dcpReportId) {
       return;
     }
 
-    ActionModal.show({
-      title: 'Bỏ duyệt phiếu chấm này?',
-      onAccept: async () => {
-        try {
-          await DcpReportsService.cancelAssessDcpReport(dcpReportId);
-          fetchDcpReport();
-          toast('Bỏ duyệt thành công!', {
-            type: 'success'
-          });
-        } catch (err) {
-          console.log(err);
-          toast('Đã có lỗi xảy ra!', {
-            type: 'error'
-          });
-        }
-      } 
+    const { result } = await dialogService.show(null, {
+      title: 'Bỏ duyệt phiếu chấm này?'
     });
+
+    if (result !== 'Ok') {
+      return;
+    }
+    try {
+      await DcpReportsService.cancelAssessDcpReport(dcpReportId);
+      fetchDcpReport();
+      toast.success('Bỏ duyệt thành công!');
+    } catch (err) {
+      console.log(err);
+      toast('Đã có lỗi xảy ra!', {
+        type: 'error'
+      });
+    }
   };
 
-  const handleEdit = () =>  {
+  const handleEdit = async () =>  {
     const { dcpReportId } = params;
 
     if (!dcpReportId) {
@@ -291,30 +293,31 @@ const DCPReportPage = () => {
     history.push(routeWithParams(routes.UpdateDCPReport, dcpReportId));
   };
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     const { dcpReportId } = params;
 
     if (!dcpReportId) {
       return;
     }
 
-    ActionModal.show({
+    const { result } = await dialogService.show(null, {
       title: 'Xóa phiếu chấm này?',
-      onAccept: async () => {
-        try {
-          await DcpReportsService.deleteDcpReportById(dcpReportId);
-          fetchDcpReport();
-          toast('Xóa thành công!', {
-            type: 'success'
-          });
-        } catch (err) {
-          console.log(err);
-          toast('Đã có lỗi xảy ra!', {
-            type: 'error'
-          });
-        }
-      } 
-    })
+    });
+
+    if (result === 'Ok') {
+      try {
+        await DcpReportsService.deleteDcpReportById(dcpReportId);
+        fetchDcpReport();
+        toast('Xóa thành công!', {
+          type: 'success'
+        });
+      } catch (err) {
+        console.log(err);
+        toast('Đã có lỗi xảy ra!', {
+          type: 'error'
+        });
+      }
+    }
   };
 
   return (
@@ -384,12 +387,13 @@ const DCPReportPage = () => {
                 disableColumnFilter
                 disableColumnMenu
                 hideFooter
-                onCellClick={(params) => {
+                onCellClick={async (params) => {
                   if (params.colIndex === 4) {
                     const students = params.getValue('relatedStudents') as DcpReport.DcpStudentReportDto[] || [];
-                    ActionModal.show({
+                    dialogService.show({students}, {
                       title: 'Danh sách học sinh vi phạm',
-                      component: <StudentList students={students} />
+                      type: 'data',
+                      renderFormComponent: StudentList
                     });
                   }
                 }}

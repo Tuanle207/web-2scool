@@ -12,12 +12,11 @@ import { useFetchV2 } from '../hooks/useFetchV2';
 import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@material-ui/icons/Edit';
 import PublishIcon from '@material-ui/icons/Publish';
-import ActionModal from '../components/Modal';
 import { comparers, regulationType, dataGridLocale } from '../appConsts';
 import { toast } from 'react-toastify';
 import { useDialog } from '../hooks';
 import CreateOrUpdateRegulationRequest, { CreateOrUpdateRegulationRequestProps } from '../components/Modal/CreateOrUpdateRegulationRequest';
-import { busyService } from '../services';
+import { busyService, dialogService } from '../services';
 import useStyles from '../assets/jss/views/StudentsPage';
 
 interface RowMenuProps {
@@ -295,16 +294,19 @@ const RegulationsPage = () => {
     fileRef.current?.click();
   };
 
-  const onFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+  const onFileChange = async (event: ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files || [];
     if (files.length > 0) {
       const file = files[0];
 
-      ActionModal.show({
+      const { result } = await dialogService.show(null, {
         title: 'Xác nhận nhập dữ liệu từ excel',
-        onAccept: () => importFromExcel(file),
-        onClose: resetFileInput
       });
+
+      if (result === 'Ok') {
+        await importFromExcel(file);
+      }
+      resetFileInput();
     }
   };
 

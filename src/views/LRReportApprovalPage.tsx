@@ -354,7 +354,6 @@ const LRReportApprovalPage = () => {
     setDateFilterType('week');
     const startDate = moment().startOf('isoWeek').format('MM/DD/YYYY');
     const endDate = moment().endOf('isoWeek').format('MM/DD/YYYY');
-    console.log({startDate, endDate});
 
     setFilter({
       key: 'CreationTime',

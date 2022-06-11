@@ -27,11 +27,21 @@ const Endpoint = {
     `/api/app/statistics/students-with-most-faults-excel${query}`,
 
   GetClassFaultDetails: (classId: string, query: string) =>
-    `/api/app/statistics/class-fault-details/${classId}?${query}`,
+    `/api/app/statistics/class-fault-details/${classId}${query}`,
+  GetClassFaultDetailsExcel: (classId: string, query: string) =>
+    `/api/app/statistics/class-fault-details-excel/${classId}${query}`,
   GetRegulationFaultDetails: (regulationId: string, query: string) =>
-    `/api/app/statistics/regulation-fault-details/${regulationId}?${query}`,
+    `/api/app/statistics/regulation-fault-details/${regulationId}${query}`,
+  GetRegulationFaultDetailsExcel: (regulationId: string, query: string) =>
+    `/api/app/statistics/regulation-fault-details-excel/${regulationId}${query}`,
   GetStudentFaultDetails: (studentId: string, query: string) =>
-    `/api/app/statistics/student-fault-details/${studentId}?${query}`,
+    `/api/app/statistics/student-fault-details/${studentId}${query}`,
+  GetStudentFaultDetailsExcel: (studentId: string, query: string) =>
+    `/api/app/statistics/student-fault-details-excel/${studentId}${query}`,
+  SendClassFaultsThroughEmail: (classId: string, query: string) =>
+    `/api/app/statistics/send-class-faults-through-email${query}&classId=${classId}`,
+  SendStudentFaultsThroughEmail: (classId: string, query: string) =>
+    `/api/app/statistics/send-student-faults-through-email${query}&studentId=${classId}`,
 };
 
 export default Endpoint;

@@ -62,7 +62,6 @@ const CreateOrUpdateClassRequest: FC<CreateOrUpdateClassRequestProps> = ({
   }
 
   const validateName = async (value: string) => {
-    console.log({value});
     if (!value || value?.length > 20) {
       return;
     }

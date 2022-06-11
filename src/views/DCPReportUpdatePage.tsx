@@ -15,12 +15,12 @@ import { Class, Student, Regulation, DcpReport, Util } from '../interfaces';
 import { DcpReportsService, RegulationsService, StudentsService, TaskAssignmentService } from '../api';
 import { DcpReportActions } from '../store/actions';
 import { formatTime } from '../utils/TimeHelper';
-import ActionModal from '../components/Modal';
 import { taskType } from '../appConsts';
 import { useDispatch, useSelector } from 'react-redux';
 import { DcpReportSelector, LoadingSelector } from '../store/selectors';
 import { toast } from 'react-toastify';
 import useStyles from '../assets/jss/views/DCPReportUpdatePage';
+import { dialogService } from '../services';
 
 
 interface Props { }
@@ -104,7 +104,7 @@ const DCPReportUpdatePage: FC<Props> = () => {
   const handleAddStudentView = (regulationId: string) => {
     setSelectedRegulationId(regulationId);
     setIsAddingStudent(true);
-  }
+  };
 
   const handleAddClass = () => {
     if (currentClass === null) {
@@ -115,12 +115,14 @@ const DCPReportUpdatePage: FC<Props> = () => {
     }
     dispatch(DcpReportActions.addClassToReport(currentClass.id));
   };
+
   const handleRemoveClass = (classId: string) => {
     dispatch(DcpReportActions.removeClassFromReport(classId));
     if (classId === selectedClassId) {
       setSelectedClassId(null);
     }
   };
+
   const handleAddFault = () => {
     if (selectedClassId === null || currentRegulation === null) {
       return;
@@ -136,7 +138,8 @@ const DCPReportUpdatePage: FC<Props> = () => {
       classId: selectedClassId,
       regulationId: currentRegulation.id
     }));
-  }
+  };
+
   const handleRemoveFault = (regulationId: string) => {
     if (selectedClassId === null) {
       return;
@@ -153,16 +156,20 @@ const DCPReportUpdatePage: FC<Props> = () => {
       setSelectedRegulationId(null);
     }
   };
-  const handleSend = () => {
+
+  const handleSend = async () => {
     if (dcpReport.dcpClassReports.length === 0) {
       toast.info("Vui lòng chấm ít nhất 1 lớp!");
       return;
     }
     const { dcpReportId } = params;
-    ActionModal.show({
+    const { result } = await dialogService.show(null, {
       title: 'Xác nhận cập nhật phiếu chấm điểm?',
-      onAccept: () => dispatch(DcpReportActions.updateDcpReport({dcpReportId}))
     });
+
+    if (result === 'Ok') {
+      dispatch(DcpReportActions.updateDcpReport({dcpReportId}))
+    }
   };
 
   const handleAddStudent = (regulationId: string) => {
