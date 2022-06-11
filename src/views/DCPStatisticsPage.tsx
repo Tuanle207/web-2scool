@@ -82,7 +82,7 @@ const ClassRowMenuCell = (props: RowMenuProps) => {
     try {
       busyService.busy(true)
       await StatisticsService.sendClassFaultsThroughEmail({ startTime, endTime }, classId);
-      toast.info('Email đang được gửi tới các giáo viên chủ nhiệm');
+      toast.info(`Email đang được gửi tới giáo viên chủ nhiệm ${className}`);
     } catch {
       toast.error('Đã có lỗi xảy ra. Không thể gửi email!');
     } finally {
@@ -230,7 +230,7 @@ const StudentRowMenuCell = (props: RowMenuProps) => {
     try {
       busyService.busy(true)
       await StatisticsService.sendStudentFaultsThroughEmail({ startTime, endTime }, classId);
-      toast.info('Email đang được gửi tới các giáo viên chủ nhiệm');
+      toast.info(`Email đang được gửi tới giáo viên chủ nhiệm ${className}`);
     } catch {
       toast.error('Đã có lỗi xảy ra. Không thể gửi email!');
     } finally {
