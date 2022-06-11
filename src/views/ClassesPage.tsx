@@ -73,15 +73,15 @@ const RowMenuCell = (props: RowMenuProps) => {
     if  (result !== 'Ok' || !data) {
       return;
     }
-    await saveUpdateData(data);
+    await saveUpdateData({...data, formTeacherId: undefined});
   };
 
   const initUpdateData = async (): Promise<CreateOrUpdateClassRequestProps | null> => {
     try {
       busyService.busy(true);
-      const { items: grades } = await GradesService.getAllGrades({});
-      const { items: teachers } = await TeachersService.getFormableTeachers();
       const classId = id.toString();
+      const { items: grades } = await GradesService.getAllGrades({});
+      const { items: teachers } = await TeachersService.getFormableTeachers(classId);
       const editItem = await ClassesService.getClassById(classId);
       busyService.busy(false);
       const data: CreateOrUpdateClassRequestProps = {
@@ -233,7 +233,7 @@ const ClassesPage = () => {
     }
     try {
       busyService.busy(true);
-      await ClassesService.createClass(data);
+      await ClassesService.createClass({...data, formTeacherId: undefined});
       toast('Thêm lớp học thành công', {
         type: toast.TYPE.SUCCESS
       });

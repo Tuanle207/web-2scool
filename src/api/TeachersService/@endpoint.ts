@@ -5,8 +5,8 @@ const Endpoint = {
     `/api/app/teachers/paging`,
   getAllTeachersSimpleList: () => 
     `/api/app/teachers/simple-list`,
-  getFormableTeachers: () =>
-    `/api/app/teachers/formable-teachers`,
+  getFormableTeachers: (classId?: string) =>
+    `/api/app/teachers/formable-teachers?classId=${classId}`,
   CreateTeacher: () =>
     `/api/app/teachers`,
   UpdateTeacher: (id: string) =>

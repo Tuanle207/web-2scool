@@ -33,7 +33,7 @@ const CreateOrUpdateClassRequest: FC<CreateOrUpdateClassRequestProps> = ({
     defaultValues: {
       name: '',
       gradeId: '',
-      formTeacherId: undefined,
+      formTeacherId: '',
     }
   });
 

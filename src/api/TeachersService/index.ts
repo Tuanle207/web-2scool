@@ -32,9 +32,9 @@ const getAllTeachersSimpleList = async () =>  {
   return result;
 };
 
-const getFormableTeachers = async () =>  {
+const getFormableTeachers = async (classId?: string) =>  {
   const apiService = await getApiService({ queryActiveCourse: true });
-  const result = await apiService.get<Util.PagingModel<Teacher.TeacherForSimpleListDto>>(Endpoint.getFormableTeachers());
+  const result = await apiService.post<Util.PagingModel<Teacher.TeacherForSimpleListDto>>(Endpoint.getFormableTeachers(classId || ''));
   return result;
 };
 
