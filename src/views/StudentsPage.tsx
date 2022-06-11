@@ -7,6 +7,7 @@ import PersonAddIcon from '@material-ui/icons/PersonAdd';
 import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@material-ui/icons/Edit';
 import PublishIcon from '@material-ui/icons/Publish';
+import InsertDriveFileIcon from '@material-ui/icons/InsertDriveFile';
 import Header from '../components/Header';
 import PageTitleBar from '../components/PageTitleBar';
 import FilterButton, { IFilterOption } from '../components/FilterButton';
@@ -249,7 +250,7 @@ const StudentsPage = () => {
     loading,
     error,
     resetFilter
-  } = useFetchV2({ fetchFn: fetchAPIDebounced });
+  } = useFetchV2({ fetchFn: fetchAPIDebounced, pageSize: 30 });
 
   useEffect(() => {
 
@@ -380,6 +381,10 @@ const StudentsPage = () => {
     }
   };
 
+  const onDownloadTemplateExcel = async () => {
+    await DataImportService.downloadTemplateStudentImport();
+  };
+
   return (
     <Grid style={{ background: '#fff', flexGrow: 1 }} item container direction='column'>
       <Grid item >
@@ -418,6 +423,11 @@ const StudentsPage = () => {
               )}
               actionComponent={(
                 <Fragment>
+                  <Tooltip title="Tải file nhập mẫu">
+                    <IconButton size="small" onClick={onDownloadTemplateExcel}>
+                      <InsertDriveFileIcon color="primary" />
+                    </IconButton>
+                  </Tooltip>
                   <Tooltip title="Nhập từ excel">
                     <IconButton style={{ marginRight: 16 }} size="small" onClick={onImportFromExcel}>
                       <PublishIcon color="primary" />

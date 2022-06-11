@@ -234,8 +234,7 @@ const CoursesPage = () => {
   };
 
   const onRequestCreate = async () => {
-    const editResult = await showDialog();
-    const { result, data } = editResult;
+    const { result, data } = await showDialog();
     if (result !== 'Ok' || !data) {
       return;
     } 

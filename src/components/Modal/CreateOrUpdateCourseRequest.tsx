@@ -186,28 +186,25 @@ const CreateOrUpdateCourseRequest: FC<CreateOrUpdateCourseRequestProps> = ({
         </MuiPickersUtilsProvider>
         {
           !editItem && (
-            <Box style={{marginBottom: 16}}>
-              <Controller
-                control={control}
-                name="fromActiveCourse"
-                rules={{
-                  required: "Bạn cần chọn loại vi phạm",
-                }}
-                render={({field: { value, onChange }, fieldState: { error },},) => (
-                  <Tooltip title="Dữ liệu sẽ được sao chép từ khóa học đang hoạt động.">
-                    <FormControl fullWidth variant="standard"  error={!!error} >
+            <Tooltip title="Dữ liệu sẽ được sao chép từ khóa học đang hoạt động.">
+              <Box style={{marginBottom: 16}}>
+                <Controller
+                  control={control}
+                  name="fromActiveCourse"
+                  render={({field: { value, onChange }}) => (
+                    <FormControl fullWidth variant="standard" >
                       <FormControlLabel
                         control={<Checkbox color="primary" checked={value} onChange={(e) => onChange(e.target.checked)} />}
                         label="Tạo từ khóa học hiện tại"
                       />
                     </FormControl>
-                  </Tooltip>
-                )}
-              />
-            </Box>
+                  )}
+                />
+              </Box>
+            </Tooltip>
           )
         }
-      </Container>
+    </Container>
   );
 };
 

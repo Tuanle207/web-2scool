@@ -1,7 +1,6 @@
 import { getApiService } from '../BaseApiService';
 import Endpoint from './@endpoint';
 
-
 const importStudentsData = async (excel: File) => {
   const apiService = await getApiService({ queryActiveCourse: true });
   const formData = new FormData();
@@ -42,10 +41,36 @@ const importCriteriasData = async (excel: File) => {
   return result;
 };
 
+const downloadTemplateTeacherImport = async () => {
+  window.location.assign(Endpoint.GetTemplateTeacherImport());
+};
+
+const downloadTemplateClassImport = async () => {
+  window.location.assign(Endpoint.GetTemplateClassImport());
+};
+
+const downloadTemplateStudentImport = async () => {
+  window.location.assign(Endpoint.GetTemplateStudentImport());
+};
+
+const downloadTemplateRegulationImport = async () => {
+  window.location.assign(Endpoint.GetTemplateRegulationImport());
+};
+
+const downloadTemplateCriteriaImport = async () => {
+  window.location.assign(Endpoint.GetTemplateCriteriaImport());
+};
+
 export const DataImportService = {
   importStudentsData,
   importTeachersData,
   importClassesData,
   importRegulationsData,
   importCriteriasData,
+
+  downloadTemplateTeacherImport,
+  downloadTemplateClassImport,
+  downloadTemplateStudentImport,
+  downloadTemplateRegulationImport,
+  downloadTemplateCriteriaImport,
 };

@@ -10,6 +10,7 @@ import { useFetchV2 } from '../hooks/useFetchV2';
 import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@material-ui/icons/Edit';
 import PublishIcon from '@material-ui/icons/Publish';
+import InsertDriveFileIcon from '@material-ui/icons/InsertDriveFile';
 import { comparers, dataGridLocale } from '../appConsts';
 import { toast } from 'react-toastify';
 import { useDialog } from '../hooks';
@@ -228,6 +229,10 @@ const CriteriasPage = () => {
     }
   };
 
+  const onDownloadTemplateExcel = async () => {
+    await DataImportService.downloadTemplateCriteriaImport();
+  };
+
   return (
     <Grid style={{ background: '#fff', flexGrow: 1 }} item container direction='column'>
       <Grid item >
@@ -252,6 +257,11 @@ const CriteriasPage = () => {
               filterCount={getFilterCount()}
               actionComponent={(
                 <Fragment>
+                  <Tooltip title="Tải file nhập mẫu">
+                    <IconButton size="small" onClick={onDownloadTemplateExcel}>
+                      <InsertDriveFileIcon color="primary" />
+                    </IconButton>
+                  </Tooltip>
                   <Tooltip title="Nhập từ excel">
                     <IconButton style={{ marginRight: 16 }} size="small" onClick={onImportFromExcel}>
                       <PublishIcon color="primary" />

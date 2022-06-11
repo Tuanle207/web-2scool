@@ -139,12 +139,6 @@ const CreateOrUpdateStudentRequest: FC<CreateOrUpdateStudentRequestProps> = ({
         <Controller
           control={control}
           name="parentPhoneNumber"
-          rules={{
-            required: {
-              value: true,
-              message: 'Số điện thoại phụ huynh là bắt buộc'
-            },
-          }}
           render={({field, fieldState: { error }}) => (
             <TextField 
               id='create-Student-parentPhoneNumber' 

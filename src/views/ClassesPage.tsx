@@ -5,6 +5,7 @@ import { DataGrid, GridApi, GridColDef, GridPageChangeParams, GridRowId, GridVal
 import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@material-ui/icons/Edit';
 import PublishIcon from '@material-ui/icons/Publish';
+import InsertDriveFileIcon from '@material-ui/icons/InsertDriveFile';
 import Header from '../components/Header';
 import { toast } from 'react-toastify';
 import PageTitleBar from '../components/PageTitleBar';
@@ -144,11 +145,6 @@ const cols: GridColDef[] =  [
     headerName: 'Giáo viên chủ nhiệm',
     width: 200,
     valueFormatter: (params: GridValueFormatterParams) => (params.value as Teacher.TeacherDto)?.name as string || 'Chưa được phân công'
-  },
-  {
-    field: 'noStudents',
-    headerName: 'Sĩ số',
-    width: 200
   },
   {
     field: 'actions',
@@ -311,6 +307,10 @@ const ClassesPage = () => {
     }
   };
 
+  const onDownloadTemplateExcel = async () => {
+    await DataImportService.downloadTemplateClassImport();
+  };
+
   return (
     <Grid style={{ background: '#fff', flexGrow: 1 }} item container direction='column'>
       <Grid item >
@@ -344,6 +344,11 @@ const ClassesPage = () => {
               )}
               actionComponent={(
                 <Fragment>
+                  <Tooltip title="Tải file nhập mẫu">
+                    <IconButton size="small" onClick={onDownloadTemplateExcel}>
+                      <InsertDriveFileIcon color="primary" />
+                    </IconButton>
+                  </Tooltip>
                   <Tooltip title="Nhập từ excel">
                     <IconButton style={{ marginRight: 16 }} size="small" onClick={onImportFromExcel}>
                       <PublishIcon color="primary" />
