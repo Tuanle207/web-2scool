@@ -25,6 +25,13 @@ export const policies = {
   CoursesCreate: 'Courses.Create',
   CoursesUpdate: 'Courses.Update',
   CoursesDelete: 'Courses.Delete',
+
+  Rules: 'Rules',
+  RulesGet: 'Rules.Get',
+  RulesGetAll: 'Rules.GetAll',
+  RulesCreate: 'Rules.Create',
+  RulesUpdate: 'Rules.Update',
+  RulesDelete: 'Rules.Delete',
   
   DcpReports: 'DcpReports',
   CreateNewDcpReport: 'DcpReports.CreateNewDcpReport',

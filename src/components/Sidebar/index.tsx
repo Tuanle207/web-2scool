@@ -167,14 +167,15 @@ const menuItems: IMenuItem[] = [
     Icon: RegulationIcon,
     title: 'Quy định nề nếp',
     route: routes.RegulationManager,
-    policyName: policies.Courses
+    policyName: policies.Rules,
+    showSeparator: true,
   },
   {
     key: routes.CriteriaManager,
     Icon: CategoryIcon,
     title: 'Tiêu chí nề nếp',
     route: routes.CriteriaManager,
-    policyName: policies.Courses
+    policyName: policies.Rules
   },
   {
     key: routes.UsersManager,
@@ -281,7 +282,7 @@ const MenuItem: FC<IMenuItemProps> = ({
       )
     }
     return (
-      <Fragment>
+      <div>
         {item.showSeparator && <Divider light className={styles.divider} />}
         <ListItem
           button 
@@ -295,7 +296,7 @@ const MenuItem: FC<IMenuItemProps> = ({
           </Grid>
           <ListItemText primary={item.title} />
         </ListItem>
-      </Fragment>
+      </div>
     );
   }
 

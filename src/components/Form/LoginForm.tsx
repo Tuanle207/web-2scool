@@ -37,7 +37,7 @@ const LoginForm: FC<LoginFormProps> = () => {
   return (
     <Container className={styles.formContainer}>
       <form className={styles.form} onSubmit={handleSubmit(onSumbit)}>
-        <p className={styles.title}>{`Hệ thống quản lí nề nếp ${schoolName} - 2Scool`}</p>
+        <p className={styles.title}>{`Hệ thống quản lý nề nếp ${schoolName} - 2Scool`}</p>
         <Controller
           name="username"
           control={control}

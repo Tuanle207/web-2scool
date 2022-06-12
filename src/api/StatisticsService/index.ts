@@ -63,6 +63,20 @@ const getStatForLineChart = async (input: Util.DateFilterDto) => {
   return result;
 };
 
+const getStatForPieChart = async (input: Util.DateFilterDto) => {
+  const apiService = await getApiService({ queryActiveCourse: true });
+  const query = `?StartTime=${formatQueryDate(input.startTime)}&EndTime=${formatQueryDate(input.endTime)}`;
+  const result = await apiService.get<Stats.PieChartStatDto>(Endpoint.GetStatForPieChart(query));
+  return result;
+};
+
+const getStatForBarChart = async (input: Util.DateFilterDto) => {
+  const apiService = await getApiService({ queryActiveCourse: true });
+  const query = `?StartTime=${formatQueryDate(input.startTime)}&EndTime=${formatQueryDate(input.endTime)}`;
+  const result = await apiService.get<Stats.BarChartStatDto>(Endpoint.GetStatForBarChart(query));
+  return result;
+};
+
 const getOverallRankingExcel = async (input: Util.DateFilterDto) => {
   const apiService = await getApiService({ queryActiveCourse: true, blobResponseType: true });
   const query = `?StartTime=${formatQueryDate(input.startTime)}&EndTime=${formatQueryDate(input.endTime)}`;
@@ -180,6 +194,8 @@ export const StatisticsService = {
   getCommonFaults,
   getStudentsWithMostFaults,
   getStatForLineChart,
+  getStatForPieChart,
+  getStatForBarChart,
   getOverallRankingExcel,
   getDcpRankingExcel,
   getLrRankingExcel,

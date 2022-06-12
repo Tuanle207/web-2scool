@@ -13,6 +13,10 @@ const Endpoint = {
     `/api/app/statistics/students-with-most-faults${query}`,
   GetStatForLineChart: (query: string) =>
     `/api/app/statistics/stat-for-line-chart${query}`,
+  GetStatForPieChart: (query: string) =>
+    `/api/app/statistics/stat-for-pie-chart${query}`,
+  GetStatForBarChart: (query: string) =>
+    `/api/app/statistics/stat-for-bar-chart${query}`,
   GetOverallRankingExcel: (query: string) =>
     `/api/app/statistics/overall-ranking-excel${query}`,
   GetDcpRankingExcel: (query: string) =>

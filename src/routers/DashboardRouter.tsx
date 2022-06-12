@@ -157,12 +157,12 @@ const DashboardRouteDictionary = () => {
       />
       <ProtectedRoute
         path={routes.RegulationManager}
-        policyName={policies.Courses}
+        policyName={policies.Rules}
         component={RegulationsPage}
       />
       <ProtectedRoute
         path={routes.CriteriaManager}
-        policyName={policies.Courses}
+        policyName={policies.Rules}
         component={CriteriasPage}
       />
       <ProtectedRoute 

@@ -65,6 +65,25 @@ export namespace Stats {
     items: Util.IObject<LineChartStat[]>;
   }
 
+  export interface PieChartStatDto {
+    items: PieChartStat[];
+  }
+
+  export interface PieChartStat {
+    name: string;
+    value: number;
+  }
+
+  export interface BarChartStatDto {
+    items: BarChartStat[];
+  }
+
+  export interface BarChartStat {
+    name: string;
+    points: number;
+    faults: number;
+  }
+
   export interface ClassFaultDetail {
     id: string;
     regulationId: string;

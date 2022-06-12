@@ -80,6 +80,7 @@ const DCPReportUpdatePage: FC<Props> = () => {
     };
 
     initData();
+    console.log('hello')
   }, []);
 
   useEffect(() => {
