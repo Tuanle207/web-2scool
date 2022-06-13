@@ -8,16 +8,16 @@ function toLocalISOString(date: Date) {
 
 const formatDate = (date: string, format?: string) => {
   if (!format) {
-    return moment(date).format('DD/MM/YYYY');
+    return moment.utc(date).local().format('DD/MM/YYYY');
   }
-  return moment(date).format(format);
+  return moment.utc(date).local().format(format);
 };
 
 const formatTime = (date: string, format?: string) => {
   if (!format) {
-    return moment(date).format('DD/MM/YYYY - HH:mm');
+    return moment.utc(date).local().format('DD/MM/YYYY - HH:mm');
   }
-  return moment(date).format(format);
+  return moment.utc(date).local().format(format);
 };
 
 const getDayOfWeek = (date: string) => {
