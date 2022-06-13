@@ -50,14 +50,16 @@ const Dashboard = () => {
   const grantedPolicy = useSelector(AppConfigSelector.grantedPolicies);
 
   useEffect(() => {
-    if (grantedPolicy[policies.Statistics]) {
-      fetchDcpReportStatsData();
-    }
-
     document.title = "2Scool | Trang chủ";
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    if (grantedPolicy[policies.Statistics]) {
+      fetchDcpReportStatsData();
+    }
+  }, [grantedPolicy]);
 
   const fetchDcpReportStatsData = async () => {
     const startDate = moment().startOf('isoWeek').toDate();
