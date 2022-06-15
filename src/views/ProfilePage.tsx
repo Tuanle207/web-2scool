@@ -9,6 +9,7 @@ import { AppConfigSelector } from '../store/selectors';
 import useStyles from '../assets/jss/views/ProfilePage';
 import { Controller, useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
+import { PASSWORD_PATTERN } from '../utils/regex-pattern';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -108,7 +109,7 @@ interface IChangePasswordFormInputs {
 
 const ChangePasswordTab: FC<IChangePasswordTabProps> = () => {
 
-  const { control, handleSubmit, getValues, setValue } = useForm<IChangePasswordFormInputs>({
+  const { control, handleSubmit, getValues, reset } = useForm<IChangePasswordFormInputs>({
     defaultValues: {
       currentPassword: '',
       newPassword: '',
@@ -116,17 +117,29 @@ const ChangePasswordTab: FC<IChangePasswordTabProps> = () => {
     }
   });
 
-  const onSubmit = (data: IChangePasswordFormInputs) => {
-    console.log(data);
+  const onSubmit = async (data: IChangePasswordFormInputs) => {
+    try {
+      await ProfileService.changePassword({
+        currentPassword: data.currentPassword,
+        newPassword: data.newPassword,
+      });
+  
+      reset({
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword:'',
+      });
+  
+      toast.success('Thay đổi mật khẩu thành công!');
+    } catch (err) {
+      console.log({err});
+      toast.error('Đã có lỗi xảy ra, không thể đổi mật khẩu.');
+    }
+    
   };
 
   const onSubmitClick = (e: any) => {
     handleSubmit(onSubmit)(e);
-    toast.success('Thay đổi mật khẩu thành công!');
-    
-    setValue('currentPassword', '');
-    setValue('newPassword', '');
-    setValue('confirmPassword', '');
   };
 
   return (
@@ -142,7 +155,7 @@ const ChangePasswordTab: FC<IChangePasswordTabProps> = () => {
             ref={ref}
             required
             id="xcurrent-password"
-            label="Current password" 
+            label="Mật khẩu cũ" 
             type="password"
             autoComplete="new-password"
             style={{ marginBottom: 16 }}
@@ -159,19 +172,17 @@ const ChangePasswordTab: FC<IChangePasswordTabProps> = () => {
         control={control}
         rules={{
           required: "Vui lòng nhập mật khẩu mới",
-          validate: (value) => {
-            if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/.test(value)) {
-              return "Mật khẩu phải có tối thiểu 6 kí tự, bao gồm ít nhất 1 kí tự số, 1 kí tự đặc biệt, 1 kí tự in hoa";
-            }
-            return true;
-          }
+          pattern: {
+            value: PASSWORD_PATTERN,
+            message: 'Mật khẩu phải gồm 6-20 kí tự, chỉ có thể gồm 0-9, a-z, A-Z, _ và kí tự đầu tiên phải là chữ cái'
+          },
         }}
         render={({field: { ref, value, onChange, onBlur }, fieldState: { invalid, error }}) => (
           <TextField
             ref={ref}
             required
             id="new-password"
-            label="New password" 
+            label="Mật khẩu mới" 
             type="password"
             autoComplete="new-password"
             style={{ marginBottom: 16 }}
@@ -187,7 +198,7 @@ const ChangePasswordTab: FC<IChangePasswordTabProps> = () => {
         name="confirmPassword"
         control={control}
         rules={{
-          required: "Vui lòng nhập xác nhận mật khẩu",
+          required: "Vui lòng nhập lại mật khẩu",
           validate: (value) => {
             if (value !== getValues('newPassword')) {
               return "Mật khẩu không trùng khớp";
@@ -200,7 +211,7 @@ const ChangePasswordTab: FC<IChangePasswordTabProps> = () => {
             ref={ref}
             required
             id="new-confirm-password"
-            label="Confirm password" 
+            label="Xác nhận mật khẩu mới" 
             type="password"
             autoComplete="new-password"
             style={{ marginBottom: 16 }}
@@ -212,7 +223,7 @@ const ChangePasswordTab: FC<IChangePasswordTabProps> = () => {
           />
         )}
       />
-      <Button variant="contained" onClick={onSubmitClick}>Lưu</Button>
+      <Button type="submit" variant="contained" color="primary" style={{ marginTop: 32 }} onClick={onSubmitClick}>Lưu</Button>
     </Grid>
   );
 };

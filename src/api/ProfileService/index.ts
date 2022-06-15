@@ -16,7 +16,7 @@ const updateMyProfile = async (input: Profile.UpdateMyProfileRequest) => {
 
 const changePassword = async (input: Profile.ChangePasswordRequest) => {
   const apiService = await getApiService();
-  const result = await apiService.get<Profile.ChangePasswordRequest>(Endpoint.ChangePassword(), input);
+  const result = await apiService.post<void>(Endpoint.ChangePassword(), input);
   return result;
 };
 
