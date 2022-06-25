@@ -87,7 +87,7 @@ const Dashboard = () => {
   const weekDay = moment().startOf('isoWeek').format('DD/MM/YYYY');
 
   return (
-    <Grid style={{ background: '#fff', flexGrow: 1,}} item container direction='column'>
+    <Grid style={{ background: '#fff', height: "100%"}} item container direction='column'>
       <Grid item >
         <Header
           pageName="Trang chủ"
@@ -129,21 +129,18 @@ const Dashboard = () => {
             </Grid>
           </Paper>
         </Grid>              
-        <Grid item container direction='column' style={{ flex: 1, flexWrap: 'nowrap', background: "#e8e8e8" }}>
-          <Paper elevation={3} variant="outlined" className="auto-hidden-scroll" style={{ position: 'relative', flex: 1, minHeight: 0, margin: "16px 24px", overflowY: 'hidden' }}>
+        <Grid item container direction='column' style={{ flex: 1, minHeight: 0, flexWrap: 'nowrap', background: "#e8e8e8" }}>
+          <Paper elevation={3} variant="outlined" className="auto-hidden-scroll" style={{ position: 'relative', overflowX: "auto", flex: 1, minHeight: 0, margin: "16px 24px" }}>
             {
               (grantedPolicy[policies.Statistics] && viewType === 'DcpClass') && (
-                <Grid container justify="center" alignItems="center" style={{ height: "100%", margin: "0 32px", width: "auto", flexWrap: 'nowrap', }}>
-                  <ResponsiveContainer width="60%" height="80%">
+                <Grid container  direction="column" alignItems="center" justify="center" style={{ margin: "0 32px", width: "auto", flexWrap: 'nowrap', }}>
+                  <ResponsiveContainer width={600} height={500} >
                     <BarChart
-                      width={500}
-                      height={500}
+                      width={600}
+                      height={400}
                       data={pointsChartData}
                       margin={{
-                        top: 36,
-                        right: 36,
-                        left: 36,
-                        bottom: 36,
+                        top: 64,
                       }}
                     >
                       <XAxis dataKey="name" />
@@ -159,7 +156,7 @@ const Dashboard = () => {
                       </Bar>
                     </BarChart>
                   </ResponsiveContainer>
-                  <div style={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)', bottom: 16 }}>
+                  <div style={{ paddingTop: 16, paddingBottom: 16 }}>
                     <Typography>Lớp có điểm nề nếp cao tuần {weekDay}</Typography>
                   </div>
                 </Grid>
@@ -168,9 +165,15 @@ const Dashboard = () => {
             
             {
               (grantedPolicy[policies.Statistics] && viewType === 'DcpFault') && (
-                <Grid container justify="center" style={{ height: "100%", margin: "0 32px", width: "auto", flexWrap: 'nowrap', }}>
-                  <ResponsiveContainer width="60%" height="80%">
-                    <PieChart width={500} height={500}>
+                <Grid container direction="column" alignItems="center" justify="center" style={{  margin: "0 32px", width: "auto", flexWrap: 'nowrap', }}>
+                  <ResponsiveContainer width={700} height={500}>
+                    <PieChart width={700} height={500}  
+                      margin={{
+                          top: 36,
+                          right: 36,
+                          left: 36,
+                          bottom: 36,
+                      }}>
                       <Pie
                         dataKey="value"
                         data={faultsChartData}
@@ -189,7 +192,7 @@ const Dashboard = () => {
                         ))}
                       </Pie>
                       <ChartToolTip />
-                        <Legend />
+                      <Legend  />
                         {
                           faultsChartData.map((el, index) => (
                             <Line 
@@ -204,7 +207,7 @@ const Dashboard = () => {
                         }
                     </PieChart>
                   </ResponsiveContainer>
-                  <div style={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)', bottom: 16 }}>
+                  <div style={{ paddingTop: 16, paddingBottom: 16 }}>
                     <Typography>Lỗi vi phạm nhiều tuần {weekDay}</Typography>
                   </div>
                 </Grid>
