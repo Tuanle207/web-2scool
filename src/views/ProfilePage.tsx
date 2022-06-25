@@ -2,7 +2,6 @@ import React, { FC, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Grid, TextField, Typography, Tabs, Tab, Box, Button } from '@material-ui/core';
 import Header from '../components/Header';
-import PageTitleBar from '../components/PageTitleBar';
 import { Profile, Util } from '../interfaces';
 import { ProfileService } from '../api';
 import { AppConfigSelector } from '../store/selectors';
