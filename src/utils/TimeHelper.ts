@@ -70,20 +70,6 @@ const addDays = (date: Date, dayToAdd: number = 1) => {
   return new Date(temp.setDate(currentDay + dayToAdd));
 };
 
-const getPreviousMonday = (input: Date) => {
-    var date = new Date(input);
-    var day = date.getDay();
-    var prevMonday = new Date(input);
-    if(date.getDay() === 0) {
-        prevMonday.setDate(date.getDate() - 6);
-    }
-    else{
-        prevMonday.setDate(date.getDate() - (day-1));
-    }
-
-    return prevMonday;
-};
-
 const getLatestMonday = () => {
   return moment().startOf('isoWeek').toDate();
 };
@@ -99,7 +85,6 @@ export {
   toLocalISOString,
   getDayOfWeek,
   addDays,
-  getPreviousMonday,
   formatFullDateTime,
   formatFullDateTimeWithoutTime,
   getLatestMonday,

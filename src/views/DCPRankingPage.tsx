@@ -11,7 +11,7 @@ import Header from '../components/Header';
 import { Stats } from '../interfaces';
 import { DataGrid, GridCellParams, GridColDef } from '@material-ui/data-grid';
 import { StatisticsService } from '../api';
-import { getPreviousMonday } from '../utils/TimeHelper';
+import { getLatestMonday } from '../utils/TimeHelper';
 import GetAppIcon from '@material-ui/icons/GetApp';
 import { ReactComponent as FilterIcon } from '../assets/img/filter.svg';
 import useStyles from '../assets/jss/views/DCPRankingPage';
@@ -235,7 +235,7 @@ const DCPRankingPage = () => {
 
   const classes = useStyles();
 
-  const [dateFilter, setDateFilter] = useState<DateFilter>({startTime: getPreviousMonday(new Date()), endTime: new Date()})
+  const [dateFilter, setDateFilter] = useState<DateFilter>({startTime: getLatestMonday(new Date()), endTime: new Date()})
 
   const [overalRankings, setOveralRankings] = useState<Stats.OverallClassRanking[]>([]);
   const [dcpRankings, setDcpRankings] = useState<Stats.DcpClassRanking[]>([]);
@@ -257,7 +257,7 @@ const DCPRankingPage = () => {
   }, [dateFilter]);
 
   const handleWeekFilter = () => {
-    const startTime = getPreviousMonday(new Date());
+    const startTime = getLatestMonday(new Date());
     const endTime = new Date();
     setDateFilter({
       startTime,

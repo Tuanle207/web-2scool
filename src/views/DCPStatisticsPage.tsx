@@ -7,7 +7,7 @@ import { ChangeEvent, useEffect, useMemo, useState } from 'react';
 import Header from '../components/Header';
 import { DataGrid, GridApi, GridColDef, GridRowData, GridRowId } from '@material-ui/data-grid';
 import { StatisticsService } from '../api';
-import { formatFullDateTimeWithoutTime, getPreviousMonday } from '../utils/TimeHelper';
+import { formatFullDateTimeWithoutTime, getLatestMonday } from '../utils/TimeHelper';
 import { FindInPage } from '@material-ui/icons';
 import GetAppIcon from '@material-ui/icons/GetApp';
 import MailOutlineIcon from '@material-ui/icons/MailOutline';
@@ -386,7 +386,7 @@ const DCPStatisticsPage = () => {
   const [dateFilter, setDateFilter] = useState<{
     startTime: Date | null,
     endTime: Date | null
-  }>({startTime: getPreviousMonday(new Date()), endTime: new Date()})
+  }>({startTime: getLatestMonday(), endTime: new Date()})
 
 
   const [classFaultsStats, setClassFaultsStats] = useState<DcpClassFaultExtension[]>([]);
@@ -410,7 +410,7 @@ const DCPStatisticsPage = () => {
   }, [dateFilter]);
 
   const handleWeekFilter = () => {
-    const startTime = getPreviousMonday(new Date());
+    const startTime = getLatestMonday(new Date());
     const endTime = new Date();
     setDateFilter({
       startTime,
