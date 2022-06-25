@@ -235,7 +235,7 @@ const DCPRankingPage = () => {
 
   const classes = useStyles();
 
-  const [dateFilter, setDateFilter] = useState<DateFilter>({startTime: getLatestMonday(new Date()), endTime: new Date()})
+  const [dateFilter, setDateFilter] = useState<DateFilter>({startTime: getLatestMonday(), endTime: new Date()})
 
   const [overalRankings, setOveralRankings] = useState<Stats.OverallClassRanking[]>([]);
   const [dcpRankings, setDcpRankings] = useState<Stats.DcpClassRanking[]>([]);
@@ -257,7 +257,7 @@ const DCPRankingPage = () => {
   }, [dateFilter]);
 
   const handleWeekFilter = () => {
-    const startTime = getLatestMonday(new Date());
+    const startTime = getLatestMonday();
     const endTime = new Date();
     setDateFilter({
       startTime,

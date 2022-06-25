@@ -410,7 +410,7 @@ const DCPStatisticsPage = () => {
   }, [dateFilter]);
 
   const handleWeekFilter = () => {
-    const startTime = getLatestMonday(new Date());
+    const startTime = getLatestMonday();
     const endTime = new Date();
     setDateFilter({
       startTime,
