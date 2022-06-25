@@ -43,16 +43,16 @@ const ContactCard: FC<IContactCardProps> = ({
 
   return (
     <Box 
-      aria-describedby={contact.id}
+      aria-describedby={contact?.id}
       aria-owns={open ? 'mouse-over-popover' : undefined}
       aria-haspopup="true"
       className={classes.container}
       onMouseEnter={handleHover}
       onMouseLeave={handleClose}
     >
-      <Avatar src={contact.photo} alt={contact.name}>{getDelegateCharacter(contact.name || '')}</Avatar>
+      <Avatar src={contact?.photo} alt={contact?.name}>{getDelegateCharacter(contact?.name || '')}</Avatar>
       <Popover
-        id={contact.id}
+        id={contact?.id}
         open={open}
         anchorEl={anchorEl}
         onClose={handleClose}
@@ -63,27 +63,27 @@ const ContactCard: FC<IContactCardProps> = ({
       >
         <div className={classes.card}>
           <div className={classes.basicInfo}>
-            <Avatar className={classes.avatar} src={contact.photo} alt={contact.name}>{getDelegateCharacter(contact.name || '')}</Avatar>
+            <Avatar className={classes.avatar} src={contact?.photo} alt={contact?.name}>{getDelegateCharacter(contact?.name || '')}</Avatar>
             <div className={classes.basicInfoText}>
               <div className={classes.basicInfoTextRow}>
-                <p className={classes.name}>{contact.name}</p>
+                <p className={classes.name}>{contact?.name}</p>
               </div>
               {
-                contact.isStudent && (
+                contact?.isStudent && (
                 <div className={classes.basicInfoTextRow}>
                   <span className={classes.position}>Học sinh</span>
                 </div>
                 )
               }
               {
-                contact.isTeacher && (
+                contact?.isTeacher && (
                   <div className={classes.basicInfoTextRow}>
                     <span className={classes.position}>Giáo viên</span>
                   </div>
                   )
               }
               <div className={classes.basicInfoTextRow}>
-                <span className={classes.position}>{contact.classDisplayName}</span>
+                <span className={classes.position}>{contact?.classDisplayName}</span>
               </div>
             </div>
           </div>
@@ -91,11 +91,11 @@ const ContactCard: FC<IContactCardProps> = ({
           <div className={classes.contact}>
             <div className={classes.contactRowInfo}>
               <PhoneIcon fontSize="small" />
-              <span className={classes.position}>{contact.phoneNumber}</span>
+              <span className={classes.position}>{contact?.phoneNumber}</span>
             </div>
             <div className={classes.contactRowInfo}>
               <MailOutlineIcon fontSize="small" />
-              <span className={classes.position}>{contact.email}</span>
+              <span className={classes.position}>{contact?.email}</span>
             </div>
           </div>
         </div>

@@ -258,12 +258,9 @@ const ProfilePage = () => {
   return (
     <Grid style={{ background: '#fff', flexGrow: 1 }} item container direction='column'>
       <Grid item >
-        <Header hiddenSearchBar />
+        <Header pageName="Tài khoản của tôi" hiddenSearchBar />
       </Grid>
       <Grid item container direction='column' style={{ flexGrow: 1 }}>
-        <PageTitleBar 
-          title={`Tài khoản của tôi`} 
-        />
         <Grid container justify='space-between' className={classes.tabContainer}>
           <Tabs
             orientation="vertical"
