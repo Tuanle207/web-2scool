@@ -1,12 +1,12 @@
 import { Stats, Util } from '../../interfaces';
 import { getApiService } from '../BaseApiService';
 import Endpoint from './@endpoint';
-import { formatDate } from '../../utils/TimeHelper';
+import { toUtcTimeString } from '../../utils/TimeHelper';
 import { saveBlobAsFile } from '../../utils/FileHelper';
 import moment from 'moment';
 
-const formatQueryDate = (date: Date) => {
-  return formatDate(date.toLocaleString(), "MM/DD/YYYY");
+const formatQueryDate = (date: Date): string => {
+  return toUtcTimeString(date);
 };
 
 const getCurrentTimeString = () => {

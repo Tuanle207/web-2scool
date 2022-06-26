@@ -42,7 +42,6 @@ const DetailCell = (props: GridCellParams) => {
     >
       <PageviewIcon />
     </IconButton>
-
   );
 };
 
