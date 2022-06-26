@@ -8,7 +8,7 @@ import EditIcon from '@material-ui/icons/Edit';
 import Header from '../components/Header';
 import PageTitleBar from '../components/PageTitleBar';
 import { Tenant } from '../interfaces';
-import { IdentityService, MultitenancyService } from '../api';
+import { MultitenancyService } from '../api';
 import { useFetchV2, useDialog } from '../hooks';
 import { comparers, dataGridLocale, tenantSettingType } from '../appConsts';
 import { busyService } from '../services';
