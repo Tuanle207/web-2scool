@@ -50,8 +50,8 @@ const RowMenuCell = (props: RowMenuProps) => {
     }
     try {
       busyService.busy(true);
-      const userId = id.toString();
-      await IdentityService.deleteUserById(userId);
+      const tenantId = id.toString();
+      await MultitenancyService.deleteTenantById(tenantId);
       toast.success(`Xóa khách thuê ${tenantName} thành công!`);
       reloadCurrentPageData();
     } catch {
