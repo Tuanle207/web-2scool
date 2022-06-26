@@ -5,7 +5,7 @@ import Endpoint from './@endpoint';
 
 const createUpdate = async (input: TaskAssignment.CreateUpdateTaskAssignmentDto) => {
   try {
-    const apiService = await getApiService({ queryActiveCourse: true });
+    const apiService = await getApiService({ queryActiveCourse: true, queryCurrentAccount: true });
     await apiService.post(Endpoint.CreateUpdate(), input);
   } catch (error) {
     throw error;
