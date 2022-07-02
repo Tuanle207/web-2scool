@@ -68,9 +68,6 @@ const CreateOrUpdateRegulationRequest: FC<CreateOrUpdateRegulationRequestProps> 
               if (value.toString().includes('.')) {
                 return "Vui lòng nhập 1 số tự nhiên";
               } 
-              // else if (value <= 0) {
-              //   return "Vui lòng nhập một số dương";
-              // }
             }
           }}
           render={({field, fieldState: { error }}) => (
