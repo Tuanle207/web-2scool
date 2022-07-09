@@ -271,7 +271,7 @@ const RoleManagement = () => {
           <Container className={classes.root}>
             <DataGrid
               columns={cols}
-              rows={data.items}
+              rows={data.items.filter(x => x.name !== 'admin')}
               pageSize={pagingInfo.pageSize} 
               rowCount={data.totalCount}
               onPageChange={onPageChange}

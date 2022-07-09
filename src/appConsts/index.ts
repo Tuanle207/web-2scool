@@ -6,3 +6,4 @@ export * from './taskType';
 export * from './regulationType';
 export * from './data-grid-locale';
 export * from './tenant-setting-type';
+export * from './app-setting-type';

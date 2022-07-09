@@ -31,7 +31,7 @@ const createRegulation = async (input: Regulation.CreateUpdateRegulationDto) => 
 };
 
 const updateRegulation = async (id: string, input: Regulation.CreateUpdateRegulationDto) => {
-  const apiService = await getApiService();
+  const apiService = await getApiService({ queryActiveCourse: true });
   const result = await apiService.put<Regulation.RegulationDto>(Endpoint.UpdateRegulation(id), input);
   return result;
 };

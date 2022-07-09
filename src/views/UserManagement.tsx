@@ -1,4 +1,4 @@
-import { useState, useEffect, Fragment } from 'react';
+import { useState, useEffect, Fragment, } from 'react';
 import AwesomeDebouncePromise from 'awesome-debounce-promise';
 import { Container, Grid, IconButton, Paper, Tooltip } from '@material-ui/core';
 import { DataGrid, GridApi, GridColDef, GridPageChangeParams, GridRowId, GridValueFormatterParams } from '@material-ui/data-grid';
@@ -10,9 +10,9 @@ import PageTitleBar from '../components/PageTitleBar';
 import FilterButton, { IFilterOption } from '../components/FilterButton';
 import { Identity } from '../interfaces';
 import { IdentityService } from '../api';
-import { useFetchV2, useDialog } from '../hooks';
+import { useFetchV2, useDialog, usePermissionChecker } from '../hooks';
 import CreateOrUpdateUserRequest, { CreateOrUpdateUserRequestProps, CreateUpdateUserFormValues } from '../components/Modal/CreateOrUpdateUserRequest';
-import { comparers, dataGridLocale } from '../appConsts';
+import { comparers, dataGridLocale, policies } from '../appConsts';
 import { busyService } from '../services';
 import useStyles from '../assets/jss/views/UserManagement';
 
@@ -23,6 +23,9 @@ interface RowMenuProps {
 
 const RowMenuCell = (props: RowMenuProps) => {
   const { api, id } = props;
+
+  const canUpdateUser = usePermissionChecker(policies.AbpIdentityUsersUpdate);
+  const canDeleteUser = usePermissionChecker(policies.AbpIdentityUsersDelete);
 
   const { showDialog } = useDialog<CreateUpdateUserFormValues>({
     type: 'data',
@@ -105,16 +108,24 @@ const RowMenuCell = (props: RowMenuProps) => {
 
   return (
     <div>
+    {
+      canUpdateUser && (
       <Tooltip title='Cập nhật thông tin người dùng này'>
         <IconButton size="small" onClick={onRequestUpdate}>
           <EditIcon />
         </IconButton>
       </Tooltip>
+      )
+    }
+    {
+      canDeleteUser && (
       <Tooltip title='Xóa người dùng này'>
         <IconButton size="small" onClick={onRequestDelete}>
           <DeleteIcon />
         </IconButton>
       </Tooltip>
+      )
+    }
     </div>
   );
 };
@@ -165,6 +176,8 @@ const fetchAPIDebounced = AwesomeDebouncePromise(IdentityService.getUsers, 100);
 const UserManagement = () => {
 
   const classes = useStyles();
+
+  const canCreateUser = usePermissionChecker(policies.AbpIdentityUsersCreate);
 
   const { showDialog } = useDialog<CreateUpdateUserFormValues>({
     type: 'data',
@@ -257,7 +270,7 @@ const UserManagement = () => {
     } finally {
       busyService.busy(false);
     }
-  }
+  };
 
   return (
     <Grid style={{ background: '#fff', flexGrow: 1 }} item container direction='column'>
@@ -289,7 +302,7 @@ const UserManagement = () => {
                   />
                 </Fragment>
               )}
-              onMainButtonClick={onRequestCreate}
+              onMainButtonClick={canCreateUser ? onRequestCreate : undefined}
             />
           </Paper>
         </Grid>
@@ -297,7 +310,7 @@ const UserManagement = () => {
           <Container className={classes.root}>
             <DataGrid
               columns={cols}
-              rows={data.items}
+              rows={data.items.filter(x => x.roles.every(c => c.name !== 'admin'))}
               pageSize={pagingInfo.pageSize} 
               rowCount={data.totalCount}
               onPageChange={onPageChange}

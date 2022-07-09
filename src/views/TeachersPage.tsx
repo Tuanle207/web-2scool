@@ -6,17 +6,20 @@ import { toast } from 'react-toastify';
 import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@material-ui/icons/Edit';
 import PublishIcon from '@material-ui/icons/Publish';
+import PersonAddIcon from '@material-ui/icons/PersonAdd';
 import InsertDriveFileIcon from '@material-ui/icons/InsertDriveFile';
 import Header from '../components/Header';
 import PageTitleBar from '../components/PageTitleBar';
 import { formatDate } from '../utils/TimeHelper';
 import CreateOrUpdateTeacherRequest, { CreateOrUpdateTeacherRequestProps } from '../components/Modal/CreateOrUpdateTeacherRequest';
 import { comparers, dataGridLocale } from '../appConsts';
-import { DataImportService, TeachersService } from '../api';
+import { DataImportService, IdentityService, TeachersService } from '../api';
 import { busyService } from '../services';
 import { Teacher } from '../interfaces';
 import { useDialog, useFetchV2 } from '../hooks';
 import useStyles from '../assets/jss/views/TeachersPage';
+import { EMAIL_PATTERN } from '../utils/regex-pattern';
+import CreateTeacherAccountRequest, { CreateTeacherAccountRequestProps } from '../components/Modal/CreateTeacherAccountRequest';
 
 interface RowMenuProps {
   api: GridApi;
@@ -88,7 +91,7 @@ const RowMenuCell = (props: RowMenuProps) => {
     } finally {
       busyService.busy(false);
     }
-  }
+  };
 
   const saveUpdateData = async(data: Teacher.CreateUpdateTeacherDto) => {
     try {
@@ -102,6 +105,59 @@ const RowMenuCell = (props: RowMenuProps) => {
     } finally {
       busyService.busy(false);
     }
+  };
+
+  const onRequestAccountCreate = async () => {
+    const input = await initCreateAccountData();
+    if (!input) {
+      return;
+    }
+    const { result, data } = await showDialog(input, {
+      type: 'data',
+      title: 'Cấp tài khoản cho giáo viên',
+      acceptText: 'Cấp tài khoản',
+      cancelText: 'Hủy',
+      renderFormComponent: CreateTeacherAccountRequest
+    })
+    if (result !== 'Ok' || !data) {
+      return;
+    }
+    try {
+      busyService.busy(true);
+      await IdentityService.createUser(data);
+      toast.success('Cấp tài khoản thành công');
+    } catch {
+      toast.error('Đã có lỗi xảy ra. Không thể cấp tài khoản cho giáo viên.');
+    } finally {
+      busyService.busy(false);
+    }
+  };
+
+  const initCreateAccountData = async (): Promise<CreateTeacherAccountRequestProps | null> => {
+    try {
+      busyService.busy(true);
+      const teacherId = id.toString();
+      const foundEmail = await IdentityService.doesTeacherHaveAccountAlready(teacherId);
+      if (!!foundEmail && EMAIL_PATTERN.test(foundEmail))  {
+        toast.info(`Giáo viên này đã được cấp tài khoản với địa chỉ email "${foundEmail}" rồi`, {
+          autoClose: 4000
+        });
+        return null;
+      }
+      const teacher = await TeachersService.getTeacherById(teacherId);
+      const input: CreateTeacherAccountRequestProps = {
+        teacherName: teacher.name,
+        phoneNumber: teacher.phoneNumber,
+        email: teacher.email,
+        teacherId: teacher.id,
+      };
+      return input;
+    } catch (err) {
+      toast.error('Đã có lỗi xảy ra. Không thể khởi tạo dữ liệu để cấp tài khoản');
+      return null;
+    } finally {
+      busyService.busy(false);
+    }
   }
 
   return (
@@ -109,6 +165,11 @@ const RowMenuCell = (props: RowMenuProps) => {
       <Tooltip title='Cập nhật thông tin giáo viên này'>
         <IconButton size="small" onClick={onRequestUpdate}>
           <EditIcon />
+        </IconButton>
+      </Tooltip>
+      <Tooltip title='Cấp tài khoản cho giáo viên này'>
+        <IconButton size="small" onClick={onRequestAccountCreate}>
+          <PersonAddIcon />
         </IconButton>
       </Tooltip>
       <Tooltip title='Xóa giáo viên này'>

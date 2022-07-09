@@ -114,7 +114,7 @@ const getCommonFaultsExcel = async (input: Util.DateFilterDto) => {
   const query = `?StartTime=${formatQueryDate(input.startTime)}&EndTime=${formatQueryDate(input.endTime)}`;
 
   const blob = await apiService.get<Blob>(Endpoint.GetCommonFaultsExcel(query));
-  saveBlobAsFile(blob, `thong-ke-loi-vi-pham-${getCurrentTimeString()}`);
+  saveBlobAsFile(blob, `thong-ke-quy-dinh-ne-nep-${getCurrentTimeString()}`);
 };
 
 const getStudentsWithMostFaultsExcel = async (input: Util.DateFilterDto) => {
@@ -122,7 +122,7 @@ const getStudentsWithMostFaultsExcel = async (input: Util.DateFilterDto) => {
   const query = `?StartTime=${formatQueryDate(input.startTime)}&EndTime=${formatQueryDate(input.endTime)}`;
 
   const blob = await apiService.get<Blob>(Endpoint.GetStudentsWithMostFaultsExcel(query));
-  saveBlobAsFile(blob, `thong-ke-hoc-sinh-vi-pham-${getCurrentTimeString()}`);
+  saveBlobAsFile(blob, `thong-ke-ne-nep-hoc-sinh-${getCurrentTimeString()}`);
 };
 
 const getClassFaultDetails = async (classId: string, input: Util.DateFilterDto) => {
@@ -151,7 +151,7 @@ const getClassFaultDetailsExcel = async (classId: string, className: string, inp
   const query = `?StartTime=${formatQueryDate(input.startTime)}&EndTime=${formatQueryDate(input.endTime)}`;
 
   const blob = await apiService.get<Blob>(Endpoint.GetClassFaultDetailsExcel(classId, query));
-  saveBlobAsFile(blob, `bao-cao-lop-vi-pham-${className}-${getCurrentTimeString()}`);
+  saveBlobAsFile(blob, `bao-cao-chi-tiet-ne-nep-lop-${className}-${getCurrentTimeString()}`);
 };
 
 const getRegulationFaultDetailsExcel = async (regulationId: string, regulationName: string, input: Util.DateFilterDto) => {
@@ -159,7 +159,7 @@ const getRegulationFaultDetailsExcel = async (regulationId: string, regulationNa
   const query = `?StartTime=${formatQueryDate(input.startTime)}&EndTime=${formatQueryDate(input.endTime)}`;
 
   const blob = await apiService.get<Blob>(Endpoint.GetRegulationFaultDetailsExcel(regulationId, query));
-  saveBlobAsFile(blob, `thong-ke-vi-pham-${regulationName}-${getCurrentTimeString()}`);
+  saveBlobAsFile(blob, `thong-ke-chi-tiet-quy-dinh-ne-nep-${regulationName}-${getCurrentTimeString()}`);
 };
 
 const getStudentFaultDetailsExcel = async (studentId: string, studentName: string, input: Util.DateFilterDto) => {
@@ -167,7 +167,7 @@ const getStudentFaultDetailsExcel = async (studentId: string, studentName: strin
   const query = `?StartTime=${formatQueryDate(input.startTime)}&EndTime=${formatQueryDate(input.endTime)}`;
   
   const blob = await apiService.get<Blob>(Endpoint.GetStudentFaultDetailsExcel(studentId, query));
-  saveBlobAsFile(blob, `bao-cao-hoc-sinh-vi-pham-${studentName}-${getCurrentTimeString()}`);
+  saveBlobAsFile(blob, `bao-cao-chi-tiet-ne-nep-hoc-sinh-${studentName}-${getCurrentTimeString()}`);
 };
 
 const sendClassFaultsThroughEmail = async (input: Util.DateFilterDto, classId?: string) => {

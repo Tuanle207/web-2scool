@@ -8,6 +8,7 @@ export const policies = {
   AbpIdentityUsersCreate: 'AbpIdentity.Users.Create',
   AbpIdentityUsersUpdate: 'AbpIdentity.Users.Update',
   AbpIdentityUsersDelete: 'AbpIdentity.Users.Delete',
+  AbpIdentityUsersGet: 'AbpIdentity.Users.Get',
   AbpIdentityUsersManagePermissions: 'AbpIdentity.Users.ManagePermissions',
   AbpIdentityUserLookup: 'AbpIdentity.UserLookup',
   FeatureManaementManageHostFeatures: 'FeatureManagement.ManageHostFeatures',
@@ -25,6 +26,7 @@ export const policies = {
   CoursesCreate: 'Courses.Create',
   CoursesUpdate: 'Courses.Update',
   CoursesDelete: 'Courses.Delete',
+  CoursesStudents: 'Courses.Students',
 
   Rules: 'Rules',
   RulesGet: 'Rules.Get',

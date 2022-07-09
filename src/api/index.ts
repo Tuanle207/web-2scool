@@ -15,3 +15,4 @@ export * from './ProfileService';
 export * from './DataImportService';
 export * from './MultitenancyService';
 export * from './AccountsService';
+export * from './AppSettingService';

@@ -50,7 +50,7 @@ const cols: GridColDef[] = [
   },
   {
     field: 'regulation',
-    headerName: 'Vi phạm',
+    headerName: 'Quy định',
     flex: 1,
     valueFormatter: (params: GridValueFormatterParams) => {
       const item = params.value as Regulation.RegulationForSimpleListDto;
@@ -79,7 +79,7 @@ const cols: GridColDef[] = [
   },
   {
     field: 'relatedStudents',
-    headerName: 'Học sinh vi phạm',
+    headerName: 'Học sinh liên quan',
     width: 160,
     valueFormatter: (params: GridValueFormatterParams) => {
       const students = (params.value) as DcpReport.DcpStudentReportDto[];
@@ -96,8 +96,8 @@ const cols: GridColDef[] = [
     renderCell: (params) => {
       return (
         <Tooltip title='Xem chi tiết'>
-          <IconButton color='primary' >
-            <FindInPage />
+          <IconButton color='primary' size="small">
+            <FindInPage fontSize="small" />
           </IconButton>
         </Tooltip>
       )
@@ -375,8 +375,8 @@ const DCPReportPage = () => {
           <Grid item container direction="column" style={{ flex: 1, height: '100%' }}>
             <Grid item container direction="row" justify="space-between" alignItems="center" className={classes.classDetail}>
               <Typography variant={'body2'}>{`${className}`}</Typography>
-              <Typography variant={'body2'}>{`Số lỗi: ${faultsCount}`}</Typography>
-              <Typography variant={'body2'}>{`Số điểm trừ: ${faultsPoint}`}</Typography>
+              <Typography variant={'body2'}>{`Quy định: ${faultsCount}`}</Typography>
+              <Typography variant={'body2'}>{`Điểm: ${faultsPoint}`}</Typography>
             </Grid>
             <Grid item container style={{ flex: 1 }} className={classes.root} >
               <DataGrid
@@ -391,9 +391,11 @@ const DCPReportPage = () => {
                   if (params.colIndex === 4) {
                     const students = params.getValue('relatedStudents') as DcpReport.DcpStudentReportDto[] || [];
                     dialogService.show({students}, {
-                      title: 'Danh sách học sinh vi phạm',
+                      title: 'Danh sách học sinh liên quan',
                       type: 'data',
-                      renderFormComponent: StudentList
+                      renderFormComponent: StudentList,
+                      noCancelButton: true,
+                      acceptText: 'Đóng'
                     });
                   }
                 }}

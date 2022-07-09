@@ -28,6 +28,7 @@ export const routes = {
   Profile: '/tai-khoan-cua-toi',
   RegulationManager: '/quan-ly-quy-dinh',
   CriteriaManager: '/quan-ly-tieu-chi',
+  SettingManager: '/cai-dat-he-thong',
 
   //
   Login: '/dang-nhap'

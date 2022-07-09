@@ -1,6 +1,6 @@
 import React, { FC, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { Grid, TextField, Typography, Tabs, Tab, Box, Button } from '@material-ui/core';
+import { Grid, TextField, Typography, Tabs, Tab, Button } from '@material-ui/core';
 import Header from '../components/Header';
 import { Profile, Util } from '../interfaces';
 import { ProfileService } from '../api';
@@ -9,43 +9,7 @@ import useStyles from '../assets/jss/views/ProfilePage';
 import { Controller, useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 import { PASSWORD_PATTERN } from '../utils/regex-pattern';
-
-interface TabPanelProps {
-  children?: React.ReactNode;
-  index: any;
-  value: any;
-  [key: string]: any;
-}
-
-
-
-function TabPanel(props: TabPanelProps) {
-  const { children, value, index, ...rest } = props;
-
-  return (
-    <div
-      role="tabpanel"
-      hidden={value !== index}
-      id={`vertical-tabpanel-${index}`}
-      aria-labelledby={`vertical-tab-${index}`}
-      {...rest}
-    >
-      {value === index && (
-        <Box p={3}>
-          {children}
-        </Box>
-      )}
-    </div>
-  );
-}
-
-
-function a11yProps(index: number) {
-  return {
-    id: `vertical-tab-${index}`,
-    'aria-controls': `vertical-tabpanel-${index}`,
-  };
-}
+import TabPanel, { a11yProps } from '../components/TabPanel';
 
 interface IProfileTabProps extends Util.IHaveExtraProperties {
   name?: string;
@@ -96,9 +60,7 @@ const ProfileTab: FC<IProfileTabProps> = ({
   );
 }
 
-interface IChangePasswordTabProps {
-
-}
+interface IChangePasswordTabProps { }
 
 interface IChangePasswordFormInputs {
   currentPassword: string;

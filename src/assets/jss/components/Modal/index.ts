@@ -30,7 +30,6 @@ const modalStyles: {[key: string]: CSSProperties} = {
   },
   content: {
     maxHeight: 400,
-    overflowY: 'auto',
   },
   warning: {
     display: "flex",

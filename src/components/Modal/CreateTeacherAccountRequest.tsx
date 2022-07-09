@@ -7,18 +7,20 @@ import { useDialogController } from '../../hooks';
 import { IdentityService } from '../../api';
 import { EMAIL_PATTERN } from '../../utils/regex-pattern';
 
-export interface CreateStudentAccountRequestProps {
-  studentName: string;
-  parentPhoneNumber: string;
-  studentId: string;
+export interface CreateTeacherAccountRequestProps {
+  teacherName: string;
+  phoneNumber: string;
+  email: string;
+  teacherId: string;
 }
 
 const isEmailAlreadyUsedDebounced = AwesomeDebouncePromise(IdentityService.isEmailAlreadyUsed, 200);
 
-const CreateStudentAccountRequest: FC<CreateStudentAccountRequestProps> = ({
-  studentName,
-  parentPhoneNumber,
-  studentId,
+const CreateTeacherAccountRequest: FC<CreateTeacherAccountRequestProps> = ({
+  teacherName,
+  phoneNumber,
+  teacherId,
+  email,
 }) => {
 
   const { control, reset, watch, setValue, handleSubmit } = useForm<Identity.CreateUpdateUserDto>({
@@ -39,14 +41,14 @@ const CreateStudentAccountRequest: FC<CreateStudentAccountRequestProps> = ({
   useEffect(() => {
     reset({ 
       userName: 'username',
-      name: studentName,
-      email: '',
-      phoneNumber: parentPhoneNumber,
+      name: teacherName,
+      email: email,
+      phoneNumber: phoneNumber,
       roleNames: [''],
       password: 'password',
       concurrencyStamp: '',
       extraProperties: {
-        'StudentId': studentId
+        'TeacherId': teacherId
       }
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -168,4 +170,4 @@ const CreateStudentAccountRequest: FC<CreateStudentAccountRequestProps> = ({
   );
 };
 
-export default CreateStudentAccountRequest;
+export default CreateTeacherAccountRequest;

@@ -1,11 +1,10 @@
 import { FC, memo, useState } from 'react';
-import { AppBar, IconButton, Badge, Toolbar,
+import { AppBar, IconButton, Toolbar,
   InputBase, Menu, MenuItem, ListItemIcon, ListItemText, Typography, ButtonBase } from '@material-ui/core';
 import { StyledMenu, StyledMenuItem } from './HeaderMenu';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import AccountCircle from '@material-ui/icons/AccountCircle';
 import SearchIcon from '@material-ui/icons/Search';
-import NotificationsIcon from '@material-ui/icons/Notifications';
 import MoreIcon from '@material-ui/icons/MoreVert';
 import { useHistory } from 'react-router';
 import { AuthActions } from '../../store/actions';
@@ -118,14 +117,6 @@ const Header: FC<Props> = ({
       open={isMobileMenuOpen}
       onClose={handleMobileMenuClose}
     >
-      <MenuItem>
-        <IconButton aria-label="show 11 new notifications" color="inherit">
-          <Badge badgeContent={11} color="secondary">
-            <NotificationsIcon />
-          </Badge>
-        </IconButton>
-        <p>Thông báo</p>
-      </MenuItem>
       <MenuItem onClick={handleProfileClick}>
         <IconButton
           aria-label="account of current user"
@@ -182,11 +173,6 @@ const Header: FC<Props> = ({
               </div>
             </div>
           <div className={classes.sectionDesktop}>
-            <IconButton aria-label="show 17 new notifications" color="inherit">
-              <Badge badgeContent={17} color="secondary">
-                <NotificationsIcon />
-              </Badge>
-            </IconButton>
             <IconButton
               edge="end"
               aria-label="account of current user"

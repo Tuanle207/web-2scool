@@ -281,7 +281,7 @@ const DCPReportCreatePage: FC<Props> = () => {
                   value={currentRegulation}
                   onChange={(e, newValue) => setCurrentRegulation(newValue)}
                   renderInput={(params) => (
-                    <TextField {...params} variant="outlined" placeholder="Thêm vi phạm" />
+                    <TextField {...params} variant="outlined" placeholder="Thêm quy định" />
                   )}
                 />
                 <IconButton 
@@ -360,7 +360,7 @@ const DCPReportCreatePage: FC<Props> = () => {
                         <p>{regulationOptions.find(x => x.id === el.regulationId)?.name}</p>
                       </Grid>
                       <Grid item container alignItems='center' direction='row' style={{marginLeft: 'auto', width: 'auto'}}>
-                        <Tooltip title="Thêm học sinh vi phạm">
+                        <Tooltip title="Thêm học sinh liên quan">
                           <IconButton 
                             aria-label='add-students-item' 
                             color='primary'
@@ -388,7 +388,7 @@ const DCPReportCreatePage: FC<Props> = () => {
                       }
                     >
                       <FaceIcon fontSize='small' style={{marginRight: 8}} />
-                      <p>Học sinh vi phạm</p>
+                      <p>Học sinh liên quan</p>
                     </Grid>
                     {
                       /**
@@ -433,7 +433,7 @@ const DCPReportCreatePage: FC<Props> = () => {
                         value={currentStudent}
                         onChange={(e, newValue) => setCurrentStudent(newValue)}
                         renderInput={(params) => (
-                          <TextField {...params} variant='outlined' label='Thêm học sinh vi phạm' placeholder='Học sinh' />
+                          <TextField {...params} variant='outlined' label='Thêm học sinh liên quan' placeholder='Học sinh' />
                         )}
                       />
                       <IconButton 
@@ -462,7 +462,7 @@ const DCPReportCreatePage: FC<Props> = () => {
             {
               (getDcpClassReportItems().length === 0) && (
                 <Grid container justify='center' alignItems='center' className={classes.emptySelectedList} >
-                  <p>Chọn lớp và thêm vi phạm (nếu có)</p>
+                  <p>Chọn lớp và thêm quy định (nếu có)</p>
                 </Grid>
               )
             }

@@ -25,14 +25,14 @@ const classFaultDetailCols: GridColDef[] = [
   },
   {
     field: 'penaltyPoints',
-    headerName: 'Điểm trừ',
-    width: 120,
+    headerName: 'Điểm nề nếp',
+    width: 150,
     align: 'center',
     headerAlign: 'right'
   },
   {
     field: 'studentNames',
-    headerName: 'Học sinh vi phạm',
+    headerName: 'Học sinh liên quan',
     align: 'left',
     headerAlign: 'left',
     width: 500,
@@ -50,21 +50,21 @@ const regulationFaultDetailCols: GridColDef[] = [
   },
   {
     field: 'penaltyPoints',
-    headerName: 'Điểm trừ',
+    headerName: 'Điểm',
     width: 120,
     align: 'center',
     headerAlign: 'right'
   },
   {
     field: 'className',
-    headerName: 'Lớp vi phạm',
+    headerName: 'Tên lớp',
     width: 150,
     align: 'center',
-    headerAlign: 'right'
+    headerAlign: 'center'
   },
   {
     field: 'studentNames',
-    headerName: 'Học sinh vi phạm',
+    headerName: 'Học sinh liên quan',
     align: 'left',
     headerAlign: 'left',
     width: 500,
@@ -92,14 +92,14 @@ const studentFaultDetailCols: GridColDef[] = [
   },
   {
     field: 'penaltyPoints',
-    headerName: 'Điểm trừ',
+    headerName: 'Điểm',
     width: 120,
     align: 'center',
     headerAlign: 'right'
   },
   {
     field: 'count',
-    headerName: 'Lượt vi phạm',
+    headerName: 'Lượt chấm',
     align: 'center',
     headerAlign: 'right',
     width: 150,

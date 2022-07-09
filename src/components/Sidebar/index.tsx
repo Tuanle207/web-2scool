@@ -18,17 +18,19 @@ import FlagIcon from '@material-ui/icons/Flag';
 import LocalLibraryIcon from '@material-ui/icons/LocalLibrary';
 import BookIcon from '@material-ui/icons/Book';
 import CategoryIcon from '@material-ui/icons/Category';
+import SettingsIcon from '@material-ui/icons/Settings';
 import { ReactComponent as TeacherIcon } from '../../assets/img/teacher.svg';
 import { ReactComponent as StudentIcon } from '../../assets/img/student.svg';
 import { ReactComponent as RoleIcon } from '../../assets/img/permission.svg';
 import { ReactComponent as UserIcon } from '../../assets/img/user.svg';
 import { ReactComponent as RegulationIcon } from '../../assets/img/regulation.svg';
 import { ReactComponent as LrBookIcon } from '../../assets/img/lesson-register.svg';
-import { ReactComponent as MultitenancyIcon } from '../../assets/img/multitenancy.svg';
+import { ReactComponent as MultitenancyIcon } from '../../assets/img/ep_school.svg';
 import { routes } from '../../routers/routesDictionary';
 import { AppConfigSelector } from '../../store/selectors';
 import { useSelector } from 'react-redux';
 import useSidebarStyles from '../../assets/jss/components/Sidebar/sidebarStyles';
+import { useCurrentTenant } from '../../hooks';
 
 interface AccessResolver {
   (grantedPolicies: Util.IObject<boolean>): boolean;
@@ -42,6 +44,7 @@ interface IMenuItem {
   policyName?: string | AccessResolver;
   subItems?: IMenuItem[];
   showSeparator?: boolean;
+  availableFor?: 'tenantOnly' | 'hostOnly';
 }
 
 const menuItems: IMenuItem[] = [
@@ -50,27 +53,30 @@ const menuItems: IMenuItem[] = [
     title: 'Trang chủ',
     Icon: Dashboard,
     route: routes.Dashboard,
-    policyName: ''
+    policyName: '',
   },
   {
     key: routes.DCPReportApproval,
     Icon: CheckCircleIcon,
     title: 'Duyệt nề nếp',
     route: routes.DCPReportApproval,
-    policyName: policies.DcpReportApproval
+    policyName: policies.DcpReportApproval,
+    availableFor: 'tenantOnly',
   },
   {
     key: routes.LRReportApproval,
     Icon: LrBookIcon,
     title: 'Duyệt sổ đầu bài',
     route: routes.LRReportApproval,
-    policyName: policies.LRReportApproval
+    policyName: policies.LRReportApproval,
+    availableFor: 'tenantOnly',
   },
   {
     key: 'my-report',
     Icon: CreateIcon,
     title: 'Chấm điểm',
     policyName: policies.CreateNewDcpReport,
+    availableFor: 'tenantOnly',
     showSeparator: true,
     subItems: [
       {
@@ -79,6 +85,7 @@ const menuItems: IMenuItem[] = [
         title: 'Chấm điểm nề nếp',
         route: routes.MyDCPReport,
         policyName: policies.CreateNewDcpReport,
+        availableFor: 'tenantOnly',
       },
       {
         key: routes.MyLRReport,
@@ -86,6 +93,7 @@ const menuItems: IMenuItem[] = [
         title: 'Sổ đầu bài',
         route: routes.MyLRReport,
         policyName: policies.CreateNewLRReport,
+        availableFor: 'tenantOnly',
       }
     ]
   },
@@ -94,20 +102,23 @@ const menuItems: IMenuItem[] = [
     Icon: AssignmentIcon,
     title: 'Phân công',
     policyName: policies.GetScheduleList,
+    availableFor: 'tenantOnly',
     subItems: [
       {
         key: routes.DCPReportSchedule,
         Icon: AssignmentTurnedInIcon,
         title: 'Trực cờ đỏ',
         route: routes.DCPReportSchedule,
-        policyName: policies.AssignDcpReport
+        policyName: policies.AssignDcpReport,
+        availableFor: 'tenantOnly',
       },
       {
         key: routes.LRReportSchedule,
         Icon: ImportContactsIcon,
         title: 'Nộp sổ đầu bài',
         route: routes.LRReportSchedule,
-        policyName: policies.AssignLessonRegisterReport
+        policyName: policies.AssignLessonRegisterReport,
+        availableFor: 'tenantOnly',
       }
     ]
   },
@@ -118,13 +129,15 @@ const menuItems: IMenuItem[] = [
     route: routes.DCPRanking,
     policyName: policies.Rankings,
     showSeparator: true,
+    availableFor: 'tenantOnly',
   },
   {
     key: routes.DCPStatistics,
     Icon: ShowChartIcon,
     title: 'Thống kê',
     route: routes.DCPStatistics,
-    policyName: policies.Statistics
+    policyName: policies.Statistics,
+    availableFor: 'tenantOnly',
   },
   {
     key: routes.CoursesManager,
@@ -133,34 +146,48 @@ const menuItems: IMenuItem[] = [
     route: routes.CoursesManager,
     policyName: policies.Courses,
     showSeparator: true,
+    availableFor: 'tenantOnly',
   },
   {
     key: routes.TeachersManager,
     Icon: TeacherIcon,
     title: 'Giáo viên',
     route: routes.TeachersManager,
-    policyName: policies.Courses
+    policyName: policies.Courses,
+    availableFor: 'tenantOnly',
   },
   {
     key: routes.ClassesManager,
     Icon: LocalLibraryIcon,
     title: 'Lớp học',
     route: routes.ClassesManager,
-    policyName: policies.Courses
+    policyName: policies.Courses,
+    availableFor: 'tenantOnly',
   },
   {
     key: routes.StudentsManager,
     Icon: StudentIcon,
     title: 'Học sinh',
     route: routes.StudentsManager,
-    policyName: policies.Courses
+    policyName: (grantedPolicies) => grantedPolicies[policies.Courses],
+    availableFor: 'tenantOnly',
+  },
+  {
+    key: routes.StudentsManager,
+    Icon: StudentIcon,
+    title: 'Học sinh',
+    route: routes.StudentsManager,
+    policyName: (grantedPolicies) => grantedPolicies[policies.CoursesStudents] && !grantedPolicies[policies.Courses],
+    availableFor: 'tenantOnly',
+    showSeparator: true,
   },
   {
     key: routes.GradesManager,
     Icon: BookIcon,
     title: 'Khối',
     route: routes.GradesManager,
-    policyName: policies.Courses
+    policyName: policies.Courses,
+    availableFor: 'tenantOnly',
   },
   {
     key: routes.RegulationManager,
@@ -169,20 +196,30 @@ const menuItems: IMenuItem[] = [
     route: routes.RegulationManager,
     policyName: policies.Rules,
     showSeparator: true,
+    availableFor: 'tenantOnly',
   },
   {
     key: routes.CriteriaManager,
     Icon: CategoryIcon,
     title: 'Tiêu chí nề nếp',
     route: routes.CriteriaManager,
-    policyName: policies.Rules
+    policyName: policies.Rules,
+    availableFor: 'tenantOnly',
+  },
+  {
+    key: routes.SettingManager,
+    Icon: SettingsIcon,
+    title: 'Cài đặt',
+    route: routes.SettingManager,
+    policyName: policies.Rules,
+    availableFor: 'tenantOnly',
   },
   {
     key: routes.UsersManager,
     Icon: UserIcon,
     title: 'Người dùng',
     route: routes.UsersManager,
-    policyName: policies.AbpIdentityUsers,
+    policyName: policies.AbpIdentityUsersGet,
     showSeparator: true,
   },
   {
@@ -190,15 +227,16 @@ const menuItems: IMenuItem[] = [
     Icon: RoleIcon,
     title: 'Vai trò',
     route: routes.RolesManager,
-    policyName: policies.AbpIdentityRoles
+    policyName: policies.AbpIdentityRoles,
   },
   {
     key: routes.TenansManager,
     Icon: MultitenancyIcon,
-    title: 'Khách thuê',
+    title: 'Trường học',
     route: routes.TenansManager,
     policyName: policies.AbpTenantManagementTenants,
     showSeparator: true,
+    availableFor: 'hostOnly',
   }
 ];
 
@@ -207,12 +245,14 @@ interface IMenuItemProps {
   grantedPolicies: Util.IObject<boolean>;
   activeKey?: string;
   expand?: boolean;
+  currentTenant: any;
   onToggleExpand?: (key: string) => void;
 }
 
 const MenuItem: FC<IMenuItemProps> = ({
   item, 
   grantedPolicies,
+  currentTenant,
   activeKey,
   expand,
   onToggleExpand = () => {},
@@ -238,6 +278,10 @@ const MenuItem: FC<IMenuItemProps> = ({
   };
 
   const canAccess = hasAccessRight();
+
+  if ((item.availableFor === 'hostOnly' && !!currentTenant?.isAvailable) || (item.availableFor === 'tenantOnly' && !currentTenant?.isAvailable)) {
+    return null;
+  }
 
   if (canAccess) {
     if (item.subItems && item.subItems.length > 0) {
@@ -315,6 +359,7 @@ const Sidebar: FC<ISidebarProps> = () => {
   const [ expandKey, setExpandKey ] = useState<string | undefined>();
   const [ key, setKey ] = useState<string | undefined>();
   const grantedPolicies = useSelector(AppConfigSelector.grantedPolicies);
+  const { currentTenant } = useCurrentTenant();
 
   useEffect(() => {
     // Init active menu item
@@ -364,6 +409,7 @@ const Sidebar: FC<ISidebarProps> = () => {
                 grantedPolicies={grantedPolicies}
                 onToggleExpand={onToggleExpand}
                 expand={item.key === expandKey}    
+                currentTenant={currentTenant}
               />
             ))
           }

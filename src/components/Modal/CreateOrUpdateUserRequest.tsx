@@ -6,7 +6,7 @@ import AwesomeDebouncePromise from 'awesome-debounce-promise';
 import { Identity } from '../../interfaces';
 import { useDialogController } from '../../hooks';
 import { IdentityService } from '../../api';
-import { EMAIL_PATTERN, PASSWORD_PATTERN } from '../../utils/regex-pattern';
+import { EMAIL_PATTERN } from '../../utils/regex-pattern';
 
 export interface CreateOrUpdateUserRequestProps {
   editItem?: Identity.UserDto;
@@ -32,7 +32,7 @@ const CreateOrUpdateUserRequest: FC<CreateOrUpdateUserRequestProps> = ({
       phoneNumber: '',
       roleNames: [''],
       roles: [],
-      password: '',
+      password: 'password',
       extraProperties: {},
       concurrencyStamp: ''
     },
@@ -56,7 +56,7 @@ const CreateOrUpdateUserRequest: FC<CreateOrUpdateUserRequestProps> = ({
         email: email,
         phoneNumber: phoneNumber,
         roleNames: roles?.map(x => x.name) || [],
-        password: '',
+        password: 'password',
         extraProperties: {},
         concurrencyStamp: concurrencyStamp,
         roles: assignableRoles.filter(x => roles.some(ar => ar.id === x.id)),
@@ -72,7 +72,7 @@ const CreateOrUpdateUserRequest: FC<CreateOrUpdateUserRequestProps> = ({
       } else if (fieldName === 'roles') {
         setValue('roleNames', roles.map(x => x.name));
       }
-    })
+    });
     return () => subscription.unsubscribe();
   }, [ watch, setValue ]);
 
@@ -197,35 +197,6 @@ const CreateOrUpdateUserRequest: FC<CreateOrUpdateUserRequestProps> = ({
               label='Email đăng nhập' 
               required
               autoComplete="new-email"
-              style={{width: '40ch'}}
-              {...field}
-              error={!!error}
-              helperText={error?.message}
-            />
-          )}
-        />
-      </Box>
-      <Box style={{marginBottom: 16}}>
-        <Controller
-          control={control}
-          name="password"
-          rules={{
-            required: {
-              value: true,
-              message: 'Mật khẩu là bắt buộc'
-            },
-            pattern: {
-              value: PASSWORD_PATTERN,
-              message: 'Mật khẩu phải gồm 6-20 kí tự, chỉ có thể gồm 0-9, a-z, A-Z, _ và kí tự đầu tiên phải là chữ cái'
-            },
-          }}
-          render={({field, fieldState: { error }}) => (
-            <TextField
-              id='create-user-password' 
-              label='Mật khẩu đăng nhập'
-              type="password"
-              required
-              autoComplete='new-password'
               style={{width: '40ch'}}
               {...field}
               error={!!error}

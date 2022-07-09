@@ -13,6 +13,12 @@ const useStyles = makeStyles(theme => ({
   },
   tabs: {
     borderRight: `1px solid ${theme.palette.divider}`,
+    '& .MuiTab-wrapper': {
+      alignItems: 'flex-start',
+    },
+    '& .Mui-selected': {
+      color: theme.palette.primary.light
+    }
   },
   tabView: {
     flex: 1,

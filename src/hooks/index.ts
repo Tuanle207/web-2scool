@@ -7,3 +7,5 @@ export * from './useFetchV2';
 export * from './usePermissionCheck';
 export * from './useDialog';
 export * from './useDialogController';
+export * from './useCurrentUser';
+export * from './useCurrentTenant';

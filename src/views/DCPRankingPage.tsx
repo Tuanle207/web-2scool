@@ -69,14 +69,14 @@ const overallCols: GridColDef[] = [
   },
   {
     field: 'faults',
-    headerName: 'Lượt vi phạm',
+    headerName: 'Lượt chấm nề nếp',
     width: 150,
     align: 'center',
     headerAlign: 'center'
   },
   {
     field: 'penaltyPoints',
-    headerName: 'Điểm trừ',
+    headerName: 'Điểm',
     width: 150,
     align: 'center',
     headerAlign: 'center'
@@ -146,14 +146,14 @@ const dcpCols: GridColDef[] = [
   },
   {
     field: 'faults',
-    headerName: 'Lượt vi phạm',
-    width: 150,
+    headerName: 'Lượt chấm nề nếp',
+    width: 180,
     align: 'center',
     headerAlign: 'center'
   },
   {
     field: 'penaltyPoints',
-    headerName: 'Điểm trừ',
+    headerName: 'Điểm chấm',
     width: 150,
     align: 'center',
     headerAlign: 'center'

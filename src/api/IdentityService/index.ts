@@ -106,6 +106,12 @@ const doesStudentHaveAccountAlready = async (studentId: string) => {
   return result;
 };
 
+const doesTeacherHaveAccountAlready = async (teacherId: string) => {
+  const apiService = await getApiService();
+  const result = await apiService.get<string>(Endpoint.DoesTeacherHaveAccountAlready(teacherId));
+  return result;
+};
+
 const isRoleNameAlreadyUsed = async (roleName: string, roleId: string) => {
   const apiService = await getApiService();
   const result = await apiService.get<boolean>(Endpoint.IsRoleNameAlreadyUsed(roleId, roleName));
@@ -130,5 +136,6 @@ export const IdentityService = {
   deleteRoleById,
   isEmailAlreadyUsed,
   doesStudentHaveAccountAlready,
+  doesTeacherHaveAccountAlready,
   isRoleNameAlreadyUsed
 };

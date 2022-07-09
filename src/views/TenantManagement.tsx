@@ -27,7 +27,7 @@ const RowMenuCell = (props: RowMenuProps) => {
 
   const { showDialog } = useDialog({
     type: 'data',
-    title: 'Cập nhật khách thuê',
+    title: 'Cập nhật trường học',
     acceptText: 'Lưu',
     cancelText: 'Hủy',
     renderFormComponent: UpdateTenantRequest,
@@ -42,7 +42,7 @@ const RowMenuCell = (props: RowMenuProps) => {
     const { result } = await showDialog(null, {
       type: 'default',
       title: 'Xác nhận',
-      message: `Xác nhận xóa khách thuê ${tenantName}?`,
+      message: `Xác nhận xóa trường học ${tenantName}?`,
       acceptText: 'Xác nhận'
     });
     if (result !== 'Ok') {
@@ -52,10 +52,10 @@ const RowMenuCell = (props: RowMenuProps) => {
       busyService.busy(true);
       const tenantId = id.toString();
       await MultitenancyService.deleteTenantById(tenantId);
-      toast.success(`Xóa khách thuê ${tenantName} thành công!`);
+      toast.success(`Xóa trường học ${tenantName} thành công!`);
       reloadCurrentPageData();
     } catch {
-      toast.error('Đã có lỗi xảy ra. Không thể xóa khách thuê.');
+      toast.error('Đã có lỗi xảy ra. Không thể xóa trường học.');
     } finally {
       busyService.busy(false);
     }
@@ -81,10 +81,10 @@ const RowMenuCell = (props: RowMenuProps) => {
         },
       };
       await MultitenancyService.updateTenant({id: tenantId, data: tenant});
-      toast.success('Cập nhật thông tin khách thuê thành công');
+      toast.success('Cập nhật thông tin trường học thành công');
       reloadCurrentPageData();
     } catch {
-      toast.error('Đã có lỗi xảy ra. Không thể cập nhật khách thuê.');
+      toast.error('Đã có lỗi xảy ra. Không thể cập nhật trường học.');
     } finally {
       busyService.busy(false);
     }
@@ -102,7 +102,7 @@ const RowMenuCell = (props: RowMenuProps) => {
       };
       return input;
     } catch {
-      toast.error('Đã có lỗi xảy ra. Không thể khởi tạo dữ liệu để cập nhật khách thuê.');
+      toast.error('Đã có lỗi xảy ra. Không thể khởi tạo dữ liệu để cập nhật trường học.');
       return null;
     } finally {
       busyService.busy(false);
@@ -111,12 +111,12 @@ const RowMenuCell = (props: RowMenuProps) => {
 
   return (
     <div>
-      <Tooltip title='Cập nhật thông tin khách thuê này'>
+      <Tooltip title='Cập nhật thông tin trường học này'>
         <IconButton onClick={onRequestUpdate}>
           <EditIcon />
         </IconButton>
       </Tooltip>
-      <Tooltip title='Xóa khách thuê này'>
+      <Tooltip title='Xóa trường học này'>
         <IconButton onClick={onRequestDelete}>
           <DeleteIcon />
         </IconButton>
@@ -128,7 +128,7 @@ const RowMenuCell = (props: RowMenuProps) => {
 const cols: GridColDef[] =  [
   {
     field: 'name',
-    headerName: 'Tên khách thuê',
+    headerName: 'Tên trường học',
     width: 250,
   },
   {
@@ -166,7 +166,7 @@ const TenantManagement = () => {
 
   const { showDialog } = useDialog<CreateTenantFormData>({
     type: 'data',
-    title: 'Thêm khách thuê mới',
+    title: 'Thêm trường học mới',
     acceptText: 'Lưu',
     cancelText: 'Hủy',
     renderFormComponent: CreateTenantRequest
@@ -185,7 +185,7 @@ const TenantManagement = () => {
   } = useFetchV2({ fetchFn: fetchAPIDebounced });
 
   useEffect(() => {
-    document.title = '2Scool | Quản lý khách thuê';
+    document.title = '2Scool | Quản lý trường học';
   }, []);
 
   const onPageChange = (param: GridPageChangeParams) => {
@@ -213,10 +213,10 @@ const TenantManagement = () => {
         },
       };
       await MultitenancyService.createTenant(tenant);
-      toast.success('Thêm khách thuê thành công');
+      toast.success('Thêm trường học thành công');
       resetFilter();
     } catch {
-      toast.error('Đã có lỗi xảy ra. Không thể tạo khách thuê.');
+      toast.error('Đã có lỗi xảy ra. Không thể tạo trường học.');
     } finally {
       busyService.busy(false);
     }
@@ -227,8 +227,8 @@ const TenantManagement = () => {
       <Grid item >
         <Header
           onTextChange={(value) => setFilter({key: 'Name', comparison: comparers.Contains, value: value })}
-          searchBarPlaceholder="Tìm kiếm khách thuê"
-          pageName="Quản lý khách thuê"
+          searchBarPlaceholder="Tìm kiếm trường học"
+          pageName="Quản lý trường học"
         />
       </Grid>
       <Grid item container direction='column' style={{ flexGrow: 1 }}>
@@ -241,7 +241,7 @@ const TenantManagement = () => {
         >
           <Paper variant="outlined" elevation={1}>
             <PageTitleBar 
-              title={`Khách thuê`}
+              title={`Trường học`}
               filterCount={getFilterCount()}
               onMainButtonClick={onRequestCreate}
             />

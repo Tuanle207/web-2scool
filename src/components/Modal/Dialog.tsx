@@ -185,7 +185,7 @@ class Dialog extends Component<{}, ModalState> {
             }
           </Box>
           <Box>
-            <Grid item container style={this.state.height ? {...styles.content, height: this.state.height }: styles.content}>
+            <Grid item container className="auto-hidden-scroll" style={this.state.height ? {...styles.content, height: this.state.height }: styles.content}>
             {
               !!this.state.message ? (
                 <p>{this.state.message}</p>

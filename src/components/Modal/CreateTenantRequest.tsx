@@ -3,7 +3,7 @@ import { Controller, useForm } from 'react-hook-form';
 import AwesomeDebouncePromise from 'awesome-debounce-promise';
 import { useDialogController } from '../../hooks';
 import { MultitenancyService } from '../../api';
-import { EMAIL_PATTERN, PASSWORD_PATTERN } from '../../utils/regex-pattern';
+import { EMAIL_PATTERN, TENANT_NAME_PATTERN } from '../../utils/regex-pattern';
 
 export interface CreateTenantFormData {
   name: string;
@@ -21,7 +21,7 @@ const CreateTenantRequest = () => {
       name: '',
       displayName: '',
       adminEmailAddress: '',
-      adminPassword: '',
+      adminPassword: 'password',
     },
   });
 
@@ -33,7 +33,7 @@ const CreateTenantRequest = () => {
     }
     const isAlreadyUsed = await isNameAlreadyUsedDebounced(value, '');
     if (isAlreadyUsed) {
-      return 'Tên khách thuê này đã được sử dụng';
+      return 'Tên trường học này đã được sử dụng';
     }
   };
 
@@ -46,18 +46,22 @@ const CreateTenantRequest = () => {
           rules={{
             required: {
               value: true,
-              message: 'Tên khách thuê là bắt buộc'
+              message: 'Tên trường học là bắt buộc'
             },
             maxLength: {
               value: 50,
-              message: 'Tên khách thuê không thể vượt quá 50 kí tự'
+              message: 'Tên trường học không thể vượt quá 50 kí tự'
+            },
+            pattern: {
+              value: TENANT_NAME_PATTERN,
+              message: 'Tên trường học chỉ có thể bao gồm a-z,A-Z,-'
             },
             validate: validateUniqueName
           }}
           render={({field, fieldState: { error }}) => (
             <TextField 
               id='create-tenant-name' 
-              label='Tên khách thuê'
+              label='Tên trường học'
               required
               autoFocus
               autoComplete='off'
@@ -119,7 +123,7 @@ const CreateTenantRequest = () => {
           render={({field, fieldState: { error }}) => (
             <TextField 
               id='create-tenant-email' 
-              label='Email quản trị viên'
+              label='Email tài khoản quản trị viên'
               autoComplete='off'
               required
               style={{width: '40ch'}}
@@ -130,48 +134,6 @@ const CreateTenantRequest = () => {
           )}
         />
       </Box>
-      <Box style={{marginBottom: 16}}>
-        <Controller
-          control={control}
-          name="adminPassword"
-          rules={{
-            required: {
-              value: true,
-              message: 'Mật khẩu là bắt buộc'
-            },
-            pattern: {
-              value: PASSWORD_PATTERN,
-              message: 'Mật khẩu phải gồm 6-20 kí tự, chỉ có thể gồm 0-9, a-z, A-Z, _ và kí tự đầu tiên phải là chữ cái'
-            },
-          }}
-          render={({field, fieldState: { error }}) => (
-            <TextField 
-              id='create-tenant-pasword' 
-              label='Mật khẩu đăng nhập'
-              autoComplete='off'
-              type="password"
-              required
-              style={{width: '40ch'}}
-              {...field}
-              error={!!error}
-              helperText={error?.message}
-            />
-          )}
-        />
-      </Box>
-      {/* <Box style={{marginBottom: 16}}>
-        <div>
-        className={classes.button}
-
-        <Button
-          variant="contained"
-          color="default"
-          startIcon={<CloudUploadIcon />}
-        >
-          Upload
-        </Button>
-        </div>
-      </Box> */}
     </Container>
   );
 };

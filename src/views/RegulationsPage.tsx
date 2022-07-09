@@ -76,7 +76,13 @@ const RowMenuCell = (props: RowMenuProps) => {
     }
     try {
       busyService.busy(true);
-      await RegulationsService.updateRegulation(regulationId, data);
+      const formData: Regulation.CreateUpdateRegulationDto = {
+        displayName: data.displayName,
+        point: data.pointValue,
+        criteriaId: data.criteriaId,
+        type: data.type
+      };
+      await RegulationsService.updateRegulation(regulationId, formData);
       toast.success('Cập nhật quy định thành công');
       reloadCurrentPageData();
     } catch {
@@ -156,8 +162,18 @@ const cols: GridColDef[] =  [
   },
   {
     field: 'point',
-    headerName: 'Điểm trừ',
-    width: 120
+    headerName: 'Điểm',
+    width: 120,
+    valueFormatter: (params: GridValueFormatterParams) => {
+      const value = +(params.value as string);
+      if (value > 0) {
+        return `-${value}`
+      }
+      if (value < 0) {
+        return `+${Math.abs(value)}`
+      }
+      return ;
+    }
   },
   {
     field: 'actions',
@@ -258,7 +274,13 @@ const RegulationsPage = () => {
     }
     try {
       busyService.busy(true);
-      await RegulationsService.createRegulation(data);
+      const formData: Regulation.CreateUpdateRegulationDto = {
+        displayName: data.displayName,
+        point: data.pointValue,
+        criteriaId: data.criteriaId,
+        type: data.type
+      };
+      await RegulationsService.createRegulation(formData);
       toast.success('Thêm quy định thành công');
       resetFilter();
     } catch {

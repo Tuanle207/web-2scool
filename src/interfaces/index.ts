@@ -14,6 +14,7 @@ import { TaskAssignment } from './TaskAssignment';
 import { Profile } from './Profile';
 import { Tenant } from './Tenant';
 import { Account } from './Account';
+import { AppSetting } from './AppSetting';
 
 export type {
   Util,
@@ -32,4 +33,5 @@ export type {
   Profile,
   Tenant,
   Account,
+  AppSetting,
 };

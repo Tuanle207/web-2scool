@@ -37,7 +37,7 @@ const Endpoint = {
   UpdateUserRoleById: (id: string) =>
     `/api/identity/users/${id}/roles`,
   GetAssignableRoles: () =>
-    `/api/identity/users/assignable-roles`,
+    `/api/app/identity/assignable-roles`,
   CreateUser: () =>
     `/api/app/identity`,
   UpdateUser: (id: string) =>
@@ -50,6 +50,8 @@ const Endpoint = {
     `/api/app/identity/is-email-already-used?email=${email}&userId=${userId}`,
   DoesStudentHaveAccountAlready: (studentId: string) =>
     `/api/app/identity/does-student-have-account-already?studentId=${studentId}`,
+  DoesTeacherHaveAccountAlready: (teacherId: string) =>
+    `/api/app/identity/does-teacher-have-account-already?teacherId=${teacherId}`,
   IsRoleNameAlreadyUsed: (roleId: string, name: string) => 
     `api/app/identity/is-role-name-already-used?roleId=${roleId}&name=${name}`  
 }

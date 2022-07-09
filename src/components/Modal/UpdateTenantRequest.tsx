@@ -37,7 +37,7 @@ const UpdateTenantRequest: FC<UpdateTenantRequestProps> = ({
     }
     const isAlreadyUsed = await isNameAlreadyUsedDebounced(value, id);
     if (isAlreadyUsed) {
-      return 'Tên khách thuê này đã được sử dụng';
+      return 'Tên trường học này đã được sử dụng';
     }
   };
 
@@ -50,18 +50,18 @@ const UpdateTenantRequest: FC<UpdateTenantRequestProps> = ({
           rules={{
             required: {
               value: true,
-              message: 'Tên khách thuê là bắt buộc'
+              message: 'Tên trường học là bắt buộc'
             },
             maxLength: {
               value: 50,
-              message: 'Tên khách thuê không thể vượt quá 50 kí tự'
+              message: 'Tên trường học không thể vượt quá 50 kí tự'
             },
             validate: validateUniqueName
           }}
           render={({field, fieldState: { error }}) => (
             <TextField 
               id='create-tenant-name' 
-              label='Tên khách thuê'
+              label='Tên trường học'
               required
               autoFocus
               autoComplete='off'

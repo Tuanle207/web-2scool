@@ -45,7 +45,7 @@ const ClassRowMenuCell = (props: RowMenuProps) => {
       };
   
       dialogService.show(input, {
-        title: `Chi tiết vi phạm ${className} từ ${formatFullDateTimeWithoutTime(startTime.toLocaleString())} đến ${formatFullDateTimeWithoutTime(endTime.toLocaleString())}`,
+        title: `Chi tiết nề nếp ${className} từ ${formatFullDateTimeWithoutTime(startTime.toLocaleString())} đến ${formatFullDateTimeWithoutTime(endTime.toLocaleString())}`,
         renderFormComponent: StatsDetailView,
         noCancelButton: true,
         acceptText: 'Đóng',
@@ -134,7 +134,7 @@ const RegulationRowMenuCell = (props: RowMenuProps) => {
       };
 
       dialogService.show(input, {
-        title: `Chi tiết vi phạm ${regulationName} từ ${formatFullDateTimeWithoutTime(startTime.toLocaleString())} đến ${formatFullDateTimeWithoutTime(endTime.toLocaleString())}`,
+        title: `Chi tiết quy định ${regulationName} từ ${formatFullDateTimeWithoutTime(startTime.toLocaleString())} đến ${formatFullDateTimeWithoutTime(endTime.toLocaleString())}`,
         renderFormComponent: StatsDetailView,
         noCancelButton: true,
         acceptText: 'Đóng',
@@ -193,7 +193,7 @@ const StudentRowMenuCell = (props: RowMenuProps) => {
       };
 
       dialogService.show(input, {
-        title: `Chi tiết vi phạm của học sinh ${studentName} - ${className} từ ${formatFullDateTimeWithoutTime(startTime.toLocaleString())} đến ${formatFullDateTimeWithoutTime(endTime.toLocaleString())}`,
+        title: `Chi tiết nề nếp của học sinh ${studentName} - ${className} từ ${formatFullDateTimeWithoutTime(startTime.toLocaleString())} đến ${formatFullDateTimeWithoutTime(endTime.toLocaleString())}`,
         renderFormComponent: StatsDetailView,
         noCancelButton: true,
         acceptText: 'Đóng',
@@ -275,14 +275,14 @@ const classFaultsStatsCols: GridColDef[] = [
   },
   {
     field: 'faults',
-    headerName: 'Lượt vi phạm',
+    headerName: 'Lượt chấm',
     width: 150,
     align: 'center',
     headerAlign: 'right'
   },
   {
     field: 'penaltyPoints',
-    headerName: 'Tổng điểm trừ',
+    headerName: 'Điểm nề nếp',
     width: 150,
     align: 'center',
     headerAlign: 'right'
@@ -307,7 +307,7 @@ const classFaultsStatsCols: GridColDef[] = [
 const commonFaultsStasCols: GridColDef[] = [
   {
     field: 'name',
-    headerName: 'Tên Vi phạm',
+    headerName: 'Tên quy định',
     width: 300,
     flex: 2,
   },
@@ -319,7 +319,7 @@ const commonFaultsStasCols: GridColDef[] = [
   },
   {
     field: 'faults',
-    headerName: 'Lượt vi phạm',
+    headerName: 'Lượt chấm',
     width: 150,
     align: 'center',
     headerAlign: 'right'
@@ -347,7 +347,7 @@ const studentsWithMostFaultsStasCols: GridColDef[] = [
   },
   {
     field: 'faults',
-    headerName: 'Lượt vi phạm',
+    headerName: 'Lượt chấm',
     width: 150,
     align: 'center',
     headerAlign: 'right'
@@ -550,7 +550,7 @@ const DCPStatisticsPage = () => {
       return;
     }
     const { result } = await dialogService.show(null, {
-      title: `Xác nhận gửi email báo cáo vi phạm các lớp tới các giáo viên chủ nhiệm?`
+      title: `Xác nhận gửi email báo cáo nề nếp các lớp tới các giáo viên chủ nhiệm?`
     });
     if (result !== 'Ok') {
       return;
@@ -620,9 +620,9 @@ const DCPStatisticsPage = () => {
                   onChange={handleStatsTypeChange}
                   placeholder="Loại vi phạm"
                 >
-                  <MenuItem value={'ClassFaults'}>Lớp vi phạm</MenuItem>
-                  <MenuItem value={'CommonFaults'}>Lỗi vi phạm</MenuItem>
-                  <MenuItem value={'StudentWithMostFaults'}>Học sinh vi phạm</MenuItem>
+                  <MenuItem value={'ClassFaults'}>Lớp</MenuItem>
+                  <MenuItem value={'CommonFaults'}>Quy định</MenuItem>
+                  <MenuItem value={'StudentWithMostFaults'}>Học sinh</MenuItem>
                 </Select>
               </FormControl>
               <Chip 

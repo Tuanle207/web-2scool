@@ -28,9 +28,10 @@ import ProfilePage from '../views/ProfilePage';
 import RegulationsPage from '../views/RegulationsPage';
 import TenantManagement from '../views/TenantManagement';
 import Sidebar from '../components/Sidebar';
+import CriteriasPage from '../views/CriteriasPage';
+import AppSettingPage from '../views/AppSettingPage';
 import { policies } from '../appConsts';
 import { routes } from './routesDictionary';
-import CriteriasPage from '../views/CriteriasPage';
 
 const DashboardRouteDictionary = () => {
   return (
@@ -126,7 +127,6 @@ const DashboardRouteDictionary = () => {
       />
       <ProtectedRoute 
         path={routes.Profile}
-        // policyName={policies.Courses}
         component={ProfilePage}
       />
       <ProtectedRoute
@@ -142,7 +142,7 @@ const DashboardRouteDictionary = () => {
       />
       <ProtectedRoute 
         path={routes.StudentsManager}
-        policyName={policies.Courses}
+        policyName={policies.CoursesStudents}
         component={StudentsPage}
       />
       <ProtectedRoute 
@@ -165,9 +165,14 @@ const DashboardRouteDictionary = () => {
         policyName={policies.Rules}
         component={CriteriasPage}
       />
+      <ProtectedRoute
+        path={routes.SettingManager}
+        policyName={policies.Rules}
+        component={AppSettingPage}
+      />
       <ProtectedRoute 
         path={routes.UsersManager}
-        policyName={policies.AbpIdentityUsers}
+        policyName={policies.AbpIdentityUsersGet}
         component={UserManagement}
       />
       <ProtectedRoute 
@@ -181,7 +186,7 @@ const DashboardRouteDictionary = () => {
         component={TenantManagement}
       />
       <Route 
-        path='/errors'
+        path='/da-co-loi-xay-ra'
         component={ErrorPage}
       />
       <Redirect to={routes.Dashboard} />
@@ -190,6 +195,7 @@ const DashboardRouteDictionary = () => {
 };
 
 const DashboardRouter = () => {
+
   return (
     <Router>
       <div style={{ height: '100%' }}>
