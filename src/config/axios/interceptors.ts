@@ -21,16 +21,14 @@ const isTimeKey = (key: string) => {
 };
 
 const convertToUtcTime = (config: AxiosRequestConfig) => {
-  if (config.data === undefined || config.data === null) {
-    return;
-  }
   if (typeof config.data === 'string') {
     const data = JSON.parse(config.data);
     recursiveParseUtcTime(data);
     config.data = JSON.stringify(data);
   } else if (typeof config.data === 'object') {
-    const { data } = config;
+    const data = structuredClone(config.data);
     recursiveParseUtcTime(data);
+    config.data = data;
   }
 };
 
@@ -70,7 +68,9 @@ export const configHttpRequest = (axios: AxiosInstance) => {
 
     const { auth: { token } } = redux.store.getState() as IState;
     
-    convertToUtcTime(config);
+    if (config.data !== undefined && config.data !== null) {
+      convertToUtcTime(config);
+    }
 
     config.headers['Authorization'] = `Bearer ${token}`;
     config.headers['Accept-Language'] = 'vi-vn'
