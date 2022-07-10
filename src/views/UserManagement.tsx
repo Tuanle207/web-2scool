@@ -24,9 +24,6 @@ interface RowMenuProps {
 const RowMenuCell = (props: RowMenuProps) => {
   const { api, id } = props;
 
-  const canUpdateUser = usePermissionChecker(policies.AbpIdentityUsersUpdate);
-  const canDeleteUser = usePermissionChecker(policies.AbpIdentityUsersDelete);
-
   const { showDialog } = useDialog<CreateUpdateUserFormValues>({
     type: 'data',
     title: 'Cập nhật tài khoản người dùng',
