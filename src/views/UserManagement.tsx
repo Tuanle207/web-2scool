@@ -108,24 +108,16 @@ const RowMenuCell = (props: RowMenuProps) => {
 
   return (
     <div>
-    {
-      canUpdateUser && (
       <Tooltip title='Cập nhật thông tin người dùng này'>
         <IconButton size="small" onClick={onRequestUpdate}>
           <EditIcon />
         </IconButton>
       </Tooltip>
-      )
-    }
-    {
-      canDeleteUser && (
       <Tooltip title='Xóa người dùng này'>
         <IconButton size="small" onClick={onRequestDelete}>
           <DeleteIcon />
         </IconButton>
       </Tooltip>
-      )
-    }
     </div>
   );
 };
