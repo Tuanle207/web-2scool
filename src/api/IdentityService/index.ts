@@ -118,6 +118,11 @@ const isRoleNameAlreadyUsed = async (roleName: string, roleId: string) => {
   return result;
 };
 
+const resetUserPassword = async (userId: string) => {
+  const apiService = await getApiService();
+  const result = await apiService.post<string>(Endpoint.ResetUserPassWord(userId));
+  return result;
+}
 
 export const IdentityService = {
   getUsers,
@@ -137,5 +142,6 @@ export const IdentityService = {
   isEmailAlreadyUsed,
   doesStudentHaveAccountAlready,
   doesTeacherHaveAccountAlready,
-  isRoleNameAlreadyUsed
+  isRoleNameAlreadyUsed,
+  resetUserPassword,
 };

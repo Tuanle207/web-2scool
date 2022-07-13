@@ -7,3 +7,4 @@ export * from './regulationType';
 export * from './data-grid-locale';
 export * from './tenant-setting-type';
 export * from './app-setting-type';
+export * from './app-role';

@@ -53,7 +53,7 @@ const menuItems: IMenuItem[] = [
     title: 'Trang chủ',
     Icon: Dashboard,
     route: routes.Dashboard,
-    policyName: '',
+    policyName: policies.Statistics,
   },
   {
     key: routes.DCPReportApproval,
@@ -62,6 +62,7 @@ const menuItems: IMenuItem[] = [
     route: routes.DCPReportApproval,
     policyName: policies.DcpReportApproval,
     availableFor: 'tenantOnly',
+    showSeparator: true,
   },
   {
     key: routes.LRReportApproval,
@@ -145,7 +146,6 @@ const menuItems: IMenuItem[] = [
     Icon: FlagIcon,
     route: routes.CoursesManager,
     policyName: policies.Courses,
-    showSeparator: true,
     availableFor: 'tenantOnly',
   },
   {
@@ -215,6 +215,14 @@ const menuItems: IMenuItem[] = [
     availableFor: 'tenantOnly',
   },
   {
+    key: routes.TenantsManager,
+    Icon: MultitenancyIcon,
+    title: 'Trường học',
+    route: routes.TenantsManager,
+    policyName: policies.AbpTenantManagementTenants,
+    availableFor: 'hostOnly',
+  },
+  {
     key: routes.UsersManager,
     Icon: UserIcon,
     title: 'Người dùng',
@@ -229,15 +237,6 @@ const menuItems: IMenuItem[] = [
     route: routes.RolesManager,
     policyName: policies.AbpIdentityRoles,
   },
-  {
-    key: routes.TenansManager,
-    Icon: MultitenancyIcon,
-    title: 'Trường học',
-    route: routes.TenansManager,
-    policyName: policies.AbpTenantManagementTenants,
-    showSeparator: true,
-    availableFor: 'hostOnly',
-  }
 ];
 
 interface IMenuItemProps {

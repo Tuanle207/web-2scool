@@ -65,7 +65,7 @@ const DashboardRouteDictionary = () => {
         policyName={policies.GetMyDcpReport}
         component={MyDCPReportPage}
       />
-        <ProtectedRoute 
+      <ProtectedRoute 
         path={routes.MyLRReport}
         exact
         policyName={policies.GetMyLRReport}
@@ -181,7 +181,7 @@ const DashboardRouteDictionary = () => {
         component={RoleManagement}
       />
       <ProtectedRoute 
-        path={routes.TenansManager}
+        path={routes.TenantsManager}
         policyName={policies.AbpTenantManagementTenants}
         component={TenantManagement}
       />

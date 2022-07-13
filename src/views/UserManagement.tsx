@@ -5,15 +5,16 @@ import { DataGrid, GridApi, GridColDef, GridPageChangeParams, GridRowId, GridVal
 import { toast } from 'react-toastify';
 import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@material-ui/icons/Edit';
+import VpnKeyIcon from '@material-ui/icons/VpnKey';
 import Header from '../components/Header';
 import PageTitleBar from '../components/PageTitleBar';
 import FilterButton, { IFilterOption } from '../components/FilterButton';
 import { Identity } from '../interfaces';
 import { IdentityService } from '../api';
-import { useFetchV2, useDialog, usePermissionChecker } from '../hooks';
+import { useFetchV2, useDialog, usePermissionChecker, useCurrentTenant } from '../hooks';
 import CreateOrUpdateUserRequest, { CreateOrUpdateUserRequestProps, CreateUpdateUserFormValues } from '../components/Modal/CreateOrUpdateUserRequest';
 import { comparers, dataGridLocale, policies } from '../appConsts';
-import { busyService } from '../services';
+import { busyService, dialogService } from '../services';
 import useStyles from '../assets/jss/views/UserManagement';
 
 interface RowMenuProps {
@@ -84,6 +85,32 @@ const RowMenuCell = (props: RowMenuProps) => {
     }
   };
 
+  const onRequestResetPassword = async () => {
+    const userId = id.toString();
+    const userName = api.getCellValue(id, 'name')?.toString().toUpperCase();
+    const { result } = await dialogService.show(null, {
+      type: 'default',
+      title: 'Xác nhận',
+      message: `Xác nhận đặt lại mật khẩu cho người dùng ${userName}?`,
+      acceptText: 'Xác nhận'
+    });
+    if (result !== 'Ok') {
+      return;
+    }
+    try {
+      busyService.busy(true);
+      await IdentityService.resetUserPassword(userId);
+      toast.success('Thành công! Mật khẩu mới đã được gửi tới email của người dùng.')
+    }
+    catch {
+      toast.error('Đã có lỗi xảy ra. Không thể khởi đặt lại mật khẩu.');
+      return null;
+    }
+    finally {
+      busyService.busy(false);
+    }
+  };
+
   const initUpdateData = async () => {
     try {
       busyService.busy(true);
@@ -101,13 +128,18 @@ const RowMenuCell = (props: RowMenuProps) => {
     } finally {
       busyService.busy(false);
     }
-  }
+  };
 
   return (
     <div>
       <Tooltip title='Cập nhật thông tin người dùng này'>
         <IconButton size="small" onClick={onRequestUpdate}>
           <EditIcon />
+        </IconButton>
+      </Tooltip>
+      <Tooltip title='Đặt lại mật khẩu'>
+        <IconButton size="small" onClick={onRequestResetPassword}>
+          <VpnKeyIcon />
         </IconButton>
       </Tooltip>
       <Tooltip title='Xóa người dùng này'>
@@ -177,6 +209,8 @@ const UserManagement = () => {
   });
 
   const [ roleOptions, setRoleOptions ] = useState<IFilterOption[]>([]);
+
+  const { currentTenant } = useCurrentTenant();
 
   const { 
     pagingInfo,
@@ -261,9 +295,11 @@ const UserManagement = () => {
     }
   };
 
+  const items = currentTenant?.isAvailable ? data.items.filter(x => !x.roles.some(c => c.name === 'admin')) : data.items;
+
   return (
     <Grid style={{ background: '#fff', flexGrow: 1 }} item container direction='column'>
-      <Grid item >
+      <Grid item>
         <Header
           onTextChange={(value) => setFilter({key: 'Name', comparison: comparers.Contains, value: value })}
           searchBarPlaceholder="Tìm kiếm người dùng"
@@ -299,7 +335,7 @@ const UserManagement = () => {
           <Container className={classes.root}>
             <DataGrid
               columns={cols}
-              rows={data.items.filter(x => x.roles.every(c => c.name !== 'admin'))}
+              rows={items}
               pageSize={pagingInfo.pageSize} 
               rowCount={data.totalCount}
               onPageChange={onPageChange}

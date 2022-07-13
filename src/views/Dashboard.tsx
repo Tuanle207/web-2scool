@@ -8,7 +8,10 @@ import { Line, XAxis, YAxis, Tooltip as ChartToolTip, Legend, ResponsiveContaine
 import { useSelector } from 'react-redux';
 import TimelineIcon from '@material-ui/icons/Timeline';
 import { AppConfigSelector } from '../store/selectors';
-import { policies } from '../appConsts';
+import { appRole, policies } from '../appConsts';
+import { useCurrentTenant, useCurrentUser } from '../hooks';
+import { useHistory } from 'react-router';
+import { routes } from '../routers/routesDictionary';
 
 const list100colors = [
   '#00c49f',
@@ -41,6 +44,8 @@ type ViewType = 'DcpClass' | 'DcpFault';
 
 const Dashboard = () => {
 
+  const history = useHistory();
+
   const [ pointsChartData, setPointsChartData ] = useState<Util.IObject[]>([]);
   const [ faultsChartData, setFaultsChartData ] = useState<Util.IObject[]>([]);
 
@@ -49,16 +54,26 @@ const Dashboard = () => {
 
   const grantedPolicy = useSelector(AppConfigSelector.grantedPolicies);
 
+  const { currentTenant } = useCurrentTenant();
+  const { currentUser } = useCurrentUser();
+
   useEffect(() => {
     document.title = "2Scool | Trang chủ";
-
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
+    if (!currentTenant?.isAvailable && grantedPolicy[policies.AbpTenantManagementTenants]) {
+      history.replace(routes.TenantsManager);
+    }
+    if (currentTenant?.isAvailable && currentUser?.roles?.some(x => x === appRole.Admin)) {
+      history.replace(routes.CoursesManager);
+    }
     if (grantedPolicy[policies.Statistics]) {
       fetchDcpReportStatsData();
+      return;
     }
+    // eslint-disable-next-line
   }, [grantedPolicy]);
 
   const fetchDcpReportStatsData = async () => {

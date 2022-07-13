@@ -53,7 +53,9 @@ const Endpoint = {
   DoesTeacherHaveAccountAlready: (teacherId: string) =>
     `/api/app/identity/does-teacher-have-account-already?teacherId=${teacherId}`,
   IsRoleNameAlreadyUsed: (roleId: string, name: string) => 
-    `api/app/identity/is-role-name-already-used?roleId=${roleId}&name=${name}`  
+    `api/app/identity/is-role-name-already-used?roleId=${roleId}&name=${name}`,
+  ResetUserPassWord: (userId: string) => 
+    `api/app/identity/reset-password/${userId}`  
 }
 
 export default Endpoint;

@@ -10,7 +10,7 @@ import Header from '../components/Header';
 import PageTitleBar from '../components/PageTitleBar';
 import { Identity } from '../interfaces';
 import { IdentityService } from '../api';
-import { useDialog, useFetchV2 } from '../hooks';
+import { useCurrentTenant, useDialog, useFetchV2 } from '../hooks';
 import CreateOrUpdateRoleRequest from '../components/Modal/CreateOrUpdateRoleRequest';
 import UpdateRolePermissionsRequest, { UpdateRolePermissionsRequestProps } from '../components/Modal/UpdateRolePermissionsRequest';
 import { comparers, dataGridLocale } from '../appConsts';
@@ -196,6 +196,8 @@ const RoleManagement = () => {
 
   const classes = useStyles();
 
+  const { currentTenant } = useCurrentTenant();
+
   const { showDialog } = useDialog<Identity.CreateUpdateRoleDto>({
     type: 'data',
     title: 'Thêm vai trò mới',
@@ -244,6 +246,8 @@ const RoleManagement = () => {
     }
   };
 
+  const items = currentTenant?.isAvailable ? data.items.filter(x => x.name !== 'admin') : data.items;
+
   return (
     <Grid style={{ background: '#fff', flexGrow: 1 }} item container direction='column'>
       <Grid item >
@@ -271,7 +275,7 @@ const RoleManagement = () => {
           <Container className={classes.root}>
             <DataGrid
               columns={cols}
-              rows={data.items.filter(x => x.name !== 'admin')}
+              rows={items}
               pageSize={pagingInfo.pageSize} 
               rowCount={data.totalCount}
               onPageChange={onPageChange}
