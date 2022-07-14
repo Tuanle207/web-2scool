@@ -21,6 +21,9 @@ const isTimeKey = (key: string) => {
 };
 
 const convertToUtcTime = (config: AxiosRequestConfig) => {
+  if (config.headers['Content-Type'] === 'multipart/form-data') {
+    return;
+  }
   if (typeof config.data === 'string') {
     const data = JSON.parse(config.data);
     recursiveParseUtcTime(data);
